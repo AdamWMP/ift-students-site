@@ -216,6 +216,39 @@ export const welcomeVideos: Record<string, { url: string; embedUrl: string }> = 
   },
 };
 
+// ─── Special Offers (time-limited) ─────────────────────────────────
+// Each offer targets a package by ID, overrides price/minDeposit, and
+// expires at a given UTC date-time. After expiry the normal price applies.
+export interface SpecialOffer {
+  packageId: string;
+  price: number;
+  originalPrice: number;
+  minDeposit: number;
+  expires: string; // ISO 8601 date-time (UTC)
+  label: string;
+}
+
+export const specialOffers: SpecialOffer[] = [
+  {
+    packageId: 'pro-coach',
+    price: 2600,
+    originalPrice: 2800,
+    minDeposit: 350,
+    expires: '2026-04-01T00:00:00+01:00', // midnight IST March 31
+    label: 'Special Offer — Today Only',
+  },
+];
+
+/** Get the active special offer for a package (if any). */
+export function getActiveOffer(packageId: string): SpecialOffer | null {
+  const now = new Date();
+  return (
+    specialOffers.find(
+      (o) => o.packageId === packageId && new Date(o.expires) > now
+    ) ?? null
+  );
+}
+
 // ─── Helper Functions ───────────────────────────────────────────────
 
 /** Get available timetables for a location */
