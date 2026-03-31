@@ -67,7 +67,7 @@ const locations = [
     city: 'Clare',
     venue: 'The Pilates Playground',
     address: 'Unit 19, Ballycasey Craft & Design Centre, Shannon, Co. Clare, V14 EA30',
-    courses: ['Personal Trainer'],
+    courses: ['Reformer Pilates'],
     schedule: 'Saturdays',
     highlight: false,
     mapUrl: 'https://maps.google.com/?q=Ballycasey+Craft+and+Design+Centre+Shannon+Clare',
