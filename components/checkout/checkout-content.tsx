@@ -81,6 +81,7 @@ function CheckoutForm() {
     discountType: 'flat' | 'percent';
     discountValue: number;
     description: string;
+    minDeposit?: number;
   } | null>(null);
 
   const selectedPackage = useMemo(
@@ -107,12 +108,14 @@ function CheckoutForm() {
   const combinedPrice = (selectedPackage?.price ?? 0) + addOnsTotal;
 
   // Recalculate months when package changes
+  const effectiveMinDeposit = appliedCoupon?.minDeposit ?? selectedPackage?.minDeposit ?? 500;
+
   useEffect(() => {
     if (selectedPackage) {
       setMonths((prev) => Math.min(prev, selectedPackage.maxMonths));
-      setDepositAmount((prev) => Math.max(prev, selectedPackage.minDeposit));
+      setDepositAmount((prev) => Math.max(prev, effectiveMinDeposit));
     }
-  }, [selectedPackage]);
+  }, [selectedPackage, effectiveMinDeposit]);
 
   // ─── Coupon Discount Calculation ────────────────────────────────────
   const discount = useMemo(() => {
@@ -743,7 +746,7 @@ function CheckoutForm() {
                       </div>
                       <input
                         type="range"
-                        min={selectedPackage.minDeposit}
+                        min={effectiveMinDeposit}
                         max={discountedPrice}
                         step={50}
                         value={depositAmount}
@@ -751,7 +754,7 @@ function CheckoutForm() {
                         className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-gold slider-gold"
                       />
                       <div className="flex justify-between text-xs text-zinc-500 mt-1">
-                        <span>&euro;{selectedPackage.minDeposit} min</span>
+                        <span>&euro;{effectiveMinDeposit} min</span>
                         <span>&euro;{discountedPrice.toLocaleString()} (pay in full)</span>
                       </div>
                     </div>

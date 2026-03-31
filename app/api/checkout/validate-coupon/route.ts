@@ -26,6 +26,11 @@ export async function POST(req: NextRequest) {
     // Package-specific coupon restrictions
     const CERT_ONLY_COUPONS = ['THECERT200'];
     const CAREER_ONLY_COUPONS = ['CAREER300', 'THECAREER300'];
+
+    // Coupons that override the minimum deposit amount
+    const COUPON_DEPOSIT_OVERRIDES: Record<string, number> = {
+      THECERT200: 300,
+    };
     if (packageId) {
       if (CAREER_ONLY_COUPONS.includes(trimmedCode) && packageId === 'pro-coach') {
         return NextResponse.json({ valid: false, error: 'Wrong coupon for this programme' });
@@ -167,7 +172,8 @@ export async function POST(req: NextRequest) {
       type = 'flat';
     }
 
-    console.log(`[Coupon] Valid coupon: "${trimmedCode}" → ${type} discount of ${discountValue} (${couponName}), ${remaining} uses remaining`);
+    const depositOverride = COUPON_DEPOSIT_OVERRIDES[trimmedCode];
+    console.log(`[Coupon] Valid coupon: "${trimmedCode}" → ${type} discount of ${discountValue} (${couponName}), ${remaining} uses remaining${depositOverride !== undefined ? `, minDeposit override: €${depositOverride}` : ''}`);
 
     return NextResponse.json({
       valid: true,
@@ -178,6 +184,7 @@ export async function POST(req: NextRequest) {
         discountType: type,
         discountValue: discountValue,
         description: coupon.discount_description || '',
+        ...(depositOverride !== undefined && { minDeposit: depositOverride }),
       },
     });
   } catch (err) {
