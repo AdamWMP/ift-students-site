@@ -61,7 +61,9 @@ const startDates = [
   { id: '14', date: '2026-05-10', scheduleId: 'saturdays', locationId: 'belfast', spotsLeft: 15, status: 'available' },
 ]
 
-const packages = [
+import { getActiveOffer } from '@/lib/course-data'
+
+const basePackages = [
   {
     id: 'pro-coach',
     name: 'Pro Coach',
@@ -95,6 +97,15 @@ const packages = [
     popular: true,
   },
 ]
+
+// Apply any active special offers to packages
+const packages = basePackages.map((pkg) => {
+  const offer = getActiveOffer(pkg.id)
+  if (offer) {
+    return { ...pkg, price: offer.price, deposit: offer.minDeposit, monthlyFrom: Math.ceil((offer.price - offer.minDeposit) / 8) }
+  }
+  return pkg
+})
 
 const steps = [
   { id: 1, label: 'Location', icon: MapPin },
@@ -597,7 +608,7 @@ export default function PTTimetableWizard() {
               }`}
             >
               <CreditCard className="w-4 h-4" />
-              <span>{selectedPayment === 'deposit' ? 'Pay €500 Deposit' : 'Pay in Full'}</span>
+              <span>{selectedPayment === 'deposit' ? `Pay €${packageData?.deposit ?? 500} Deposit` : 'Pay in Full'}</span>
             </button>
             <a
               href={getWhatsAppUrl()}
