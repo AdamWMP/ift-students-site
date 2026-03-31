@@ -64,6 +64,15 @@ const locations = [
     mapUrl: 'https://maps.google.com/?q=Predator+Fitness+Wexford',
   },
   {
+    city: 'Clare',
+    venue: 'The Pilates Playground',
+    address: 'Unit 19, Ballycasey Craft & Design Centre, Shannon, Co. Clare, V14 EA30',
+    courses: ['Personal Trainer'],
+    schedule: 'Saturdays',
+    highlight: false,
+    mapUrl: 'https://maps.google.com/?q=Ballycasey+Craft+and+Design+Centre+Shannon+Clare',
+  },
+  {
     city: 'Belfast',
     venue: 'Momentum Fitness',
     address: 'Unit 7, 220 Stewartstown Rd, Belfast',
@@ -101,7 +110,7 @@ export default function LocationsContent() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/30 rounded-full mb-6">
               <MapPin className="w-4 h-4 text-gold" />
-              <span className="text-sm text-gold font-medium">7 Locations Across Ireland</span>
+              <span className="text-sm text-gold font-medium">8 Locations Across Ireland</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6">

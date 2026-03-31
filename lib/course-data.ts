@@ -173,6 +173,7 @@ export const locations: Location[] = [
   { id: 'galway',   name: 'Galway',            address: 'N17 Business Park, Galway Rd, Tuam, Co. Galway' },
   { id: 'limerick', name: 'Limerick',          address: 'Limerick City' },
   { id: 'wexford',  name: 'Wexford',           address: 'Wexford Town' },
+  { id: 'clare',    name: 'Clare',             address: 'Unit 19, Ballycasey Craft & Design Centre, Shannon, Co. Clare, V14 EA30' },
   { id: 'online',   name: 'Online',            address: 'Live online sessions — flexible scheduling' },
 ];
 
@@ -191,9 +192,9 @@ export const courseStartDates: CourseStartDate[] = [
   // Dublin (Swords & Tallaght) — 8-Week Full Time
   { date: '2026-07-02', label: '2 July 2026',   locations: ['swords', 'tallaght'], timetable: '8-week-intensive' },
   // Cork, Galway, Limerick, Wexford — Saturday 16-Week
-  { date: '2026-04-25', label: '25 April 2026', locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '16-week-saturday' },
-  // Cork, Galway, Limerick, Wexford — 8-Week Full Time
-  { date: '2026-07-02', label: '2 July 2026',   locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '8-week-intensive' },
+  { date: '2026-04-25', label: '25 April 2026', locations: ['cork', 'galway', 'limerick', 'wexford', 'clare'], timetable: '16-week-saturday' },
+  // Cork, Galway, Limerick, Wexford, Clare — 8-Week Full Time
+  { date: '2026-07-02', label: '2 July 2026',   locations: ['cork', 'galway', 'limerick', 'wexford', 'clare'], timetable: '8-week-intensive' },
 ];
 
 // ─── Welcome Videos (per timetable type) ────────────────────────────
