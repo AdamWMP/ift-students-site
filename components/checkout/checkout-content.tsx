@@ -38,6 +38,12 @@ interface FormData {
   startDate: string;
 }
 
+// ─── Coupon deposit overrides ─────────────────────────────────────────
+// Coupon codes that lower the minimum deposit below the package default
+const COUPON_DEPOSIT_OVERRIDES: Record<string, number> = {
+  THECERT200: 350,
+};
+
 // ─── Main Component ──────────────────────────────────────────────────
 export function CheckoutContent() {
   return <CheckoutForm />;
@@ -107,19 +113,19 @@ function CheckoutForm() {
   // Combined total (package + add-ons)
   const combinedPrice = (selectedPackage?.price ?? 0) + addOnsTotal;
 
-  // Recalculate months when package changes
-  const effectiveMinDeposit = appliedCoupon?.minDeposit ?? selectedPackage?.minDeposit ?? 500;
+  // Effective minimum deposit — coupon code may override the package default
+  const effectiveMinDeposit = useMemo(() => {
+    if (appliedCoupon?.code && COUPON_DEPOSIT_OVERRIDES[appliedCoupon.code] !== undefined) {
+      return COUPON_DEPOSIT_OVERRIDES[appliedCoupon.code];
+    }
+    return selectedPackage?.minDeposit ?? 500;
+  }, [appliedCoupon, selectedPackage]);
 
+  // Snap deposit to the effective minimum whenever package or coupon changes
   useEffect(() => {
     if (selectedPackage) {
       setMonths((prev) => Math.min(prev, selectedPackage.maxMonths));
-      // Clamp deposit: must be at or above the effective minimum (coupon may lower it)
-      setDepositAmount((prev) => {
-        if (prev < effectiveMinDeposit) return effectiveMinDeposit;
-        // If deposit was at the old package minimum and the coupon lowers it, snap to new minimum
-        if (prev === selectedPackage.minDeposit && effectiveMinDeposit < selectedPackage.minDeposit) return effectiveMinDeposit;
-        return prev;
-      });
+      setDepositAmount(effectiveMinDeposit);
     }
   }, [selectedPackage, effectiveMinDeposit]);
 
