@@ -44,19 +44,12 @@ const COUPON_DEPOSIT_OVERRIDES: Record<string, number> = {
   THECERT200: 350,
 };
 
-// ─── Price Override (for private/special checkout links) ─────────────
-export interface PriceOverride {
-  price: number;
-  originalPrice?: number;
-  minDeposit: number;
-}
-
 // ─── Main Component ──────────────────────────────────────────────────
-export function CheckoutContent({ priceOverrides }: { priceOverrides?: Record<string, PriceOverride> } = {}) {
-  return <CheckoutForm priceOverrides={priceOverrides} />;
+export function CheckoutContent() {
+  return <CheckoutForm />;
 }
 
-function CheckoutForm({ priceOverrides }: { priceOverrides?: Record<string, PriceOverride> }) {
+function CheckoutForm() {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
   const [depositAmount, setDepositAmount] = useState(300);
@@ -100,16 +93,12 @@ function CheckoutForm({ priceOverrides }: { priceOverrides?: Record<string, Pric
   const selectedPackage = useMemo(() => {
     const pkg = packages.find((p) => p.id === selectedPackageId) ?? null;
     if (!pkg) return null;
-    const override = priceOverrides?.[pkg.id];
-    if (override) {
-      return { ...pkg, price: override.price, originalPrice: override.originalPrice ?? pkg.price, minDeposit: override.minDeposit };
-    }
     const offer = getActiveOffer(pkg.id);
     if (offer) {
       return { ...pkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit };
     }
     return pkg;
-  }, [selectedPackageId, priceOverrides]);
+  }, [selectedPackageId]);
 
   // Add-on total
   const addOnsTotal = useMemo(() => {
@@ -493,13 +482,8 @@ function CheckoutForm({ priceOverrides }: { priceOverrides?: Record<string, Pric
                 >
                   <div className="space-y-3 pt-3">
                     {packages.map((basePkg) => {
-                      const override = priceOverrides?.[basePkg.id];
-                      const offer = !override ? getActiveOffer(basePkg.id) : null;
-                      const pkg = override
-                        ? { ...basePkg, price: override.price, originalPrice: override.originalPrice ?? basePkg.price, minDeposit: override.minDeposit }
-                        : offer
-                          ? { ...basePkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit }
-                          : basePkg;
+                      const offer = getActiveOffer(basePkg.id);
+                      const pkg = offer ? { ...basePkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit } : basePkg;
                       const isComingSoon = pkg.comingSoon;
                       return (
                         <motion.button
@@ -525,12 +509,12 @@ function CheckoutForm({ priceOverrides }: { priceOverrides?: Record<string, Pric
                               COMING SOON
                             </div>
                           )}
-                          {(offer || override) && !isComingSoon && (
+                          {offer && !isComingSoon && (
                             <div className="absolute -top-2.5 right-4 px-2 py-0.5 bg-red-500/90 text-white text-[10px] md:text-xs font-bold rounded-full animate-pulse">
-                              {offer?.label ?? 'Special Offer'}
+                              {offer.label}
                             </div>
                           )}
-                          {pkg.badge && !offer && !override && !isComingSoon && (
+                          {pkg.badge && !offer && !isComingSoon && (
                             <div className="absolute -top-2.5 right-4 px-2 py-0.5 bg-red-500/90 text-white text-[10px] md:text-xs font-bold rounded-full">
                               {pkg.badge}
                             </div>
@@ -554,12 +538,12 @@ function CheckoutForm({ priceOverrides }: { priceOverrides?: Record<string, Pric
                               )}
                             </div>
                             <div className="text-right flex-shrink-0">
-                              {(offer || override) && pkg.originalPrice && (
+                              {offer && (
                                 <span className="text-sm text-zinc-500 line-through block">
-                                  &euro;{pkg.originalPrice.toLocaleString()}
+                                  &euro;{offer.originalPrice.toLocaleString()}
                                 </span>
                               )}
-                              <span className={`text-xl md:text-2xl font-bold block ${isComingSoon ? 'text-zinc-600' : (offer || override) ? 'text-gold' : 'text-white'}`}>
+                              <span className={`text-xl md:text-2xl font-bold block ${isComingSoon ? 'text-zinc-600' : offer ? 'text-gold' : 'text-white'}`}>
                                 &euro;{pkg.price.toLocaleString()}
                               </span>
                               {!isComingSoon && (
