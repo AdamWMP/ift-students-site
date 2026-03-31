@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     // Coupons that override the minimum deposit amount
     const COUPON_DEPOSIT_OVERRIDES: Record<string, number> = {
-      THECERT200: 300,
+      THECERT200: 350,
     };
     if (packageId) {
       if (CAREER_ONLY_COUPONS.includes(trimmedCode) && packageId === 'pro-coach') {

@@ -113,7 +113,13 @@ function CheckoutForm() {
   useEffect(() => {
     if (selectedPackage) {
       setMonths((prev) => Math.min(prev, selectedPackage.maxMonths));
-      setDepositAmount((prev) => Math.max(prev, effectiveMinDeposit));
+      // Clamp deposit: must be at or above the effective minimum (coupon may lower it)
+      setDepositAmount((prev) => {
+        if (prev < effectiveMinDeposit) return effectiveMinDeposit;
+        // If deposit was at the old package minimum and the coupon lowers it, snap to new minimum
+        if (prev === selectedPackage.minDeposit && effectiveMinDeposit < selectedPackage.minDeposit) return effectiveMinDeposit;
+        return prev;
+      });
     }
   }, [selectedPackage, effectiveMinDeposit]);
 
