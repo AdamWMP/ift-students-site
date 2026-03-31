@@ -1,0 +1,119 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  region    String
+  address   String
+  schedules Schedule[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Schedule {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  duration    String
+  icon        String
+  times       String
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+  startDates  StartDate[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StartDate {
+  id         String   @id @default(cuid())
+  date       DateTime
+  spotsLeft  Int      @default(12)
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  bookings   Booking[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Package {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  price       Float
+  fundedPrice Float?
+  description String?
+  features    String?
+  popular     Boolean  @default(false)
+  bookings    Booking[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tutor {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  bio       String?
+  imageUrl  String?
+  location  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id                  String   @id @default(cuid())
+  firstName           String
+  lastName            String
+  email               String
+  phone               String
+  packageId           String
+  package             Package  @relation(fields: [packageId], references: [id])
+  startDateId         String
+  startDate           StartDate @relation(fields: [startDateId], references: [id])
+  depositAmount       Float
+  totalAmount         Float
+  remainingBalance    Float
+  monthlyPayment      Float
+  paymentMonths       Int      @default(12)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  paymentStatus       String   @default("pending")
+  paymentsCompleted   Int      @default(0)
+  ontraportContactId  String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  course    String
+  content   String
+  imageUrl  String?
+  rating    Int      @default(5)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

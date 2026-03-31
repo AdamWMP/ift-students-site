@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #D4A836;
+  --charcoal: #1a1a1a;
+  --cache-bust: 20260218;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0d0d0d;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide hydration errors */
+[data-hydration-error] {
+  display: none !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4A836;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E5B82A;
+}
+
+/* Gold text gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #D4A836 0%, #F5D966 50%, #D4A836 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button styles */
+.btn-gold {
+  @apply bg-gold text-black font-semibold px-6 py-3 rounded-lg transition-all duration-300;
+  @apply hover:bg-gold-400 hover:shadow-lg hover:shadow-gold/30;
+  @apply active:scale-95;
+}
+
+.btn-outline {
+  @apply border-2 border-gold text-gold font-semibold px-6 py-3 rounded-lg transition-all duration-300;
+  @apply hover:bg-gold hover:text-black;
+}
+
+/* Card styles */
+.card {
+  @apply bg-charcoal-800 rounded-xl p-6 transition-all duration-300;
+  @apply hover:shadow-xl hover:shadow-gold/10 hover:-translate-y-1;
+}
+
+/* Section backgrounds */
+.section-dark {
+  @apply bg-charcoal-950;
+}
+
+.section-light {
+  @apply bg-charcoal-900;
+}
+
+/* Mobile-first tap targets */
+@media (max-width: 768px) {
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Parallax effect container */
+.parallax-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-bg {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  right: 0;
+  bottom: -10%;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+
+/* WhatsApp button animation */
+.whatsapp-btn {
+  animation: pulseGold 2s ease-in-out infinite;
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(194, 152, 40, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(194, 152, 40, 0);
+  }
+}
+
+/* Safe area for iPhone notches */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
