@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Check, Award, ArrowRight, Star, Play, ChevronDown, ChevronUp,
   BookOpen, Brain, TrendingUp, Lock, AlertCircle, X,
@@ -188,36 +188,35 @@ const previews = [
     tag: 'Science',
     title: 'Setting Up a Healthy Diet',
     description: 'The foundational framework for building a client\'s nutrition plan — covering calorie targets, macronutrient ratios, and practical meal structuring.',
+    videoId: 'GzjgTplMxKQ',
   },
   {
     unit: 'Unit 04 · Full Lesson',
     tag: 'Hot Topics',
     title: 'Creatine — The Full Picture',
     description: 'A deep dive into the most researched supplement in sport — what the science actually says, how to use it, and how to advise clients confidently.',
-  },
-  {
-    unit: 'Unit 03 · Full Lesson',
-    tag: 'Performance',
-    title: 'Maintaining Muscle During Fat Loss',
-    description: 'One of the most common client goals — learn the exact strategies to preserve performance and muscle mass while in a calorie deficit.',
+    videoId: 'h72fQUx9LrM',
   },
   {
     unit: 'Unit 05 · Full Lesson',
     tag: 'Coaching Psychology',
     title: 'Identifying Behavioural Patterns',
     description: 'Learn to spot the habits and thought patterns that keep clients stuck — and the coaching techniques to help them break through.',
+    videoId: 'Zp667wlWLjw',
   },
   {
     unit: 'Unit 05 · Full Lesson',
     tag: 'Coaching Psychology',
     title: 'Cognitive Behavioural Therapy Skills',
     description: 'A practical introduction to CBT techniques for coaches — how to help clients reframe negative thinking and build sustainable habits.',
+    videoId: '2kKEK7ue7g0',
   },
   {
     unit: 'Unit 08 · Social Reel',
     tag: 'Client Content',
     title: 'Chicken Salad — Client Content Reel',
     description: 'A sample of the ready-to-use social media recipe reels included in the course — download and post directly to your channels.',
+    videoId: null,
   },
 ]
 
@@ -614,49 +613,7 @@ export default function NutriCertContent() {
 
       {/* ── Course Previews ───────────────────────────────────── */}
       <section id="preview" className="py-16 sm:py-24 bg-charcoal-950">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <p className="text-sm tracking-[0.25em] text-gold uppercase mb-4">COURSE PREVIEW</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-              See What&apos;s Inside the Course.
-            </h2>
-            <p className="text-white/60 max-w-2xl mx-auto">
-              These are real lessons from the course — no edited highlights, no trailers. This is exactly what you get.
-            </p>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {previews.map((preview, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                className="group bg-charcoal-900 border border-charcoal-800 hover:border-gold/30 rounded-2xl overflow-hidden transition-colors"
-              >
-                {/* Thumbnail placeholder */}
-                <div className="relative aspect-video bg-charcoal-800 flex items-center justify-center">
-                  <div className="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center group-hover:bg-gold/20 transition-colors">
-                    <Lock className="w-6 h-6 text-gold/60 group-hover:hidden" />
-                    <Play className="w-6 h-6 text-gold hidden group-hover:block ml-0.5" fill="currentColor" />
-                  </div>
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <span className="px-2 py-0.5 bg-gold text-black text-xs font-bold rounded">FREE PREVIEW</span>
-                    <span className="px-2 py-0.5 bg-charcoal-900/80 text-white/70 text-xs rounded">{preview.tag}</span>
-                  </div>
-                  <p className="absolute bottom-2 right-3 text-white/40 text-xs">{preview.unit}</p>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-semibold text-white mb-2">{preview.title}</h3>
-                  <p className="text-white/55 text-sm leading-relaxed">{preview.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <p className="text-white/50 text-sm mb-4">Ready to unlock all 10 units and 100+ lessons?</p>
-            <button onClick={scrollToCheckout} className="btn-gold inline-flex items-center gap-2">
-              ENROL TO UNLOCK ALL CONTENT <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+        <VideoPreviewSection scrollToCheckout={scrollToCheckout} />
       </section>
 
       {/* ── Testimonials ──────────────────────────────────────── */}
@@ -868,6 +825,134 @@ export default function NutriCertContent() {
           </motion.div>
         </div>
       </section>
+    </>
+  )
+}
+
+// ─── Video Preview Section ─────────────────────────────────────────
+function VideoPreviewSection({ scrollToCheckout }: { scrollToCheckout: () => void }) {
+  const [activeVideo, setActiveVideo] = useState<string | null>(null)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setActiveVideo(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = activeVideo ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [activeVideo])
+
+  return (
+    <>
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <p className="text-sm tracking-[0.25em] text-gold uppercase mb-4">COURSE PREVIEW</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+            See What&apos;s Inside the Course.
+          </h2>
+          <p className="text-white/60 max-w-2xl mx-auto">
+            These are real lessons from the course — no edited highlights, no trailers. This is exactly what you get.
+          </p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {previews.map((preview, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              onClick={() => preview.videoId && setActiveVideo(preview.videoId)}
+              className={`group bg-charcoal-900 border rounded-2xl overflow-hidden transition-colors ${preview.videoId ? 'border-charcoal-800 hover:border-gold/40 cursor-pointer' : 'border-charcoal-800 opacity-70'}`}
+            >
+              {/* Thumbnail */}
+              <div className="relative aspect-video bg-charcoal-800 overflow-hidden">
+                {preview.videoId ? (
+                  <>
+                    <img
+                      src={`https://img.youtube.com/vi/${preview.videoId}/hqdefault.jpg`}
+                      alt={preview.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+                    {/* Play button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-14 h-14 bg-gold rounded-full flex items-center justify-center shadow-lg shadow-gold/30 group-hover:scale-110 transition-transform">
+                        <Play className="w-6 h-6 text-black ml-1" fill="currentColor" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-14 h-14 bg-charcoal-700 rounded-full flex items-center justify-center">
+                      <Lock className="w-6 h-6 text-white/30" />
+                    </div>
+                  </div>
+                )}
+                <div className="absolute top-3 left-3 flex gap-2">
+                  {preview.videoId
+                    ? <span className="px-2 py-0.5 bg-gold text-black text-xs font-bold rounded">FREE PREVIEW</span>
+                    : <span className="px-2 py-0.5 bg-charcoal-700 text-white/50 text-xs font-semibold rounded">WITH ENROLMENT</span>
+                  }
+                  <span className="px-2 py-0.5 bg-black/60 text-white/70 text-xs rounded">{preview.tag}</span>
+                </div>
+                <p className="absolute bottom-2 right-3 text-white/40 text-xs">{preview.unit}</p>
+              </div>
+              <div className="p-5">
+                <h3 className="font-semibold text-white mb-2 group-hover:text-gold transition-colors">{preview.title}</h3>
+                <p className="text-white/55 text-sm leading-relaxed">{preview.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="text-center mt-10">
+          <p className="text-white/50 text-sm mb-4">Ready to unlock all 10 units and 100+ lessons?</p>
+          <button onClick={scrollToCheckout} className="btn-gold inline-flex items-center gap-2">
+            ENROL TO UNLOCK ALL CONTENT <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Video Modal ────────────────────────────────────────── */}
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl bg-charcoal-950 rounded-2xl overflow-hidden border border-charcoal-700 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-charcoal-800">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-gold text-black text-xs font-bold rounded">FREE PREVIEW</span>
+                <span className="text-white/50 text-sm">{previews.find(p => p.videoId === activeVideo)?.title}</span>
+              </div>
+              <button
+                onClick={() => setActiveVideo(null)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-charcoal-800 transition-colors"
+              >
+                <X className="w-4 h-4 text-white/60" />
+              </button>
+            </div>
+            {/* YouTube embed */}
+            <div className="aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`}
+                title="Course Preview"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
