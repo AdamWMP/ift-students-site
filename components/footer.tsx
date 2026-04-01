@@ -119,7 +119,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://wa.me/353851234567" 
+                  href="https://wa.me/353866000001" 
                   className="flex items-center gap-3 text-white/50 hover:text-gold transition-colors text-sm"
                 >
                   <Phone className="w-4 h-4 text-gold/70" />

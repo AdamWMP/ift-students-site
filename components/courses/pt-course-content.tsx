@@ -376,7 +376,7 @@ export default function PTCourseContent() {
                 Enrol Now <ArrowRight className="w-5 h-5" />
               </Link>
               <a
-                href="https://wa.me/353851234567?text=Hi!%20I%27m%20interested%20in%20the%20Personal%20Trainer%20Course."
+                href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20Personal%20Trainer%20Course."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-outline flex items-center justify-center gap-2"
@@ -628,7 +628,7 @@ export default function PTCourseContent() {
           {getActiveIntakes().length === 0 && (
             <div className="max-w-5xl mx-auto text-center py-12">
               <p className="text-white/50 mb-4">New intake dates coming soon.</p>
-              <a href="https://wa.me/353851234567?text=Hi!%20When%20is%20the%20next%20PT%20course%20intake?" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white transition-colors text-sm font-medium">
+              <a href="https://wa.me/353866000001?text=Hi!%20When%20is%20the%20next%20PT%20course%20intake?" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white transition-colors text-sm font-medium">
                 Get notified when dates are released →
               </a>
             </div>
@@ -951,7 +951,7 @@ export default function PTCourseContent() {
               Enrol Now — From €2,800 <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="https://wa.me/353851234567?text=Hi!%20I%27d%20love%20to%20know%20more%20about%20the%20PT%20course."
+              href="https://wa.me/353866000001?text=Hi!%20I%27d%20love%20to%20know%20more%20about%20the%20PT%20course."
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline inline-flex items-center justify-center gap-2"

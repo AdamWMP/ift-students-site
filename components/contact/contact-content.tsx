@@ -71,7 +71,7 @@ export default function ContactContent() {
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div className="grid sm:grid-cols-3 gap-6 mb-16">
             <motion.a
-              href="https://wa.me/353851234567?text=Hi!%20I%27m%20interested%20in%20your%20fitness%20courses."
+              href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20your%20fitness%20courses."
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
@@ -85,7 +85,7 @@ export default function ContactContent() {
             </motion.a>
 
             <motion.a
-              href="tel:+353851234567"
+              href="tel:+353866000001"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
