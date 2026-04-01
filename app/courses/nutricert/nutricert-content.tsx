@@ -212,11 +212,11 @@ const previews = [
     videoId: '2kKEK7ue7g0',
   },
   {
-    unit: 'Unit 08 · Social Reel',
+    unit: 'Unit 08 · Recipe Video',
     tag: 'Client Content',
-    title: 'Chicken Salad — Client Content Reel',
-    description: 'A sample of the ready-to-use social media recipe reels included in the course — download and post directly to your channels.',
-    videoId: null,
+    title: 'Chicken Salad — Recipe & Client Content',
+    description: 'A full recipe video you can share directly with clients. Every recipe comes with an accompanying ready-to-post social media reel — instant content ideas for your channels.',
+    videoId: '6WEMum26ajI',
   },
 ]
 
