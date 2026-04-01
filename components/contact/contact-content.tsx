@@ -97,7 +97,7 @@ export default function ContactContent() {
             </motion.a>
 
             <motion.a
-              href="mailto:info@imageft.ie"
+              href="mailto:sales@imageft.ie"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}

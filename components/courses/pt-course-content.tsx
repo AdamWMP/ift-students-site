@@ -9,7 +9,7 @@ import {
   CreditCard, ChevronDown, ChevronUp, Dumbbell, TrendingUp,
   Brain, Lock,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import GoogleReviewsSlider from '@/components/google-reviews-slider'
 import { ResultsWallSection } from '@/components/home/results-wall-section'
 import AnimatedCounter from '@/components/animated-counter'
@@ -376,12 +376,10 @@ export default function PTCourseContent() {
                 Enrol Now <ArrowRight className="w-5 h-5" />
               </Link>
               <a
-                href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20Personal%20Trainer%20Course."
-                target="_blank"
-                rel="noopener noreferrer"
+                href="mailto:sales@imageft.ie?subject=PT Course Enquiry"
                 className="btn-outline flex items-center justify-center gap-2"
               >
-                Ask a Question
+                Book a Free Call
               </a>
             </div>
           </motion.div>
@@ -723,6 +721,34 @@ export default function PTCourseContent() {
         </div>
       </section>
 
+      {/* ── Mid-page Conversion Strip ────────────────────────── */}
+      <section className="py-10 bg-gold/5 border-y border-gold/20">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-white font-semibold text-lg">Not sure which pathway is right for you?</p>
+              <p className="text-white/50 text-sm mt-1">Book a free 15-min strategy call — we&apos;ll help you figure out the best fit.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+              <a
+                href="mailto:sales@imageft.ie?subject=PT Course Strategy Call"
+                className="btn-gold flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+              >
+                Book a Free Call <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href="https://wa.me/353866000001?text=Hi!%20I%27d%20like%20to%20chat%20about%20the%20PT%20course%20options."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+              >
+                WhatsApp Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── B-Roll Video Showcase ─────────────────────────────── */}
       <section className="py-16 sm:py-24 bg-charcoal-950 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -946,21 +972,69 @@ export default function PTCourseContent() {
           <p className="text-white/60 mb-8 max-w-2xl mx-auto">
             Join the next cohort. 3 qualifications. 7 weeks of structured learning. A career that&apos;s yours to build. Secure your place with a €500 deposit.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
             <Link href="/checkout" className="btn-gold inline-flex items-center justify-center gap-2 text-lg">
               Enrol Now — From €2,800 <ArrowRight className="w-5 h-5" />
             </Link>
+            <a
+              href="mailto:sales@imageft.ie?subject=PT Course Enquiry"
+              className="btn-outline inline-flex items-center justify-center gap-2"
+            >
+              Book a Free Call
+            </a>
             <a
               href="https://wa.me/353866000001?text=Hi!%20I%27d%20love%20to%20know%20more%20about%20the%20PT%20course."
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline inline-flex items-center justify-center gap-2"
             >
-              Chat With Us
+              WhatsApp Us
             </a>
           </div>
         </div>
       </section>
+
+      {/* ── Sticky Mobile CTA Bar ─────────────────────────────── */}
+      <StickyMobileBar />
     </>
+  )
+}
+
+function StickyMobileBar() {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return (
+    <div className={`fixed bottom-0 left-0 right-0 z-40 sm:hidden transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div className="bg-charcoal-950 border-t border-gold/20 px-4 py-3 flex gap-3">
+        <Link
+          href="/checkout"
+          className="flex-1 btn-gold flex items-center justify-center gap-1.5 text-sm py-2.5"
+        >
+          Enrol Now <ArrowRight className="w-4 h-4" />
+        </Link>
+        <a
+          href="mailto:sales@imageft.ie?subject=PT Course Enquiry"
+          className="flex-1 btn-outline flex items-center justify-center gap-1.5 text-sm py-2.5"
+        >
+          Book a Call
+        </a>
+        <a
+          href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20PT%20course."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-12 btn-outline flex items-center justify-center shrink-0 text-sm py-2.5"
+          aria-label="WhatsApp"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gold">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.12 1.523 5.854L.057 23.486a.75.75 0 0 0 .918.919l5.656-1.479A11.953 11.953 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.713 9.713 0 0 1-4.952-1.355l-.355-.21-3.684.962.982-3.592-.228-.368A9.715 9.715 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
   )
 }

@@ -154,7 +154,7 @@ export default function TermsContent() {
                 <h2 className="text-xl font-bold text-gold mb-4">Contact Us</h2>
                 <p className="text-white/70">
                   If you have any questions about these terms, please contact us at{' '}
-                  <a href="mailto:info@imageft.ie" className="text-gold hover:underline">
+                  <a href="mailto:sales@imageft.ie" className="text-gold hover:underline">
                     info@imageft.ie
                   </a>
                   {' '}or via WhatsApp.
