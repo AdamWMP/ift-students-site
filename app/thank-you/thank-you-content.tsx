@@ -32,14 +32,22 @@ const nextSteps = [
   },
 ]
 
+// ─── Phase styles — static so Tailwind always picks them up ──────
+const phaseStyles = [
+  { border: 'border-gold/40',        bg: 'bg-gold/5',          label: 'text-gold',         dot: 'bg-gold'         },
+  { border: 'border-blue-500/30',    bg: 'bg-blue-900/10',     label: 'text-blue-400',     dot: 'bg-blue-400'     },
+  { border: 'border-purple-500/30',  bg: 'bg-purple-900/10',   label: 'text-purple-400',   dot: 'bg-purple-400'   },
+  { border: 'border-emerald-500/30', bg: 'bg-emerald-900/10',  label: 'text-emerald-400',  dot: 'bg-emerald-400'  },
+  { border: 'border-orange-500/30',  bg: 'bg-orange-900/10',   label: 'text-orange-400',   dot: 'bg-orange-400'   },
+  { border: 'border-gold/40',        bg: 'bg-gold/5',          label: 'text-gold',         dot: 'bg-gold'         },
+]
+
 // ─── Full Career Journey ──────────────────────────────────────────
 const journeySteps = [
   {
     phase: 'Phase 1',
     weeks: 'Weeks 1–8',
     title: 'Get Qualified',
-    colour: 'border-gold/40 bg-gold/5',
-    labelColour: 'text-gold',
     items: [
       'Fitness Instruction (EQF Level 3)',
       'Group Fitness Instruction',
@@ -53,8 +61,6 @@ const journeySteps = [
     phase: 'Phase 2',
     weeks: 'Weeks 9–12',
     title: 'Get Real Experience',
-    colour: 'border-blue-500/30 bg-blue-900/10',
-    labelColour: 'text-blue-400',
     items: [
       'Placement in a real gym environment',
       'Supervised client sessions',
@@ -67,8 +73,6 @@ const journeySteps = [
     phase: 'Phase 3',
     weeks: 'Week 13',
     title: 'Build Your Brand',
-    colour: 'border-purple-500/30 bg-purple-900/10',
-    labelColour: 'text-purple-400',
     items: [
       'Professional photoshoot',
       'Advertising reels produced',
@@ -81,8 +85,6 @@ const journeySteps = [
     phase: 'Phase 4',
     weeks: 'Weeks 14–17',
     title: 'Start Earning',
-    colour: 'border-emerald-500/30 bg-emerald-900/10',
-    labelColour: 'text-emerald-400',
     items: [
       'Fitness Business Accelerator (FBA) Phase 1',
       'Pricing and packaging your services',
@@ -95,8 +97,6 @@ const journeySteps = [
     phase: 'Phase 5',
     weeks: 'Weeks 18–19',
     title: 'Level Up',
-    colour: 'border-orange-500/30 bg-orange-900/10',
-    labelColour: 'text-orange-400',
     items: [
       'AI for Coaches workshop',
       'Programming for Success masterclass',
@@ -109,8 +109,6 @@ const journeySteps = [
     phase: 'Phase 6',
     weeks: 'Weeks 20–24',
     title: 'Build the Business',
-    colour: 'border-gold/40 bg-gold/5',
-    labelColour: 'text-gold',
     items: [
       'FBA Phase 2 — client retention systems',
       'Scaling beyond 1-to-1',
@@ -312,49 +310,56 @@ function ThankYouInner() {
 
           {/* Vertical timeline */}
           <div className="relative">
-            {/* Line */}
-            <div className="hidden sm:block absolute left-1/2 -translate-x-px top-0 bottom-0 w-px bg-charcoal-800" />
+            {/* Mobile: left-side line | Desktop: centre line */}
+            <div className="absolute left-[18px] sm:left-1/2 top-0 bottom-0 w-px bg-charcoal-800 sm:-translate-x-px" />
 
-            <div className="space-y-8 sm:space-y-0">
+            <div className="space-y-0">
               {journeySteps.map((step, i) => {
                 const isLeft = i % 2 === 0
+                const s = phaseStyles[i]
                 return (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: isLeft ? -24 : 24 }}
+                    initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
                     animate={journeyInView ? { opacity: 1, x: 0 } : {}}
                     transition={{ delay: i * 0.12 }}
-                    className={`sm:flex sm:items-start sm:gap-0 ${isLeft ? 'sm:flex-row' : 'sm:flex-row-reverse'} mb-8 sm:mb-0 sm:pb-12`}
+                    className={`flex items-start gap-0 sm:gap-0 pb-8 sm:pb-12 ${isLeft ? 'sm:flex-row' : 'sm:flex-row-reverse'}`}
                   >
-                    {/* Card */}
-                    <div className={`sm:w-[calc(50%-2rem)] ${isLeft ? 'sm:pr-8 sm:text-right' : 'sm:pl-8'}`}>
-                      <div className={`border rounded-2xl p-6 ${step.colour}`}>
-                        <div className={`flex items-center gap-3 mb-4 ${isLeft ? 'sm:flex-row-reverse sm:justify-end' : ''}`}>
-                          <span className={`text-xs tracking-[0.2em] uppercase font-bold ${step.labelColour}`}>{step.phase}</span>
-                          <span className="text-white/30 text-xs">·</span>
+                    {/* ── Mobile dot (left side) ─────────────────── */}
+                    <div className="flex-shrink-0 flex flex-col items-center sm:hidden" style={{ width: 38 }}>
+                      <div className={`w-3.5 h-3.5 rounded-full border-2 border-charcoal-800 mt-6 z-10 relative ${s.dot}`} />
+                    </div>
+
+                    {/* ── Card ─────────────────────────────────────── */}
+                    <div className={`flex-1 sm:flex-none sm:w-[calc(50%-2rem)] ${isLeft ? 'sm:pr-8' : 'sm:pl-8'}`}>
+                      <div className={`border rounded-2xl p-5 sm:p-6 ${s.border} ${s.bg}`}>
+                        {/* Phase header */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className={`text-xs tracking-[0.2em] uppercase font-bold ${s.label}`}>{step.phase}</span>
+                          <span className="text-white/20 text-xs">·</span>
                           <span className="text-white/50 text-xs">{step.weeks}</span>
                         </div>
-                        <h3 className="font-serif text-2xl text-white italic mb-4">{step.title}</h3>
-                        <ul className={`space-y-2 mb-4 ${isLeft ? 'sm:text-right' : ''}`}>
+                        <h3 className="font-serif text-xl sm:text-2xl text-white italic mb-4">{step.title}</h3>
+                        <ul className="space-y-2 mb-4">
                           {step.items.map((item, j) => (
-                            <li key={j} className={`flex items-start gap-2 text-white/60 text-sm ${isLeft ? 'sm:flex-row-reverse' : ''}`}>
-                              <span className={`w-1.5 h-1.5 rounded-full bg-current mt-1.5 flex-shrink-0 ${step.labelColour}`} />
+                            <li key={j} className="flex items-start gap-2 text-white/60 text-sm">
+                              <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${s.dot}`} />
                               {item}
                             </li>
                           ))}
                         </ul>
-                        <p className={`text-white/30 text-xs italic border-t border-white/10 pt-3 ${isLeft ? 'sm:text-right' : ''}`}>
+                        <p className="text-white/30 text-xs italic border-t border-white/10 pt-3">
                           {step.note}
                         </p>
                       </div>
                     </div>
 
-                    {/* Centre dot */}
-                    <div className="hidden sm:flex sm:w-16 items-center justify-center flex-shrink-0 pt-6">
-                      <div className="w-4 h-4 rounded-full bg-charcoal-950 border-2 border-gold/50 relative z-10" />
+                    {/* ── Desktop centre dot ────────────────────────── */}
+                    <div className="hidden sm:flex w-16 items-start justify-center flex-shrink-0 pt-6">
+                      <div className={`w-4 h-4 rounded-full border-2 border-charcoal-800 z-10 ${s.dot}`} />
                     </div>
 
-                    {/* Spacer */}
+                    {/* ── Desktop spacer ───────────────────────────── */}
                     <div className="hidden sm:block sm:w-[calc(50%-2rem)]" />
                   </motion.div>
                 )
