@@ -166,8 +166,18 @@ Seeing the students gain so much confidence throughout the courses is what drive
     name: 'Nina Plazanin',
     role: 'Pilates & PT Tutor',
     location: 'Dublin',
-    shortBio: 'Expert in group fitness and high-energy training sessions.',
-    fullBio: '',
+    shortBio: 'Qualified PT, Fitness Instructor and Pilates Teacher. Passionate about helping people become stronger, more confident and connected to their bodies.',
+    fullBio: `Qualified Personal Trainer, Fitness Instructor and Pilates Teacher. Passionate about helping people become stronger, more confident and connected to their bodies.
+
+My journey into fitness started as a personal one. I wanted to feel better — physically and mentally. Shortly after, that turned into a lifestyle and a career. Through discipline, education and consistency, I learned how powerful movement can be in transforming not just the body, but mindset, confidence and overall quality of life.
+
+After completing my qualifications in Personal Training, Fitness and Pilates, I continued to grow within the academy and I am now proud to work as a tutor for Combination and Pilates courses. Supporting and mentoring future instructors is something I genuinely care about — because it was something I experienced when doing my own course, and having that help meant everything.
+
+I aim to help my students not only gain knowledge but also build confidence and step into this industry with purpose.
+
+Alongside tutoring, I work as a Fitness and Pilates Instructor, run my own coaching business, and work in corporate performance and wellbeing — delivering classes, programmes and events that focus on long-term results. My approach is realistic, combining everything I know, and empowering. I don't believe in quick fixes — I believe in building strong foundations that last.
+
+I am passionate about creating a positive and supportive environment where people feel motivated, capable and inspired to push beyond their limits and become the strongest version of themselves. Because once, I was that person sitting at the back hoping nobody would ask me a question — and now I get to help and inspire others to step out of their comfort zone.`,
     image: '/tutors/nina.png'
   },
   {
