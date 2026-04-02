@@ -909,7 +909,7 @@ export default function PTCourseContent() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <p className="text-white font-semibold text-lg">Not sure which pathway is right for you?</p>
-              <p className="text-white/50 text-sm mt-1">Chat with Aaron — he&apos;ll help you figure out whether Pro Coach or Complete Coach is the right fit and your fastest path to get qualified and earning.</p>
+              <p className="text-white/50 text-sm mt-1">Have a relaxed chat with the team — no sales pressure, just a quick conversation to understand where you&apos;re at and point you towards the right fit. You&apos;ll leave knowing exactly which pathway suits you and what your next step looks like.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <a
