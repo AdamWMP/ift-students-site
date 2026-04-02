@@ -164,7 +164,7 @@ Seeing the students gain so much confidence throughout the courses is what drive
   },
   {
     name: 'Nina Plazanin',
-    role: 'Pilates Tutor',
+    role: 'Pilates & PT Tutor',
     location: 'Dublin',
     shortBio: 'Expert in group fitness and high-energy training sessions.',
     fullBio: '',
