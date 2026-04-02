@@ -196,6 +196,20 @@ Seeing the students gain so much confidence throughout the courses is what drive
     image: '/tutors/thomas.png'
   },
   {
+    name: "Aisling O'Leary",
+    role: 'Pilates Tutor & Studio Owner',
+    location: 'Cork',
+    shortBio: "Graduated Image Fitness Pilates 2024, now a course tutor and founder of Grove Pilates Studio in Cork City.",
+    fullBio: `Hi, I'm Aisling. I completed the Image Fitness Pilates Instructor course in 2024. I loved every minute of it — from meeting my incredible peers to learning from industry experts like Tomas. The course was flexible, supportive, and highly informative, giving me a strong foundation not only in Pilates but also in class planning, client management, and pricing.
+
+Since graduating, I've gone on to open my own Pilates studio, Grove, located in the heart of Cork City. Grove is a really warm and welcoming space for all to give Pilates a go, move your body, and meet new people. It has been an amazing journey for me, my team, and our clients.
+
+I've since come full circle and returned to Image Fitness as a course tutor, which I'm absolutely loving. Being on the other side of the mat is a truly rewarding experience.
+
+I would highly recommend these courses to anyone with an interest in fitness and wellness. They can be the starting point for something really special.`,
+    image: '/tutors/aisling-oleary.jpg'
+  },
+  {
     name: 'Greg Magner',
     role: 'Tutor & Examiner',
     location: 'Cork',
