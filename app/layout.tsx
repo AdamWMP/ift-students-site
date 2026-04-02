@@ -1,30 +1,70 @@
 import type { Metadata } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import './globals.css'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
-  title: 'Image Fitness Training | Ireland\'s #1 Fitness Educator',
-  description: 'Become a certified Personal Trainer or S&C Coach. 15+ years experience, 5000+ graduates, REPs accredited. Start your fitness career today.',
-  keywords: 'personal trainer course ireland, fitness instructor course, strength and conditioning, pt course dublin, fitness certification ireland',
+  metadataBase: new URL('https://imageft.ie'),
+  title: {
+    default: 'Image Fitness Training | Ireland\'s #1 Personal Trainer & Pilates Course',
+    template: '%s | Image Fitness Training',
+  },
+  description: 'Get qualified as a Personal Trainer or Pilates Instructor in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Locations in Dublin, Cork, Galway, Limerick & more.',
+  keywords: [
+    'personal trainer course ireland',
+    'personal trainer course dublin',
+    'fitness instructor course ireland',
+    'pt course ireland',
+    'pilates instructor course ireland',
+    'strength and conditioning course ireland',
+    'nutrition coach certification ireland',
+    'fitness certification ireland',
+    'image fitness training',
+    'imageft',
+    'reps ireland accredited',
+    'pre and post natal course ireland',
+    'fitness business accelerator',
+  ],
+  authors: [{ name: 'Image Fitness Training', url: 'https://imageft.ie' }],
+  creator: 'Image Fitness Training',
+  publisher: 'Image Fitness Training',
+  category: 'Education',
   openGraph: {
-    title: 'Image Fitness Training | Ireland\'s #1 Fitness Educator',
-    description: 'Become a certified Personal Trainer or S&C Coach. 15+ years experience, 5000+ graduates.',
-    images: ['/og-image.png'],
+    siteName: 'Image Fitness Training',
+    title: 'Image Fitness Training | Ireland\'s #1 Personal Trainer Course',
+    description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates across Dublin, Cork, Galway, Limerick & more.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
     type: 'website',
+    locale: 'en_IE',
+    url: 'https://imageft.ie',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Image Fitness Training',
-    description: 'Ireland\'s #1 Fitness Educator',
+    title: 'Image Fitness Training | Ireland\'s #1 Personal Trainer Course',
+    description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates.',
     images: ['/og-image.png'],
+    site: '@imagefitnesstrainingofficial',
   },
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Add Google Search Console verification code here when available
+    // google: 'your-verification-code',
   },
 }
 
@@ -37,6 +77,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <script src="https://apps.abacus.ai/chatllm/appllm-lib.js" />
+        <LocalBusinessJsonLd />
       </head>
       <body className="bg-charcoal-950 text-white antialiased" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>

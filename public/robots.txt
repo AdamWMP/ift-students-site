@@ -1,3 +1,7 @@
-# Allow all web crawlers to access all content
 User-agent: *
 Allow: /
+Disallow: /thank-you
+Disallow: /onboarding/
+Disallow: /api/
+
+Sitemap: https://imageft.ie/sitemap.xml

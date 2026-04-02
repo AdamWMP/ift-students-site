@@ -1,3 +1,30 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Personal Trainer & Pilates Courses Ireland | Get Qualified in 8–16 Weeks | Image Fitness Training',
+  description: 'Ireland\'s #1 fitness educator. Become a certified Personal Trainer or Pilates Instructor in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Locations in Dublin, Cork, Galway, Limerick, Wexford & Belfast.',
+  keywords: [
+    'personal trainer course ireland',
+    'pilates instructor course ireland',
+    'fitness instructor course ireland',
+    'become a personal trainer ireland',
+    'pt course ireland',
+    'image fitness training',
+    'imageft',
+    'fitness certification ireland',
+    'reps ireland accredited',
+    'personal trainer qualification ireland',
+  ],
+  alternates: { canonical: 'https://imageft.ie' },
+  openGraph: {
+    title: 'Personal Trainer & Pilates Courses Ireland | Image Fitness Training',
+    description: 'Ireland\'s #1 fitness educator. Get qualified in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates.',
+    url: 'https://imageft.ie',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
+    type: 'website',
+  },
+}
+
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 import WhatsAppButton from '@/components/whatsapp-button'
