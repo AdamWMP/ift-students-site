@@ -110,9 +110,12 @@ export default function Header() {
                                 href={child?.href ?? '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block px-4 py-3 text-sm text-white/80 hover:text-gold hover:bg-charcoal-700 transition-colors"
+                                className="flex items-center justify-between px-4 py-3 text-sm text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/10 transition-colors border-l-2 border-[#D4A836]/30"
                               >
-                                {child?.label}
+                                <span>{child?.label}</span>
+                                <svg className="w-3 h-3 opacity-50 flex-shrink-0 ml-2" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                  <path d="M2.5 9.5L9.5 2.5M9.5 2.5H5M9.5 2.5V7" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
                               </a>
                             ) : (
                               <Link
@@ -205,10 +208,13 @@ export default function Header() {
                             href={child?.href ?? '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block px-4 py-3 text-base text-white hover:text-gold hover:bg-charcoal-800 rounded-lg transition-colors tap-target"
+                            className="flex items-center justify-between px-4 py-3 text-base text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/10 rounded-lg transition-colors tap-target border-l-2 border-[#D4A836]/30 ml-1"
                             onClick={() => setMobileMenuOpen(false)}
                           >
-                            {child?.label}
+                            <span>{child?.label}</span>
+                            <svg className="w-3.5 h-3.5 opacity-50 flex-shrink-0" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M2.5 9.5L9.5 2.5M9.5 2.5H5M9.5 2.5V7" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
                           </a>
                         ) : (
                           <Link
