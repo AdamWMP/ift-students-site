@@ -395,26 +395,60 @@ export function AddonCheckout({ courseId }: Props) {
                         </div>
                       )}
 
-                      {/* Deposit Slider */}
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <label className="text-white font-semibold text-sm md:text-base">Deposit Amount</label>
-                          <span className="text-gold font-bold text-lg md:text-xl">€{effectiveDeposit}</span>
-                        </div>
-                        <input
-                          type="range"
-                          min={course.minDeposit}
-                          max={discountedPrice}
-                          step={50}
-                          value={Math.min(depositAmount, discountedPrice)}
-                          onChange={(e) => setDepositAmount(Number(e.target.value))}
-                          className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-gold slider-gold"
-                        />
-                        <div className="flex justify-between text-xs text-zinc-500 mt-1">
-                          <span>€{course.minDeposit} min</span>
-                          <span>€{discountedPrice.toLocaleString()} (pay in full)</span>
-                        </div>
+                      {/* Pay in Full / Installment toggle */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setDepositAmount(discountedPrice)}
+                          className={`py-3 px-4 rounded-xl text-sm font-semibold border transition-all ${
+                            isFullPayment
+                              ? 'bg-gold text-black border-gold'
+                              : 'bg-transparent text-zinc-300 border-zinc-700 hover:border-zinc-500'
+                          }`}
+                        >
+                          <span className="block text-xs opacity-70 mb-0.5">Pay in Full</span>
+                          <span className="block font-bold">€{discountedPrice.toLocaleString()}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { if (isFullPayment) setDepositAmount(course.minDeposit); }}
+                          className={`py-3 px-4 rounded-xl text-sm font-semibold border transition-all ${
+                            !isFullPayment
+                              ? 'bg-gold/10 text-gold border-gold'
+                              : 'bg-transparent text-zinc-300 border-zinc-700 hover:border-zinc-500'
+                          }`}
+                        >
+                          <span className="block text-xs opacity-70 mb-0.5">Payment Plan</span>
+                          {course.paymentPlanPrice ? (
+                            <span className="block font-bold">€{Math.ceil(course.paymentPlanPrice / course.maxMonths)}/mo × {course.maxMonths}</span>
+                          ) : (
+                            <span className="block font-bold">From €{course.minDeposit}</span>
+                          )}
+                        </button>
                       </div>
+
+                      {/* Deposit Slider — only shown in installment mode */}
+                      {!isFullPayment && (
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="text-white font-semibold text-sm md:text-base">Deposit Amount</label>
+                            <span className="text-gold font-bold text-lg md:text-xl">€{effectiveDeposit}</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={course.minDeposit}
+                            max={discountedPrice - 1}
+                            step={50}
+                            value={Math.min(depositAmount, discountedPrice - 1)}
+                            onChange={(e) => setDepositAmount(Number(e.target.value))}
+                            className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-gold slider-gold"
+                          />
+                          <div className="flex justify-between text-xs text-zinc-500 mt-1">
+                            <span>€{course.minDeposit} min deposit</span>
+                            <span>Drag to adjust</span>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Months Slider */}
                       {!isFullPayment && (
