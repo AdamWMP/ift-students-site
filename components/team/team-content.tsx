@@ -189,10 +189,28 @@ Seeing the students gain so much confidence throughout the courses is what drive
   // — Cork —
   {
     name: 'Tomas Whelan',
-    role: 'Cork Pilates & PT Tutor',
+    role: 'Lead Tutor — Personal Training & Pilates',
     location: 'Cork',
-    shortBio: 'Industry veteran with 10+ years experience in PT and group fitness instruction.',
-    fullBio: '',
+    shortBio: 'Lead Tutor in PT and Pilates courses. Boxing coach turned PT, Pilates Instructor and head coach at FLYEfit — with nearly 5 years tutoring at Image Fitness.',
+    fullBio: `Lead Tutor 👀 In our personal training and Pilates courses. Also life of the party at summer and Xmas events.
+
+I started out as a boxing coach in 2013 and became a PT in 2015, nutrition coach in 2020 and Pilates Instructor in 2022.
+
+I've been working as a personal trainer and an online coach for myself now for over a decade. I've learned that everyone is motivated to becoming healthier and stronger but people often have a lack in confidence or ability to do so. I take pride in being a coach who can guide an individual through healthy changes and show them how to reach their full potential.
+
+Be useful is my mantra. As a Dad, Husband and a Coach. Be useful in this role and give it your best.
+
+Along with working for myself I'm also the head coach of FLYEfit.
+
+I've been a tutor now for nearly 5 years with Image. In class I get to bring my experience to the students and show them the real life workings of a coach in this industry. They can hear about my wins and losses as a coach and learn from them. I try to make the classroom a bit of craic and keep our learning as practical and interactive as we can. Best way to learn is to do.
+
+I'm a Tipp man now living in Cork and I'll never let them forget about the 2025 All Ireland hurling final down here.
+
+Aside from fitness I love my Xbox and Switch. I read a lot of Fantasy and I'm that guy who is always looking to bring Lord of the Rings into a conversation.
+
+I'm a first time Dad as of this year and wow. What a feeling. Less Xbox now days but I get to read Tolkien to him so happy days.
+
+See you in class!`,
     image: '/tutors/thomas.png'
   },
   {
@@ -329,10 +347,10 @@ A mindset I always share with clients is: If you were 30 failures away from your
 ]
 
 const pilatsTutors = [
-  { name: "Aisling O'Leary", role: 'Pilates Tutor & Studio Owner', image: null,                          initials: 'AO', bio: "Graduated Image Pilates 2024, now a tutor and founder of Grove Pilates Studio in Cork City. A student turned tutor — bringing a fresh, real-world perspective to every class." },
+  { name: "Aisling O'Leary", role: 'Pilates Tutor & Studio Owner', image: '/tutors/aisling-oleary.jpg',  initials: 'AO', bio: "Graduated Image Pilates 2024, now a tutor and founder of Grove Pilates Studio in Cork City. A student turned tutor — bringing a fresh, real-world perspective to every class." },
   { name: 'Holly Ring',      role: 'Pilates Instructor',           image: '/tutors/holly.jpg',           initials: 'HR', bio: 'Image Pilates graduate turned tutor — bringing the student perspective and reformer expertise to every session.' },
   { name: 'Rachel Edwards',  role: 'Pilates Instructor',           image: '/tutors/rachel-edwards.jpg',  initials: 'RE', bio: 'Reformer specialist dedicated to empowering students through hands-on, energetic instruction.' },
-  { name: 'Aoife McIntyre',  role: 'Pilates Instructor',           image: null,                          initials: 'AM', bio: 'Bringing warmth and expertise to every session, with a focus on inclusive, accessible Pilates.' },
+  { name: 'Aoife McIntyre',  role: 'Pilates Instructor',           image: '/tutors/aoife-mcintyre.jpg',  initials: 'AM', bio: 'Bringing warmth and expertise to every session, with a focus on inclusive, accessible Pilates.' },
   { name: 'Amy Halligan',    role: 'Pilates Instructor',           image: '/tutors/amy.png',             initials: 'AH', bio: 'Dedicated to creating a welcoming space where every student feels supported and confident.' },
 ]
 
