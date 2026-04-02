@@ -29,8 +29,7 @@ const navItems = [
       { href: '/courses/personal-trainer#the-career', label: '⭐ The Career' },
       { href: '/courses/personal-trainer#the-business', label: '⭐ The Business' },
       { href: '/courses/personal-trainer', label: 'Personal Trainer' },
-      { href: PILATES_SITE_URL, label: 'Pilates Instructor', external: true },
-      { href: `${PILATES_SITE_URL}/reformer`, label: 'Reformer Pilates', external: true },
+      { href: PILATES_SITE_URL, label: 'Mat & Reformer Pilates Course', external: true, ivory: true },
     ],
   },
   {
@@ -110,7 +109,11 @@ export default function Header() {
                                 href={child?.href ?? '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-between px-4 py-3 text-sm text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/10 transition-colors border-l-2 border-[#D4A836]/30"
+                                className={`flex items-center justify-between px-4 py-3 text-sm transition-colors border-l-2 border-[#D4A836]/30 ${
+                                  (child as { ivory?: boolean })?.ivory
+                                    ? 'bg-[#FAF8F5]/10 text-[#FAF8F5] font-medium hover:bg-[#FAF8F5]/20 hover:text-white'
+                                    : 'text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/10'
+                                }`}
                               >
                                 <span>{child?.label}</span>
                                 <svg className="w-3 h-3 opacity-50 flex-shrink-0 ml-2" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -208,7 +211,11 @@ export default function Header() {
                             href={child?.href ?? '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between px-4 py-3 text-base text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/10 rounded-lg transition-colors tap-target border-l-2 border-[#D4A836]/30 ml-1"
+                            className={`flex items-center justify-between px-4 py-3 text-base rounded-lg transition-colors tap-target border-l-2 border-[#D4A836]/30 ml-1 ${
+                              (child as { ivory?: boolean })?.ivory
+                                ? 'bg-[#FAF8F5]/10 text-[#FAF8F5] font-medium hover:bg-[#FAF8F5]/20'
+                                : 'text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/10'
+                            }`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             <span>{child?.label}</span>
