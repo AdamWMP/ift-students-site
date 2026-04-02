@@ -422,7 +422,7 @@ export default function PTCourseContent() {
       </section>
 
       {/* ── 3 Pillars ────────────────────────────────────────── */}
-      <section ref={pillarsRef} className="py-16 sm:py-24 bg-charcoal-950">
+      <section id="the-cert" ref={pillarsRef} className="py-16 sm:py-24 bg-charcoal-950">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -537,7 +537,7 @@ export default function PTCourseContent() {
       </section>
 
       {/* ── Upcoming Intakes ──────────────────────────────────── */}
-      <section ref={datesRef} className="py-16 sm:py-24 bg-charcoal-950 relative overflow-hidden">
+      <section id="the-career" ref={datesRef} className="py-16 sm:py-24 bg-charcoal-950 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-gold/5 rounded-full blur-[130px]" />
         </div>
@@ -693,7 +693,7 @@ export default function PTCourseContent() {
       </section>
 
       {/* ── Business Accelerator Preview ─────────────────────── */}
-      <section ref={businessRef} className="py-16 sm:py-24 bg-charcoal-900 relative overflow-hidden">
+      <section id="the-business" ref={businessRef} className="py-16 sm:py-24 bg-charcoal-900 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gold/5 rounded-full blur-[130px]" />
         </div>

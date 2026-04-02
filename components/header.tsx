@@ -25,12 +25,17 @@ const navItems = [
   {
     label: 'Pathways',
     children: [
-      { href: '/#the-cert', label: '⭐ The Cert' },
-      { href: '/#the-career', label: '⭐ The Career' },
-      { href: '/#the-business', label: '⭐ The Business' },
+      { href: '/courses/personal-trainer#the-cert', label: '⭐ The Cert' },
+      { href: '/courses/personal-trainer#the-career', label: '⭐ The Career' },
+      { href: '/courses/personal-trainer#the-business', label: '⭐ The Business' },
       { href: '/courses/personal-trainer', label: 'Personal Trainer' },
       { href: PILATES_SITE_URL, label: 'Pilates Instructor', external: true },
       { href: `${PILATES_SITE_URL}/reformer`, label: 'Reformer Pilates', external: true },
+    ],
+  },
+  {
+    label: 'Post Grad Courses',
+    children: [
       { href: '/courses/strength-conditioning', label: 'Strength & Conditioning' },
       { href: '/courses/nutricert', label: 'NutriCert Nutrition' },
       { href: '/courses/pre-post-natal', label: 'Pre & Post Natal' },

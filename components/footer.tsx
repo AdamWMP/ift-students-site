@@ -55,6 +55,23 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* ── Intreo Funding Strip ─────────────────────────────── */}
+      <div className="border-b border-charcoal-800/60 bg-charcoal-900/40">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#c8d94a] flex items-center justify-center flex-shrink-0">
+              <span className="text-black font-bold text-xs leading-tight text-center">Intreo</span>
+            </div>
+          </div>
+          <p className="text-white/50 text-sm leading-relaxed">
+            Image Fitness Training is one of the only training providers approved for funding.{' '}
+            If you are in receipt of any social welfare payments, you may be entitled to{' '}
+            <span className="text-gold font-semibold">€1,000 off your course fees</span>{' '}
+            through your local Intreo Office.
+          </p>
+        </div>
+      </div>
+
       {/* ── Main Grid ────────────────────────────────────────── */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
