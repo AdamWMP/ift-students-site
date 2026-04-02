@@ -37,7 +37,7 @@ const navItems = [
       { href: '/courses/strength-conditioning', label: 'Strength & Conditioning' },
       { href: '/courses/nutricert', label: 'NutriCert Nutrition' },
       { href: '/courses/pre-post-natal', label: 'Pre & Post Natal' },
-      { href: '/business-accelerator', label: 'Business Accelerator' },
+      { href: '/business-accelerator', label: 'Fitness Business Accelerator' },
     ],
   },
   { href: '/locations', label: 'Locations' },
