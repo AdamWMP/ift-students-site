@@ -167,6 +167,110 @@ const businessModules = [
   },
 ]
 
+// ─── Workshop Outcomes ────────────────────────────────────────────
+const workshopOutcomes = [
+  {
+    number: '01',
+    workshop: 'Content That Converts',
+    headline: 'A 30-day content system — ready to use',
+    outcomes: [
+      'Plug-and-play content framework for Instagram & TikTok',
+      'Your niche identified and messaging locked in',
+      'Hooks, captions and post structures that attract enquiries',
+      'A weekly posting rhythm you can sustain from day one',
+    ],
+  },
+  {
+    number: '02',
+    workshop: 'Crafting & Pricing Your Offer',
+    headline: 'Your service packaged and priced with confidence',
+    outcomes: [
+      'Signature coaching package built (1-to-1, online, or hybrid)',
+      'Pricing set based on market rate and your positioning',
+      'Value proposition written — so you can explain what you do in 30 seconds',
+      'Upsell and renewal pathway mapped out',
+    ],
+  },
+  {
+    number: '03',
+    workshop: 'Launch: Getting Your First Clients',
+    headline: 'A step-by-step launch plan you can activate immediately',
+    outcomes: [
+      'Pre-launch checklist completed before you graduate',
+      'Your first 5 outreach conversations scripted and ready',
+      'Referral and social proof system in place',
+      'Launch sequence to generate your first paid enquiries',
+    ],
+  },
+  {
+    number: '04',
+    workshop: 'All Things Sales & Mindset',
+    headline: 'A consultation framework you can use every time',
+    outcomes: [
+      'Jordan Sherlock\'s exact consultation structure (used with global clients)',
+      'Objection handling scripts for price, time, and commitment',
+      'Confidence to close without being pushy or awkward',
+      'Sales mindset shift — from "selling" to "solving"',
+    ],
+  },
+  {
+    number: '05',
+    workshop: 'Client Experience & Retention',
+    headline: 'Systems that keep clients — and free up your time',
+    outcomes: [
+      'Onboarding process built (welcome pack, check-ins, progress tracking)',
+      'Retention touchpoints mapped across the client journey',
+      'Renewal conversation framework so clients re-sign without being asked',
+      'Templates for check-ins, progress reviews, and re-engagement',
+    ],
+  },
+  {
+    number: '06',
+    workshop: 'Gym Floor Mastery',
+    headline: 'The confidence to approach, consult, and convert on the floor',
+    outcomes: [
+      'Floor conversation scripts — from hello to consultation booked',
+      'Body language and environment strategies that build instant trust',
+      'Trial session structure that leads naturally to a paid programme',
+      'Your intro offer and gym floor pitch finalised',
+    ],
+  },
+  {
+    number: '07',
+    workshop: 'AI for Coaches',
+    headline: 'AI tools running your admin and content creation',
+    outcomes: [
+      'Custom ChatGPT prompts for training plans, nutrition guides, and emails',
+      'Content generation workflow set up — cut creation time by 80%',
+      'AI-assisted client check-in and progress report templates',
+      'Automation stack that frees up 5–10 hours per week',
+    ],
+  },
+  {
+    number: '08',
+    workshop: 'Programming for Success Masterclass',
+    headline: 'Advanced programming ability that sets you apart',
+    outcomes: [
+      'Periodisation models for beginners, intermediates, and athletes',
+      'Block programming, deload protocols, and plateau-busting strategies',
+      'Programming templates for 6 common client goals',
+      'The ability to write programmes that get results — and keep clients long-term',
+    ],
+  },
+  {
+    number: '09',
+    workshop: 'Professional Brand Photoshoot & Reels',
+    headline: 'A full professional brand identity — done for you',
+    outcomes: [
+      '30+ professional brand photos (studio and gym environment)',
+      '3–5 advertising reels edited and ready to post',
+      'Profile, cover, and story content across Instagram, Facebook, LinkedIn',
+      'Visual brand assets you\'d otherwise spend €2,000+ on',
+    ],
+    businessOnly: true,
+  },
+]
+
 // ─── 3 Pillars ────────────────────────────────────────────────────
 const pillars = [
   {
@@ -731,6 +835,68 @@ export default function PTCourseContent() {
                 )}
                 <h3 className="font-semibold text-white mb-2">{mod.title}</h3>
                 <p className="text-white/50 text-sm leading-relaxed">{mod.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Workshop Outcomes ────────────────────────────────── */}
+      <section className="py-16 sm:py-24 bg-charcoal-950 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[600px] h-[500px] bg-gold/4 rounded-full blur-[160px]" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[120px]" />
+        </div>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <p className="text-sm tracking-[0.25em] text-gold uppercase mb-4">WHAT YOU WALK AWAY WITH</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+              Every workshop has a<br />
+              <span className="text-gold">tangible outcome.</span>
+            </h2>
+            <p className="text-white/50 max-w-2xl mx-auto">
+              These aren&apos;t lectures. Each session ends with something built, written, or ready to use — so by the time you graduate, your business is already in motion.
+            </p>
+          </motion.div>
+
+          <div className="space-y-4">
+            {workshopOutcomes.map((ws, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+                className={`rounded-2xl border p-6 sm:p-8 ${ws.businessOnly ? 'border-gold/40 bg-gold/5' : 'border-charcoal-800 bg-charcoal-900'}`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start gap-5">
+                  {/* Number + workshop label */}
+                  <div className="flex-shrink-0 flex sm:flex-col items-center sm:items-start gap-3 sm:gap-1 sm:w-44">
+                    <span className="text-gold font-mono text-sm">{ws.number}</span>
+                    <span className="text-white/30 text-xs uppercase tracking-wider leading-tight">{ws.workshop}</span>
+                    {ws.businessOnly && (
+                      <span className="inline-block px-2 py-0.5 bg-gold text-black text-xs font-bold rounded whitespace-nowrap">The Business Only</span>
+                    )}
+                  </div>
+
+                  {/* Headline + outcomes */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-semibold text-base sm:text-lg mb-4">{ws.headline}</p>
+                    <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+                      {ws.outcomes.map((outcome, i) => (
+                        <li key={i} className="flex items-start gap-2.5 text-sm text-white/60">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold/60 flex-shrink-0 mt-1.5" />
+                          {outcome}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
