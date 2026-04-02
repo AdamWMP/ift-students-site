@@ -229,17 +229,6 @@ const testimonials = [
 
 const plans = [
   {
-    id: 'pay-2',
-    label: 'Pay in 2',
-    price: '€375',
-    per: '× 2 payments',
-    total: '€750 total',
-    popular: false,
-    href: 'https://booking.imageft.ie/NCG-2instalment',
-    cta: 'PAY IN 2',
-    tagline: 'Split the cost over two equal payments.',
-  },
-  {
     id: 'full',
     label: 'Pay in Full',
     price: '€750',
@@ -251,14 +240,14 @@ const plans = [
     tagline: 'Pay once and get immediate, lifetime access to everything.',
   },
   {
-    id: 'pay-3',
-    label: 'Pay in 3',
-    price: '€250',
-    per: '× 3 monthly',
-    total: '€750 total',
+    id: 'payment-plan',
+    label: 'Payment Plan',
+    price: '€900',
+    per: 'spread over 3 months',
+    total: '€300 / month',
     popular: false,
     href: 'https://booking.imageft.ie/NCG-3instalment',
-    cta: 'PAY IN 3',
+    cta: 'ENROL — PAYMENT PLAN',
     tagline: 'Spread the cost over three manageable monthly payments.',
   },
 ]

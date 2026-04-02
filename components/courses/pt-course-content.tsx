@@ -130,27 +130,40 @@ const exerciseLibrary = [
 const businessModules = [
   {
     title: 'Content That Converts',
-    description: 'Build a social media presence that attracts your ideal clients and keeps them engaged.',
+    description: 'Build a social media presence that attracts your ideal clients and keeps them engaged — with frameworks you can use from day one.',
   },
   {
     title: 'Crafting & Pricing Your Offer',
-    description: 'Package your services, set your rates, and confidently justify your value.',
+    description: 'Package your services, set your rates, and confidently justify your value to any prospective client.',
   },
   {
     title: 'Launch: Getting Your First Clients',
-    description: 'Step-by-step launch plan to get paying clients from the gym floor from day one.',
+    description: 'Step-by-step launch plan to get paying clients from the gym floor from day one. No guessing — just a proven playbook.',
   },
   {
     title: 'All Things Sales & Mindset',
-    description: 'Master the consultation process and close without feeling salesy.',
+    description: 'Master the consultation process and close without feeling salesy. Jordan Sherlock walks you through the exact frameworks he uses with global clients.',
   },
   {
     title: 'Client Experience & Retention',
-    description: 'Keep clients long-term with onboarding and retention systems that run themselves.',
+    description: 'Keep clients long-term with onboarding and retention systems that run themselves — so you spend less time chasing and more time coaching.',
   },
   {
     title: 'Gym Floor Mastery',
-    description: 'Dominate the gym floor — consultations, onboarding, and converting enquiries into loyal clients.',
+    description: 'Dominate the gym floor — consultations, onboarding, and converting enquiries into loyal, paying clients.',
+  },
+  {
+    title: 'AI for Coaches Workshop',
+    description: 'Learn to use AI tools to automate your admin, generate content, build training plans, and outpace every competitor who isn\'t using them yet.',
+  },
+  {
+    title: 'Programming for Success Masterclass',
+    description: 'Advanced session design, periodisation models and programming logic for clients at every level — from beginner to competitive athlete.',
+  },
+  {
+    title: 'Professional Brand Photoshoot & Reels',
+    description: 'Walk away with a full set of professional photos and advertising reels — done for you. Your brand, your face, your story. Ready to post from day one. Included with The Business pathway.',
+    highlight: true,
   },
 ]
 
@@ -353,7 +366,7 @@ export default function PTCourseContent() {
               Personal Trainer <span className="text-gold">Course</span>
             </h1>
             <p className="text-lg sm:text-xl text-white/70 mb-8">
-              Ireland's most complete fitness qualification. 3 certifications. 7 weeks of structured modules. A video exercise library you'll use for life. Available across Dublin, Cork, Galway, Limerick, Wexford and Online.
+              Ireland's most complete fitness qualification. 3 certifications. 8–16 weeks of structured modules. A video exercise library you'll use for life. Available across Dublin, Cork, Galway, Limerick, Wexford and Online.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-8">
@@ -478,7 +491,7 @@ export default function PTCourseContent() {
           >
             <p className="text-sm tracking-[0.25em] text-gold uppercase mb-4">EVERY TOPIC COVERED</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-              18 topics. 7 weeks. <span className="text-gold">3 qualifications.</span>
+              8–16 weeks. 18 topics. <span className="text-gold">3 qualifications.</span>
             </h2>
             <p className="text-white/60 max-w-2xl mx-auto">
               Science, practice, nutrition — all in one REPs-accredited programme.
@@ -708,11 +721,14 @@ export default function PTCourseContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={businessInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: index * 0.08 }}
-                className="bg-charcoal-950 border border-gold/20 rounded-xl p-6"
+                className={`rounded-xl p-6 border ${(mod as { highlight?: boolean }).highlight ? 'border-gold bg-gold/10' : 'bg-charcoal-950 border-gold/20'}`}
               >
                 <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center mb-4">
                   <span className="text-gold text-sm font-bold">{String(index + 1).padStart(2, '0')}</span>
                 </div>
+                {(mod as { highlight?: boolean }).highlight && (
+                  <span className="inline-block px-2 py-0.5 bg-gold text-black text-xs font-bold rounded mb-2">The Business Only</span>
+                )}
                 <h3 className="font-semibold text-white mb-2">{mod.title}</h3>
                 <p className="text-white/50 text-sm leading-relaxed">{mod.description}</p>
               </motion.div>
@@ -727,7 +743,7 @@ export default function PTCourseContent() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <p className="text-white font-semibold text-lg">Not sure which pathway is right for you?</p>
-              <p className="text-white/50 text-sm mt-1">Book a free 15-min strategy call — we&apos;ll help you figure out the best fit.</p>
+              <p className="text-white/50 text-sm mt-1">Chat with Aaron — he&apos;ll help you figure out whether Pro Coach or Complete Coach is the right fit and your fastest path to get qualified and earning.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <a
@@ -970,7 +986,7 @@ export default function PTCourseContent() {
             Your career starts<br /><span className="text-gold">with one decision.</span>
           </h2>
           <p className="text-white/60 mb-8 max-w-2xl mx-auto">
-            Join the next cohort. 3 qualifications. 7 weeks of structured learning. A career that&apos;s yours to build. Secure your place with a €500 deposit.
+            Join the next cohort. 3 qualifications. 8–16 weeks of flexible learning. A career that&apos;s yours to build. Secure your place with a €500 deposit.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
             <Link href="/checkout" className="btn-gold inline-flex items-center justify-center gap-2 text-lg">

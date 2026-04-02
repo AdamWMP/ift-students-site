@@ -92,9 +92,12 @@ export default function PathwaysSection() {
 
         {/* Pathway Cards */}
         <div className="space-y-8">
-          {pathways.map((pathway, index) => (
+          {pathways.map((pathway, index) => {
+            const anchorId = pathway.name === 'The Cert' ? 'the-cert' : pathway.name === 'The Career' ? 'the-career' : 'the-business'
+            return (
             <motion.div
               key={index}
+              id={anchorId}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: index * 0.15 }}
@@ -190,7 +193,7 @@ export default function PathwaysSection() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
-          ))}
+          )})}
         </div>
       </div>
     </section>

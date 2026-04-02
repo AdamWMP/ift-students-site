@@ -23,8 +23,11 @@ const navItems = [
     ],
   },
   {
-    label: 'Courses',
+    label: 'Pathways',
     children: [
+      { href: '/#the-cert', label: '⭐ The Cert' },
+      { href: '/#the-career', label: '⭐ The Career' },
+      { href: '/#the-business', label: '⭐ The Business' },
       { href: '/courses/personal-trainer', label: 'Personal Trainer' },
       { href: PILATES_SITE_URL, label: 'Pilates Instructor', external: true },
       { href: `${PILATES_SITE_URL}/reformer`, label: 'Reformer Pilates', external: true },

@@ -21,8 +21,8 @@ const nextSteps = [
   {
     icon: Calendar,
     step: '02',
-    title: 'Your strategy call',
-    description: '15 minutes — no pitch, no pressure. We\'ll understand where you want to go and tell you honestly which pathway gets you there fastest.',
+    title: 'Your call with Aaron',
+    description: 'A quick chat to understand your goals, see whether Pro Coach or Complete Coach fits best, and map out your fastest path to get qualified and earning. No pressure — just direction.',
   },
   {
     icon: Briefcase,

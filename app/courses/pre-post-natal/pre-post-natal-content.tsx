@@ -802,7 +802,6 @@ export default function PrePostNatalContent() {
                     'Video exercise library (all categories)',
                     'Mock exam + final theory examination',
                     'Lifetime access — revisit any time',
-                    'Payment plans available on request',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-white/70">
                       <Check className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />{item}
@@ -817,7 +816,13 @@ export default function PrePostNatalContent() {
                   ENROL NOW — €697 <ArrowRight className="w-5 h-5" />
                 </button>
 
-                <p className="text-center text-white/30 text-xs mt-4">Payment plans available · Ask on WhatsApp</p>
+                <div className="mt-4 bg-charcoal-900/50 border border-charcoal-800 rounded-xl p-4">
+                  <p className="text-white/60 text-sm text-center font-medium mb-1">Payment Plan Available</p>
+                  <p className="text-center text-white/40 text-xs">€897 spread over 3 months · €299/month</p>
+                  <button onClick={scrollToCheckout} className="mt-3 w-full py-2 rounded-lg border border-gold/40 text-gold text-sm font-semibold hover:bg-gold/10 transition-colors">
+                    ENROL — PAYMENT PLAN (€897)
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-wrap justify-center gap-4 mt-5 text-sm text-white/40">

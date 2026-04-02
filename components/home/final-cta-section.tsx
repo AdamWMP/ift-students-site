@@ -31,7 +31,7 @@ export default function FinalCtaSection() {
           transition={{ delay: 0.1 }}
           className="text-white/50 text-base sm:text-lg leading-relaxed mb-10 max-w-lg mx-auto"
         >
-          Book a 15-minute strategy call. Tell us where you want to be. We&apos;ll tell you exactly how to get there. No pressure. No pitch. Just the clearest 15 minutes you&apos;ll spend on your career.
+          Hey 👋 it&apos;s Aaron here. This quick call is for anyone thinking about starting or growing a fitness career. We&apos;ll chat through your goals, see whether Pro Coach or Complete Coach fits best, and outline your fastest path to get qualified and earning. You&apos;ll leave with a clear plan — no pressure, just direction 👊
         </motion.p>
 
         <motion.div

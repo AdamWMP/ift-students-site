@@ -271,9 +271,9 @@ Outside the gym, you'll usually find me sea swimming at Blackrock Tower in Galwa
     name: 'Jordan Sherlock',
     role: 'Fitness Business Accelerator Mentor',
     location: 'Dubai',
-    shortBio: 'Business mentor helping fitness professionals build and scale their coaching businesses.',
-    fullBio: '',
-    image: '/tutors/jordan.png'
+    shortBio: 'After 8 years in corporate, Jordan backed himself — built a thriving global online coaching business from Dubai, and now helps new PTs do the same through the FBA.',
+    fullBio: `After 8 years grinding in a corporate job that looked great on paper but felt empty inside, I finally made the leap. I backed myself — and I built something better.\n\nOver the last number of years, I've grown a thriving online coaching business that allows me to work with high-level clients from all over the world — all while living a nomadic lifestyle based from Dubai.\n\nMy roster is full. My business is solid. And I've done it all without relying on gimmicks or endless Instagram reels.\n\nNow, I'm focused on helping new personal trainers build the same kind of freedom — without wasting years trying to figure it all out alone.\n\nI know the overwhelm you're feeling:\n→ Where do I even start?\n→ How do I stand out?\n→ Can I actually make this work?\n\nYou can. And I'll help you get there — step by step.\n\nInside the FBA, I'll show you how to move from "just qualified" to fully booked. From lost and unsure to clear, confident, and in control of your business.\n\nI've walked this path. Now I'll walk it with you.\n\nLet's build something you're proud of — and make a living doing what you love.`,
+    image: '/tutors/jordan-sherlock.jpg'
   },
   // — Marketing / Social / Office —
   {
