@@ -35,7 +35,7 @@ const navItems = [
     label: 'Post Grad Courses',
     children: [
       { href: '/courses/strength-conditioning', label: 'Strength & Conditioning' },
-      { href: '/courses/nutricert', label: 'NutriCert Nutrition' },
+      { href: '/courses/nutricert', label: 'NutriCert Global 2.0' },
       { href: '/courses/pre-post-natal', label: 'Pre & Post Natal' },
       { href: '/business-accelerator', label: 'Fitness Business Accelerator' },
     ],
