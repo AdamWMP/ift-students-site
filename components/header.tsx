@@ -28,7 +28,6 @@ const navItems = [
       { href: '/courses/personal-trainer#the-cert', label: '⭐ The Cert' },
       { href: '/courses/personal-trainer#the-career', label: '⭐ The Career' },
       { href: '/courses/personal-trainer#the-business', label: '⭐ The Business' },
-      { href: '/courses/personal-trainer', label: 'Personal Trainer' },
       { href: PILATES_SITE_URL, label: 'Mat & Reformer Pilates Course', external: true, ivory: true },
     ],
   },
