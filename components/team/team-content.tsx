@@ -268,20 +268,6 @@ Outside the gym, you'll usually find me sea swimming at Blackrock Tower in Galwa
   },
   // — International / Specialists —
   {
-    name: "Aisling O'Leary",
-    role: 'Pilates Tutor & Studio Owner',
-    location: 'Cork',
-    shortBio: "Graduated Image Fitness Pilates 2024, now a course tutor and founder of Grove Pilates Studio in Cork City.",
-    fullBio: `Hi, I'm Aisling. I completed the Image Fitness Pilates Instructor course in 2024. I loved every minute of it — from meeting my incredible peers to learning from industry experts like Tomas. The course was flexible, supportive, and highly informative, giving me a strong foundation not only in Pilates but also in class planning, client management, and pricing.
-
-Since graduating, I've gone on to open my own Pilates studio, Grove, located in the heart of Cork City. Grove is a really warm and welcoming space for all to give Pilates a go, move your body, and meet new people. It has been an amazing journey for me, my team, and our clients.
-
-I've since come full circle and returned to Image Fitness as a course tutor, which I'm absolutely loving. Being on the other side of the mat is a truly rewarding experience.
-
-I would highly recommend these courses to anyone with an interest in fitness and wellness. They can be the starting point for something really special.`,
-    image: '/tutors/aisling-oleary.jpg'
-  },
-  {
     name: 'Jordan Sherlock',
     role: 'Fitness Business Accelerator Mentor',
     location: 'Dubai',
@@ -343,10 +329,11 @@ A mindset I always share with clients is: If you were 30 failures away from your
 ]
 
 const pilatsTutors = [
-  { name: 'Holly Ring',     role: 'Pilates Instructor',  image: '/tutors/holly.jpg',           initials: 'HR', bio: 'Image Pilates graduate turned tutor — bringing the student perspective and reformer expertise to every session.' },
-  { name: 'Rachel Edwards', role: 'Pilates Instructor',  image: '/tutors/rachel-edwards.jpg',  initials: 'RE', bio: 'Reformer specialist dedicated to empowering students through hands-on, energetic instruction.' },
-  { name: 'Aoife McIntyre', role: 'Pilates Instructor',  image: null,                          initials: 'AM', bio: 'Bringing warmth and expertise to every session, with a focus on inclusive, accessible Pilates.' },
-  { name: 'Amy Halligan',   role: 'Pilates Instructor',  image: '/tutors/amy.png',             initials: 'AH', bio: 'Dedicated to creating a welcoming space where every student feels supported and confident.' },
+  { name: "Aisling O'Leary", role: 'Pilates Tutor & Studio Owner', image: null,                          initials: 'AO', bio: "Graduated Image Pilates 2024, now a tutor and founder of Grove Pilates Studio in Cork City. A student turned tutor — bringing a fresh, real-world perspective to every class." },
+  { name: 'Holly Ring',      role: 'Pilates Instructor',           image: '/tutors/holly.jpg',           initials: 'HR', bio: 'Image Pilates graduate turned tutor — bringing the student perspective and reformer expertise to every session.' },
+  { name: 'Rachel Edwards',  role: 'Pilates Instructor',           image: '/tutors/rachel-edwards.jpg',  initials: 'RE', bio: 'Reformer specialist dedicated to empowering students through hands-on, energetic instruction.' },
+  { name: 'Aoife McIntyre',  role: 'Pilates Instructor',           image: null,                          initials: 'AM', bio: 'Bringing warmth and expertise to every session, with a focus on inclusive, accessible Pilates.' },
+  { name: 'Amy Halligan',    role: 'Pilates Instructor',           image: '/tutors/amy.png',             initials: 'AH', bio: 'Dedicated to creating a welcoming space where every student feels supported and confident.' },
 ]
 
 export default function TeamContent() {
