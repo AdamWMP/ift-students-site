@@ -982,11 +982,11 @@ export default function PTCourseContent() {
           {/* 5-clip coaching grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             {[
-              { src: '/videos/coaching-1.mp4', label: 'Tutor coaching' },
-              { src: '/videos/coaching-2.mp4', label: 'Practical training' },
-              { src: '/videos/coaching-3.mp4', label: 'Class session' },
-              { src: '/videos/coaching-4.mp4', label: 'Kettlebell coaching' },
-              { src: '/videos/coaching-5.mp4', label: 'Deadlift technique' },
+              { src: '/videos/coaching-1.mp4', label: 'Gym floor consultation' },
+              { src: '/videos/coaching-2.mp4', label: 'Squat coaching' },
+              { src: '/videos/coaching-3.mp4', label: 'Strength training' },
+              { src: '/videos/coaching-4.mp4', label: 'Overhead press' },
+              { src: '/videos/coaching-5.mp4', label: 'Form & technique' },
             ].map((clip, i) => (
               <motion.div
                 key={i}
@@ -1065,7 +1065,7 @@ export default function PTCourseContent() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { src: '/videos/classroom-1.mp4', label: 'Tutor at the whiteboard' },
-                  { src: '/videos/classroom-2.mp4', label: 'Theory session' },
+                  { src: '/videos/classroom-2.mp4', label: 'Students in class' },
                 ].map((clip, i) => (
                   <motion.div
                     key={i}
@@ -1103,10 +1103,10 @@ export default function PTCourseContent() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { src: '/videos/practical-2.mp4', label: 'Resistance coaching' },
-                  { src: '/videos/practical-3.mp4', label: 'Cardio practical' },
-                  { src: '/videos/practical-4.mp4', label: 'Group cardio session' },
-                  { src: '/videos/practical-1.mp4', label: 'Group dumbbell drill' },
+                  { src: '/videos/practical-1.mp4', label: 'Strength training' },
+                  { src: '/videos/practical-2.mp4', label: 'Weights in action' },
+                  { src: '/videos/practical-3.mp4', label: 'Gym floor coaching' },
+                  { src: '/videos/practical-4.mp4', label: 'Exercise technique' },
                 ].map((clip, i) => (
                   <motion.div
                     key={i}
