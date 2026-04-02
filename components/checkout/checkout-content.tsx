@@ -647,6 +647,11 @@ function CheckoutForm() {
                                   <span className="text-lg font-bold text-white block">
                                     &euro;{addon.price.toLocaleString()}
                                   </span>
+                                  {addon.paymentPlanTotal && addon.paymentPlanMonths && (
+                                    <span className="text-[10px] text-zinc-500 block leading-tight">
+                                      or &euro;{Math.round(addon.paymentPlanTotal / addon.paymentPlanMonths)}/mo &times; {addon.paymentPlanMonths}
+                                    </span>
+                                  )}
                                   <div
                                     className={`w-5 h-5 rounded-md border-2 flex items-center justify-center mt-1.5 ml-auto transition-colors ${
                                       isSelected ? 'bg-gold border-gold' : 'border-zinc-600'

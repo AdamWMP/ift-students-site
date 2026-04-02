@@ -41,6 +41,8 @@ export interface AddOn {
   name: string;
   price: number;
   originalPrice?: number;
+  paymentPlanTotal?: number;
+  paymentPlanMonths?: number;
   description: string;
   badge?: string;
   delivery: string;
@@ -54,6 +56,8 @@ export const addOns: AddOn[] = [
     id: 'nutricert-global',
     name: 'NutriCert Global',
     price: 750,
+    paymentPlanTotal: 900,
+    paymentPlanMonths: 3,
     description: 'Clients expect nutrition guidance — and pay more for trainers who offer it. This is the qualification that sets you apart.',
     badge: 'Most Added',
     delivery: 'Self-Paced Online · Start Anytime',
@@ -63,6 +67,8 @@ export const addOns: AddOn[] = [
     id: 'pre-post-natal',
     name: 'Pre & Post Natal Exercise Coaching',
     price: 697,
+    paymentPlanTotal: 897,
+    paymentPlanMonths: 3,
     description: 'Pre/post natal coaching is one of the fastest-growing niches. Unlock an entire client base most trainers can\'t serve.',
     badge: 'High Demand',
     delivery: 'Self-Paced Online · Start Anytime',
