@@ -263,10 +263,20 @@ Outside the gym, you'll usually find me sea swimming at Blackrock Tower in Galwa
   // — Limerick —
   {
     name: 'May Turner',
-    role: 'Tutor',
+    role: 'Senior Tutor & S&C Coach',
     location: 'Limerick',
-    shortBio: 'Passionate about helping new trainers build confidence.',
-    fullBio: '',
+    shortBio: 'Strength & conditioning coach, personal trainer and senior tutor at IFT. Former nurse with a passion for functional movement, women\'s health, and weightlifting for longevity.',
+    fullBio: `Hi, I'm May!
+
+I am a strength & conditioning coach, personal trainer and senior tutor here at IFT.
+
+I have been working in care roles since 2015 — starting out in nursing. My passion for weightlifting and being part of helping people to get stronger was a big motivation for a change of direction with my career. I have a special interest in functional movement for a purpose, whether it's sports performance or general health-based. Pre/post injury and women's health, weightlifting for longevity and as we age are huge passions of mine. I love making the gym an all-inclusive space.
+
+I love the whole approach to training — building programmes that cater to the individual, ensuring clients gain education in weightlifting technique and movement awareness. Coaching, for me, is a communication between both client and coach to facilitate their process of gaining strength and confidence in the gym. I find my work extremely motivating and rewarding.
+
+I have been working with Image Fitness Training for almost 5 years now. I am always learning and extremely humbled to be part of students' journeys in becoming coaches. I love to stay in touch with past students — it's inspiring to see them do well and gain work they enjoy. I began tutoring on the Cork courses initially and two years ago we added the courses to a new location in Limerick, where I am currently based.
+
+My work schedule is a mix between being a mum, 1-1 hours with my own clients, coaching strength & conditioning classes, caring for patients in a GP Clinic, and tutoring students. The variety day to day is something I love. The focus is all centred around care and community, which I'm so grateful for. My son will always be the main focus and drive for everything I do.`,
     image: '/tutors/may.png'
   },
   {
