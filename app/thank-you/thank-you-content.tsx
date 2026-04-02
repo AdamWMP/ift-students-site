@@ -21,8 +21,8 @@ const nextSteps = [
   {
     icon: Calendar,
     step: '02',
-    title: 'Your call with Aaron',
-    description: 'A quick chat to understand your goals, see whether Pro Coach or Complete Coach fits best, and map out your fastest path to get qualified and earning. No pressure — just direction.',
+    title: 'Your career strategy call with the team',
+    description: 'A focused chat to understand where you\'re at, explore whether Pro Coach or Complete Coach is the right fit, and map out your fastest path to get qualified and earning. No pressure — just clear direction.',
   },
   {
     icon: Briefcase,
