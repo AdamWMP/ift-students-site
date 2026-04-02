@@ -60,9 +60,18 @@ export function AddonCheckout({ courseId }: Props) {
 
   const discountAmount = course.price - discountedPrice;
 
+  // When a payment plan premium exists (installments cost more than upfront),
+  // use paymentPlanPrice as the installment total. Coupons bypass the premium.
+  const installmentTotal = useMemo(() => {
+    if (appliedCoupon || !course.paymentPlanPrice) return discountedPrice;
+    return course.paymentPlanPrice;
+  }, [appliedCoupon, course.paymentPlanPrice, discountedPrice]);
+
   const isFullPayment = depositAmount >= discountedPrice;
   const effectiveDeposit = Math.min(depositAmount, discountedPrice);
-  const remaining = discountedPrice - effectiveDeposit;
+  // If paying in installments, use the (potentially higher) installment total
+  const planTotal = isFullPayment ? discountedPrice : installmentTotal;
+  const remaining = planTotal - effectiveDeposit;
   const monthlyPayment = months > 0 && !isFullPayment
     ? Math.ceil((remaining / months) * 100) / 100
     : 0;
@@ -178,7 +187,7 @@ export function AddonCheckout({ courseId }: Props) {
           depositAmount: effectiveDeposit,
           months,
           monthlyPayment,
-          discountedPrice,
+          discountedPrice: planTotal,
           couponCode: appliedCoupon?.code || null,
           couponId: appliedCoupon?.id || null,
           firstName,
@@ -312,9 +321,15 @@ export function AddonCheckout({ courseId }: Props) {
             <div className="mt-6 pt-5 border-t border-zinc-800">
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-white">€{course.price.toLocaleString()}</span>
-                <span className="text-zinc-500 text-sm">total</span>
+                <span className="text-zinc-500 text-sm">upfront</span>
               </div>
-              <p className="text-zinc-500 text-xs mt-1">Payment plans available from €{course.minDeposit} deposit</p>
+              {course.paymentPlanPrice ? (
+                <p className="text-zinc-500 text-xs mt-1">
+                  or €{Math.ceil(course.paymentPlanPrice / course.maxMonths)}/mo × {course.maxMonths} (€{course.paymentPlanPrice} total)
+                </p>
+              ) : (
+                <p className="text-zinc-500 text-xs mt-1">Payment plans from €{course.minDeposit} deposit</p>
+              )}
             </div>
           </motion.div>
 
@@ -493,7 +508,7 @@ export function AddonCheckout({ courseId }: Props) {
                             </div>
                             <div className="flex justify-between border-t border-zinc-700 pt-2">
                               <span className="text-zinc-400">Total</span>
-                              <span className="text-gold font-bold">€{discountedPrice.toLocaleString()}</span>
+                              <span className="text-gold font-bold">€{planTotal.toLocaleString()}</span>
                             </div>
                           </>
                         )}

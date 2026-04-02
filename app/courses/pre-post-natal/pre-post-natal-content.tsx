@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Image from 'next/image'
+import { AddonCheckout } from '@/components/checkout/addon-checkout'
 import Link from 'next/link'
 import { useState, useRef } from 'react'
 import {
@@ -833,6 +834,11 @@ export default function PrePostNatalContent() {
             </motion.div>
           </div>
         </div>
+      </section>
+
+      {/* ── Interactive Checkout ────────────────────────────── */}
+      <section id="checkout">
+        <AddonCheckout courseId="ppn" />
       </section>
 
       {/* ── FAQ ───────────────────────────────────────────────── */}

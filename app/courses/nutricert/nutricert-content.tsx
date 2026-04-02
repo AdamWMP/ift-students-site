@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { AddonCheckout } from '@/components/checkout/addon-checkout'
 import {
   Check, Award, ArrowRight, Star, Play, ChevronDown, ChevronUp,
   BookOpen, Brain, TrendingUp, Lock, AlertCircle, X,
@@ -737,6 +738,11 @@ export default function NutriCertContent() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ── Interactive Checkout ────────────────────────────── */}
+      <section id="checkout">
+        <AddonCheckout courseId="nutricert" />
       </section>
 
       {/* ── FAQ ───────────────────────────────────────────────── */}

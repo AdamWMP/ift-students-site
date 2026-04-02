@@ -44,7 +44,8 @@ export interface AddonCourseConfig {
   name: string
   fullName: string
   badge: string
-  price: number
+  price: number             // upfront / full-payment price
+  paymentPlanPrice?: number // total when paying in installments (may be higher)
   minDeposit: number
   maxMonths: number
   productId: string
@@ -107,6 +108,7 @@ export const ADDON_COURSES: Record<AddonCourseId, AddonCourseConfig> = {
     fullName: 'Pre & Post Natal Exercise Coaching Certification',
     badge: 'REPs Ireland · PD:Approval · EQF Level 4',
     price: 697,
+    paymentPlanPrice: 897,
     minDeposit: 199,
     maxMonths: 3,
     productId: '98',
@@ -139,6 +141,7 @@ export const ADDON_COURSES: Record<AddonCourseId, AddonCourseConfig> = {
     fullName: 'NutriCert Global — Advanced Nutrition Coach Certificate',
     badge: 'REPs Ireland Aligned · Advanced Level',
     price: 750,
+    paymentPlanPrice: 900,
     minDeposit: 199,
     maxMonths: 3,
     productId: '103',
