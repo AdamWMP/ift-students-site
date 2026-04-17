@@ -71,12 +71,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.65,
     },
     {
-      url: `${BASE_URL}/course-pathway-quiz`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.65,
-    },
-    {
       url: `${BASE_URL}/contact`,
       lastModified: new Date(),
       changeFrequency: 'yearly',

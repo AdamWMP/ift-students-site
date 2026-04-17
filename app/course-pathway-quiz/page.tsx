@@ -14,6 +14,7 @@ export const metadata = {
     'fitness business accelerator quiz',
   ],
   alternates: { canonical: 'https://imageft.ie/course-pathway-quiz' },
+  robots: { index: false, follow: false },
   openGraph: {
     title: 'Course Pathway Quiz | Career or Business? | Image Fitness Training',
     description: 'Find your perfect path in 60 seconds — a new fitness career or launching your own business.',
