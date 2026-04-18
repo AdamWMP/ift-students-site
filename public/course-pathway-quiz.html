@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Course Pathway Quiz | Career or Business? | Image Fitness Training</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: { DEFAULT: '#D4A836', 400: '#E5B82A', 500: '#D4A836' },
+            charcoal: { 700: '#434343', 800: '#383838', 900: '#1a1a1a', 950: '#0d0d0d' },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    .slide-in { animation: slideIn 0.3s ease-out; }
+    @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { 0% { opacity: 0; transform: translateX(20px); } 100% { opacity: 1; transform: translateX(0); } }
+    @keyframes pop { 0% { transform: scale(0) rotate(-20deg); } 100% { transform: scale(1) rotate(0); } }
+    .pop { animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .btn-gold {
+      background: linear-gradient(135deg, #D4A836 0%, #E5B82A 100%);
+      color: #0d0d0d;
+      font-weight: 600;
+      border-radius: 9999px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 10px 25px rgba(212, 168, 54, 0.3); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(212, 168, 54, 0.4);
+      color: #D4A836;
+      font-weight: 600;
+      border-radius: 9999px;
+      transition: background 0.2s;
+    }
+    .btn-outline:hover { background: rgba(212, 168, 54, 0.1); }
+    .progress-fill { background: linear-gradient(90deg, #D4A836, #E5B82A); transition: width 0.3s ease; }
+    .option-card {
+      transition: transform 0.15s, border-color 0.2s, background 0.2s;
+    }
+    .option-card:hover { transform: scale(1.01); border-color: rgba(212, 168, 54, 0.6); background: rgba(212, 168, 54, 0.05); }
+    .option-card:hover .option-icon { background: rgba(212, 168, 54, 0.1); border-color: rgba(212, 168, 54, 0.3); }
+    .option-card:hover .option-chevron { color: #D4A836; transform: translateX(4px); }
+  </style>
+</head>
+<body class="bg-charcoal-950 text-white min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div id="app" class="w-full max-w-[720px]"></div>
+
+  <script>
+    const questions = [
+      {
+        question: 'Which best describes where you are today?',
+        subtitle: 'Pick the one that feels most like you',
+        options: [
+          { emoji: '🌱', text: "I'm new to fitness coaching — I want to get qualified", scores: { career: 3 } },
+          { emoji: '🏋️', text: 'I love training and want to make it my job', scores: { career: 2, business: 1 } },
+          { emoji: '📜', text: "I'm already a qualified PT or instructor", scores: { business: 3 } },
+          { emoji: '💼', text: "I qualified a while ago but I'm not earning what I want", scores: { business: 3 } },
+        ],
+      },
+      {
+        question: "What's your biggest goal over the next 12 months?",
+        options: [
+          { emoji: '🎓', text: 'Get certified and start working in the industry', scores: { career: 3 } },
+          { emoji: '💪', text: 'Learn how to coach people properly', scores: { career: 3 } },
+          { emoji: '💰', text: 'Sign my first 10+ paying clients', scores: { business: 3 } },
+          { emoji: '🚀', text: 'Scale my coaching into a full-time business', scores: { business: 3 } },
+        ],
+      },
+      {
+        question: 'How confident do you feel coaching a client through a full programme?',
+        options: [
+          { emoji: '😅', text: "Not confident — I've never coached before", scores: { career: 3 } },
+          { emoji: '🤔', text: 'Somewhat — I know the basics but lack structure', scores: { career: 2, business: 1 } },
+          { emoji: '😎', text: "I'm confident coaching, I just need more clients", scores: { business: 3 } },
+          { emoji: '🔥', text: "I'm already coaching — I want to scale", scores: { business: 3 } },
+        ],
+      },
+      {
+        question: "What's holding you back the most right now?",
+        options: [
+          { emoji: '📚', text: 'I need a recognised qualification', scores: { career: 3 } },
+          { emoji: '🧭', text: "I don't know where to start in the industry", scores: { career: 3 } },
+          { emoji: '📣', text: "I can't find consistent paying clients", scores: { business: 3 } },
+          { emoji: '💸', text: "I'm qualified but not earning enough yet", scores: { business: 3 } },
+        ],
+      },
+      {
+        question: 'How do you want to earn money in fitness?',
+        options: [
+          { emoji: '🏢', text: 'Work in a gym, studio, or sports team', scores: { career: 3 } },
+          { emoji: '🤝', text: 'Be employed while building experience', scores: { career: 3 } },
+          { emoji: '🧑‍💻', text: 'Run my own online coaching business', scores: { business: 3 } },
+          { emoji: '👑', text: 'Build my personal brand and charge premium', scores: { business: 3 } },
+        ],
+      },
+      {
+        question: 'Which of these sounds more like you?',
+        options: [
+          { emoji: '❤️', text: 'I love the idea of coaching people in person', scores: { career: 3 } },
+          { emoji: '🧠', text: 'I want to master movement, nutrition, and programming', scores: { career: 3 } },
+          { emoji: '📱', text: 'I love marketing, content, and building a brand', scores: { business: 3 } },
+          { emoji: '📈', text: 'I think about systems, offers, and business growth', scores: { business: 3 } },
+        ],
+      },
+      {
+        question: 'How much time can you dedicate each week?',
+        options: [
+          { emoji: '⏰', text: '5–8 hours (part-time / evenings)', scores: { career: 2, business: 1 } },
+          { emoji: '📅', text: 'Weekends and some evenings', scores: { career: 3 } },
+          { emoji: '💻', text: '8–12 hours — I can work from home', scores: { business: 3 } },
+          { emoji: '🔁', text: "I'm already full-time in fitness", scores: { business: 3 } },
+        ],
+      },
+      {
+        question: 'In 6 months, what would make this feel like a win?',
+        options: [
+          { emoji: '🏅', text: 'Being a qualified personal trainer or instructor', scores: { career: 3 } },
+          { emoji: '🏋️‍♀️', text: 'Working in a gym helping real clients', scores: { career: 3 } },
+          { emoji: '💵', text: 'Earning €3–5k/month from my own clients', scores: { business: 3 } },
+          { emoji: '🌍', text: 'A full client roster and a brand I love', scores: { business: 3 } },
+        ],
+      },
+    ];
+
+    const results = {
+      career: {
+        badge: 'Your Match: Career',
+        headline: 'Start Your Fitness Career',
+        emoji: '🎓',
+        description:
+          "You're ready to step into the fitness industry. The smart move right now is to get a recognised qualification so you can confidently coach clients, earn income in a gym or studio, and build the foundation of a long career in fitness.",
+        features: [
+          'EQF Level 4 Personal Trainer qualification',
+          'NutriCert Global Nutrition Diploma included',
+          '8–16 weeks with flexible schedules',
+          'Dublin, Cork & Limerick locations',
+        ],
+        ctaText: 'See the Career Course',
+        link: 'https://imageft.ie/courses/personal-trainer',
+        runnerUp: { title: 'Already qualified? Check out the Business Accelerator', link: 'https://imageft.ie/business-accelerator' },
+      },
+      business: {
+        badge: 'Your Match: Business',
+        headline: 'Launch Your Fitness Business',
+        emoji: '🚀',
+        description:
+          "You don't need another certificate — you need clients, systems and a business that actually pays you. The Fitness Business Accelerator is built for qualified trainers ready to sign paying clients, build a brand, and grow their income fast.",
+        features: [
+          '7-week Fitness Business Accelerator',
+          'Live mentorship (Mon & Wed, 7pm)',
+          'Niche, offer, marketing, sales systems',
+          'Get your first paying clients fast',
+        ],
+        ctaText: 'See the Business Accelerator',
+        link: 'https://imageft.ie/business-accelerator',
+        runnerUp: { title: 'Not qualified yet? See the Personal Trainer course', link: 'https://imageft.ie/courses/personal-trainer' },
+      },
+    };
+
+    const state = {
+      stage: 'intro',
+      current: 0,
+      answers: [],
+      scores: { career: 0, business: 0 },
+    };
+
+    const app = document.getElementById('app');
+
+    function render() {
+      if (state.stage === 'intro') renderIntro();
+      else if (state.stage === 'quiz') renderQuiz();
+      else renderResult();
+    }
+
+    function renderIntro() {
+      app.innerHTML = `
+        <div class="text-center fade-in">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/30 rounded-full mb-6">
+            <span class="text-gold">✨</span>
+            <span class="text-sm text-gold font-medium">60-Second Pathway Quiz</span>
+          </div>
+          <div class="flex justify-center gap-4 mb-8 text-6xl sm:text-7xl">
+            <span class="pop inline-block">🎓</span>
+            <span class="pop inline-block" style="animation-delay:.12s">🚀</span>
+          </div>
+          <h1 class="text-4xl sm:text-5xl font-black mb-4 leading-tight">Career or <span class="text-gold">Business?</span></h1>
+          <p class="text-white/70 text-lg mb-10 max-w-md mx-auto">Answer 8 quick questions and we'll show you whether to start a new fitness career — or launch your own business.</p>
+          <button id="start-btn" class="btn-gold inline-flex items-center gap-2 px-10 py-4 text-lg">
+            Start the Quiz
+            <span>→</span>
+          </button>
+          <div class="grid grid-cols-3 gap-4 mt-12 text-center">
+            <div><div class="text-2xl font-bold text-gold">60s</div><div class="text-xs text-white/50">To complete</div></div>
+            <div><div class="text-2xl font-bold text-gold">8</div><div class="text-xs text-white/50">Short questions</div></div>
+            <div><div class="text-2xl font-bold text-gold">100%</div><div class="text-xs text-white/50">Free &amp; personal</div></div>
+          </div>
+        </div>
+      `;
+      document.getElementById('start-btn').addEventListener('click', () => { state.stage = 'quiz'; render(); });
+    }
+
+    function renderQuiz() {
+      const q = questions[state.current];
+      const progress = ((state.current + 1) / questions.length) * 100;
+      app.innerHTML = `
+        <div class="slide-in">
+          <div class="flex items-center gap-4 mb-6">
+            <button id="back-btn" aria-label="Go back" class="w-10 h-10 rounded-full bg-charcoal-800 border border-charcoal-700/50 flex items-center justify-center text-white/70 hover:text-white hover:border-gold/50 transition flex-shrink-0">←</button>
+            <div class="flex-1 h-2 bg-charcoal-800 rounded-full overflow-hidden">
+              <div class="progress-fill h-full rounded-full" style="width:${progress}%"></div>
+            </div>
+            <div class="text-sm text-white/50 font-medium flex-shrink-0 w-12 text-right">${state.current + 1}/${questions.length}</div>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-center">${q.question}</h2>
+          ${q.subtitle ? `<p class="text-white/50 text-center mb-8">${q.subtitle}</p>` : `<div class="mb-8"></div>`}
+          <div class="space-y-3">
+            ${q.options.map((opt, i) => `
+              <button data-idx="${i}" class="option-card w-full text-left p-4 bg-charcoal-800/60 rounded-2xl border border-charcoal-700/50 flex items-center gap-4">
+                <div class="option-icon w-14 h-14 rounded-xl bg-charcoal-900/80 border border-charcoal-700/50 flex items-center justify-center text-3xl flex-shrink-0 transition">${opt.emoji}</div>
+                <span class="flex-1 text-white/90 text-base sm:text-lg font-medium leading-snug">${opt.text}</span>
+                <span class="option-chevron text-white/30 text-xl transition">›</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('back-btn').addEventListener('click', goBack);
+      document.querySelectorAll('[data-idx]').forEach(btn => {
+        btn.addEventListener('click', () => answer(parseInt(btn.getAttribute('data-idx'), 10)));
+      });
+    }
+
+    function answer(idx) {
+      const opt = questions[state.current].options[idx];
+      for (const [k, v] of Object.entries(opt.scores)) state.scores[k] = (state.scores[k] || 0) + v;
+      state.answers.push(idx);
+      if (state.current < questions.length - 1) {
+        state.current += 1;
+        render();
+      } else {
+        state.stage = 'result';
+        render();
+      }
+    }
+
+    function goBack() {
+      if (state.current > 0) {
+        const prevIdx = state.answers.pop();
+        const prevOpt = questions[state.current - 1].options[prevIdx];
+        for (const [k, v] of Object.entries(prevOpt.scores)) state.scores[k] = (state.scores[k] || 0) - v;
+        state.current -= 1;
+        render();
+      } else {
+        state.stage = 'intro';
+        render();
+      }
+    }
+
+    function renderResult() {
+      const winnerKey = state.scores.business > state.scores.career ? 'business' : 'career';
+      const r = results[winnerKey];
+      const total = state.scores.career + state.scores.business;
+      const careerPct = total > 0 ? Math.round((state.scores.career / total) * 100) : 0;
+      const businessPct = total > 0 ? Math.round((state.scores.business / total) * 100) : 0;
+      const winnerPct = total > 0 ? Math.round((state.scores[winnerKey] / total) * 100) : 50;
+
+      app.innerHTML = `
+        <div class="fade-in">
+          <div class="text-center mb-8">
+            <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gold/30 to-gold/10 rounded-full flex items-center justify-center text-5xl pop">${r.emoji}</div>
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-gold/10 border border-gold/30 rounded-full mb-4">
+              <span class="text-gold text-sm font-medium">${r.badge}</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-3">${r.headline}</h1>
+            <p class="text-white/60">Based on your answers, this is the right next step for you.</p>
+          </div>
+
+          <div class="bg-charcoal-800/50 rounded-2xl p-5 border border-charcoal-700/50 mb-6">
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1.5">
+                  <span class="text-white/80 font-medium flex items-center gap-2"><span>🎓</span> Career Path</span>
+                  <span class="text-white/60">${careerPct}%</span>
+                </div>
+                <div class="h-2 bg-charcoal-900 rounded-full overflow-hidden">
+                  <div class="${winnerKey === 'career' ? 'progress-fill' : 'bg-charcoal-700'} h-full" style="width:${careerPct}%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1.5">
+                  <span class="text-white/80 font-medium flex items-center gap-2"><span>🚀</span> Business Path</span>
+                  <span class="text-white/60">${businessPct}%</span>
+                </div>
+                <div class="h-2 bg-charcoal-900 rounded-full overflow-hidden">
+                  <div class="${winnerKey === 'business' ? 'progress-fill' : 'bg-charcoal-700'} h-full" style="width:${businessPct}%"></div>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-white/40 mt-4 text-center">${winnerPct}% match with ${winnerKey === 'business' ? 'The Business Path' : 'The Career Path'}</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-charcoal-800/80 to-charcoal-900/80 rounded-2xl p-6 sm:p-8 border border-gold/30 mb-6">
+            <p class="text-white/80 text-base sm:text-lg leading-relaxed mb-6">${r.description}</p>
+            <div class="grid sm:grid-cols-2 gap-3 mb-8">
+              ${r.features.map(f => `
+                <div class="flex items-start gap-3">
+                  <div class="w-5 h-5 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-gold text-xs">✓</span>
+                  </div>
+                  <span class="text-white/80 text-sm">${f}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <a href="${r.link}" class="btn-gold flex items-center justify-center gap-2 flex-1 py-4">
+                ${r.ctaText} <span>→</span>
+              </a>
+              <a href="https://imageft.ie/contact" class="btn-outline flex items-center justify-center gap-2 flex-1 py-4">Book a Free Call</a>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <a href="${r.runnerUp.link}" class="inline-block px-5 py-2.5 bg-charcoal-800/50 border border-charcoal-700/50 rounded-full text-white/70 text-sm hover:border-gold/30 hover:text-gold transition mb-6">${r.runnerUp.title}</a>
+            <div>
+              <button id="restart-btn" class="flex items-center gap-2 text-white/50 hover:text-white transition mx-auto">
+                <span>↻</span><span>Retake Quiz</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('restart-btn').addEventListener('click', () => {
+        state.stage = 'intro';
+        state.current = 0;
+        state.answers = [];
+        state.scores = { career: 0, business: 0 };
+        render();
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
