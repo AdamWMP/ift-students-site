@@ -8,15 +8,18 @@
 <style>
   :root {
     --gold: #f2d06b;
+    --gold-soft: #f9e3a1;
     --navy: #1a2761;
     --ink: #111;
-    --muted: #666;
+    --muted: #6a6a6a;
     --bg: #eeeeef;
     --line: #e5e5e7;
+    --row-alt: #efeff1;
   }
   *,*::before,*::after { box-sizing: border-box; }
   html,body { margin:0; padding:0; background:var(--bg); color:var(--ink);
     font-family: "Montserrat","Helvetica Neue",Helvetica,Arial,sans-serif; }
+
   .app { display:flex; gap:24px; padding:24px; max-width:1600px; margin:0 auto; }
   @media (max-width: 1024px) { .app { flex-direction:column; } }
 
@@ -26,14 +29,15 @@
     border-radius:12px; padding:20px; position:sticky; top:16px; align-self:flex-start;
     box-shadow: 0 1px 3px rgba(0,0,0,.04);
   }
-  .form h1 { font-size:18px; margin:0 0 4px; }
+  .form h1 { font-size:18px; margin:0 0 4px; color:var(--ink); }
   .form p.hint { margin:0 0 14px; font-size:12px; color:var(--muted); }
   .tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
   .tabs button {
     border:1px solid var(--line); background:#fff; padding:9px 10px;
     border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; color:#333;
+    transition: all .15s ease;
   }
-  .tabs button.active { border-color:var(--gold); background:#fff7df; color:#6a4b00; }
+  .tabs button.active { border-color:var(--gold); background:var(--gold-soft); color:#6a4b00; }
   .field { display:block; margin-bottom:10px; }
   .field > span {
     display:block; font-size:11px; text-transform:uppercase; letter-spacing:.04em;
@@ -41,40 +45,66 @@
   }
   .field input, .field textarea {
     width:100%; padding:8px 10px; font-size:13px; border:1px solid var(--line);
-    border-radius:6px; background:#fff; color:#111; outline:none; font-family:inherit;
+    border-radius:6px; background:#fff; color:var(--ink); outline:none; font-family:inherit;
   }
   .field textarea { min-height:88px; resize:vertical; }
   .field input:focus, .field textarea:focus { border-color:var(--gold); box-shadow:0 0 0 2px #f2d06b66; }
   .row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .duration { font-size:12px; color:#555; margin:2px 0 10px; }
   .print-btn {
-    width:100%; margin-top:10px; background:#111; color:#fff; border:none;
+    width:100%; margin-top:10px; background:var(--ink); color:#fff; border:none;
     padding:10px 12px; font-weight:700; font-size:13px; border-radius:6px; cursor:pointer;
   }
   .print-btn:hover { background:#333; }
 
-  /* ---------- Preview area ---------- */
+  /* ---------- Document (preview) ---------- */
   .preview-wrap { flex:1; display:flex; justify-content:center; }
   .doc {
-    position:relative; width:794px; min-height:1123px; background:#fff; color:#111;
+    position:relative; width:794px; min-height:1123px; background:#fff; color:var(--ink);
     box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    overflow:hidden;
+    display:flex; flex-direction:column;
   }
 
-  /* Black diagonal header shape */
+  /* ---- Decorative shapes (absolute so they don't affect flow) ---- */
   .black-shape {
-    position:absolute; top:0; left:0; width:420px; height:470px;
+    position:absolute; top:0; left:0;
+    width:420px; height:380px;
     background:#000; color:#fff;
-    clip-path: polygon(0 0, 100% 0, 100% 72%, 55% 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 78%, 58% 100%, 0 100%);
+    pointer-events:none;
+    z-index:1;
   }
-  .black-shape .inner { padding: 24px 32px 0; }
-  .logo-global { width:220px; height:150px; background:url('/logo-global.png') no-repeat left center / contain; }
-  .corp-name  { font-size:17px; font-weight:800; letter-spacing:.02em; margin-top:2px; }
-  .corp-sub   { font-size:11px; font-weight:600; letter-spacing:.02em; margin-bottom:8px; }
-  .addr       { font-size:10.5px; font-weight:600; line-height:1.35; text-transform:uppercase; letter-spacing:.02em; }
-  .addr div   { margin-bottom:2px; }
+  .ribbon {
+    position:absolute; left:0; right:0; bottom:0;
+    height:70px; background:var(--gold);
+    clip-path: polygon(0 45%, 100% 0, 100% 100%, 0 100%);
+    pointer-events:none;
+    z-index:1;
+  }
 
-  /* Top-right badges + title */
-  .top-right { position:absolute; top:24px; right:40px; display:flex; flex-direction:column; align-items:flex-end; }
+  /* ---- Header (flow content above black-shape via z-index) ---- */
+  .doc-header {
+    position:relative; z-index:2;
+    display:grid; grid-template-columns: 420px 1fr;
+    padding: 24px 40px 0 32px;
+    min-height:380px;
+    gap: 16px;
+  }
+  .corp { color:#fff; }
+  .logo-global {
+    width:220px; height:140px;
+    background:url('/logo-global.png') no-repeat left center / contain;
+  }
+  .corp-name { font-size:17px; font-weight:800; letter-spacing:.02em; margin-top:2px; }
+  .corp-sub  { font-size:11px; font-weight:600; letter-spacing:.02em; margin-bottom:8px; }
+  .addr      { font-size:10.5px; font-weight:600; line-height:1.4; text-transform:uppercase; letter-spacing:.02em; }
+  .addr div  { margin-bottom:2px; }
+
+  .header-right {
+    display:flex; flex-direction:column; align-items:flex-end; justify-content:flex-start;
+    padding-top:4px;
+  }
   .badges { display:flex; align-items:center; gap:16px; }
   .reps { width:80px; height:80px; background:url('/reps-ireland-logo.png') no-repeat center / contain; }
   .nefpc { display:flex; flex-direction:column; align-items:center; }
@@ -83,90 +113,105 @@
   .nefpc .big  { font-size:14px; font-weight:900; letter-spacing:.1em; color:#000; }
   .nefpc .sml  { font-size:5px; font-weight:700; letter-spacing:.15em; color:#000; }
   .doc-title {
-    margin-top:8px; font-size:64px; font-weight:900; line-height:1;
+    margin:8px 0 0; font-size:62px; font-weight:900; line-height:1;
     letter-spacing:-.01em; color:#000;
     text-shadow: 1px 2px 0 rgba(0,0,0,.08);
   }
 
-  /* Student reference */
+  /* ---- Body content (normal flow, clear of black shape) ---- */
+  .body {
+    position:relative; z-index:2;
+    padding: 16px 40px 0;
+    display:flex; flex-direction:column;
+    flex: 1 1 auto;
+  }
+
   .student-ref {
-    position:absolute; top:330px; left:0; right:0; text-align:center;
-    font-size:18px; font-weight:800;
+    text-align:center; font-size:18px; font-weight:800; margin: 8px 0 24px;
   }
-  .student-ref span { text-decoration: underline; text-underline-offset:6px; text-decoration-thickness:2px; }
+  .student-ref .u { text-decoration: underline; text-underline-offset:6px; text-decoration-thickness:2px; }
 
-  /* Details row */
   .details {
-    position:absolute; top:385px; left:0; right:0; padding:0 40px;
     display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;
+    margin-bottom:28px;
   }
-  .details .label { font-size:13px; font-weight:800; letter-spacing:.02em; }
-  .details .recipient { margin-top:8px; font-size:12px; font-weight:700; color:var(--navy); text-transform:uppercase; line-height:1.25; white-space:pre-line; }
+  .details .label  { font-size:13px; font-weight:800; letter-spacing:.02em; color:var(--ink); }
+  .details .recipient {
+    margin-top:8px; font-size:12px; font-weight:700; color:var(--navy);
+    text-transform:uppercase; line-height:1.25; white-space:pre-line;
+  }
   .details .center { text-align:center; }
-  .details .center .date { font-size:13px; font-weight:600; }
-  .details .center .num  { font-size:13px; font-weight:600; margin-top:20px; }
+  .details .center .date { font-size:13px; font-weight:600; color:var(--ink); }
+  .details .center .num  { font-size:13px; font-weight:600; color:var(--ink); margin-top:18px; }
   .details .right { text-align:right; }
-  .details .right .amount { margin-top:8px; font-size:26px; font-weight:800; color:var(--navy); }
+  .details .right .amount {
+    margin-top:6px; font-size:26px; font-weight:800; color:var(--navy);
+  }
 
-  /* Description table */
-  .table { position:absolute; top:510px; left:40px; right:40px; }
+  /* ---- Description table ---- */
+  .table { margin-bottom:24px; }
   .table .head {
     background:#000; color:#fff; display:flex; justify-content:space-between;
     padding:12px 20px; border-radius:2px;
   }
   .table .head div { font-size:17px; font-weight:700; }
+
   .table .row {
     display:flex; justify-content:space-between; align-items:center;
     padding:14px 20px; background:#fff;
   }
-  .table .row.alt { background:#f3f3f4; }
-  .table .row.course .name { font-size:13px; font-weight:800; letter-spacing:.02em; }
-  .table .row.course .tot  { font-size:13px; font-weight:700; }
-  .table .quals { background:#f3f3f4; padding:14px 20px; }
-  .table .quals .list { white-space:pre-line; font-size:12.5px; font-weight:700; line-height:1.55; }
-  .table .spacer { height:12px; background:#fff; }
-  .table .dates  { background:#f3f3f4; padding:14px 20px; }
-  .table .dates div { font-size:12.5px; font-weight:700; line-height:1.35; margin-bottom:2px; }
-  .table .fees { border-bottom:1px solid #111; }
-  .table .fees .name { font-size:13px; font-weight:800; }
-  .table .fees .tot  { font-size:13px; font-weight:700; }
+  .table .row.course .name { font-size:13px; font-weight:800; letter-spacing:.02em; color:var(--ink); }
+  .table .row.course .tot  { font-size:13px; font-weight:700; color:var(--ink); }
 
-  /* Payment + total */
-  .pay-grid {
-    position:absolute; top:870px; left:40px; right:40px;
-    display:grid; grid-template-columns:1fr 1fr; gap:32px;
+  .table .block-alt { background:var(--row-alt); padding:14px 20px; }
+  .table .block-alt + .block-alt { margin-top:10px; }
+  .table .quals-list { white-space:pre-line; font-size:12.5px; font-weight:700; line-height:1.55; color:var(--ink); }
+  .table .dates-list div { font-size:12.5px; font-weight:700; line-height:1.4; margin-bottom:2px; color:var(--ink); }
+
+  .table .fees {
+    border-bottom:1px solid var(--ink); padding:14px 20px;
+    display:flex; justify-content:space-between; align-items:center; background:#fff;
   }
-  .pay-grid .title { font-size:15px; font-weight:800; margin-bottom:6px; }
-  .pay-grid .body  { font-size:10.5px; line-height:1.4; }
-  .pay-grid .body div { margin-bottom:2px; }
-  .pay-grid .right { display:flex; justify-content:flex-end; align-items:flex-start; padding-top:24px; }
+  .table .fees .name { font-size:13px; font-weight:800; color:var(--ink); }
+  .table .fees .tot  { font-size:13px; font-weight:700; color:var(--ink); }
+
+  /* ---- Payment + total ---- */
+  .pay-grid {
+    display:grid; grid-template-columns: 1fr 280px; gap:32px;
+    margin-top: 8px;
+  }
+  .pay-grid .title { font-size:15px; font-weight:800; margin-bottom:6px; color:var(--ink); }
+  .pay-grid .body-text  { font-size:10.5px; line-height:1.45; color:var(--ink); }
+  .pay-grid .body-text div { margin-bottom:2px; }
+
+  .pay-grid .right {
+    display:flex; justify-content:flex-end; align-items:flex-start; padding-top:6px;
+  }
   .total-box {
     width:260px; background:var(--gold); padding:12px 20px;
     display:flex; justify-content:space-between; align-items:center;
-    font-size:15px; font-weight:800;
+    font-size:15px; font-weight:800; color:var(--ink);
   }
 
-  /* Signature */
-  .sig { position:absolute; top:1010px; right:40px; text-align:right; }
-  .sig .name { font-family:"Brush Script MT","Segoe Script",cursive; font-size:22px; font-weight:700; }
-  .sig .role { font-size:12px; color:#444; }
-
-  /* Gold footer ribbon */
-  .ribbon {
-    position:absolute; left:0; right:0; bottom:0; height:90px; background:var(--gold);
-    clip-path: polygon(0 35%, 100% 0, 100% 100%, 0 100%);
+  /* ---- Signature ---- */
+  .sig {
+    text-align:right; margin: 18px 0 0;
+    padding-bottom: 90px; /* reserve space above the gold ribbon */
   }
-  .ribbon .text {
-    position:absolute; left:40px; right:40px; bottom:16px;
-    font-size:11px; font-weight:600; color:#111;
+  .sig .name { font-family:"Brush Script MT","Segoe Script",cursive; font-size:24px; font-weight:700; color:var(--ink); }
+  .sig .role { font-size:12px; color:#444; margin-top:2px; }
+
+  .ribbon-text {
+    position:absolute; left:40px; right:40px; bottom:14px;
+    font-size:11px; font-weight:600; color:var(--ink);
+    z-index:2;
   }
 
-  /* Print */
+  /* ---- Print ---- */
   @page { size: A4; margin: 0; }
   @media print {
     body { background:#fff; }
     .app { padding:0; max-width:none; }
-    .form, .preview-wrap > :not(.doc) { display:none !important; }
     .form { display:none !important; }
     .preview-wrap { display:block; }
     .doc { box-shadow:none; margin:0; }
@@ -241,9 +286,14 @@ Fitness Business Accelerator Mentorship</textarea>
   <!-- ============ PREVIEW ============ -->
   <section class="preview-wrap">
     <div class="doc" id="doc">
-      <!-- black header shape -->
-      <div class="black-shape">
-        <div class="inner">
+
+      <!-- decorative shapes (behind content) -->
+      <div class="black-shape" aria-hidden="true"></div>
+      <div class="ribbon" aria-hidden="true"></div>
+
+      <!-- header (flows over the black shape) -->
+      <header class="doc-header">
+        <div class="corp">
           <div class="logo-global" aria-label="Image Fitness Training"></div>
           <div class="corp-name">IMAGE EDUCATION LTD</div>
           <div class="corp-sub">(TA IMAGE FITNESS TRAINING)</div>
@@ -256,107 +306,105 @@ Fitness Business Accelerator Mentorship</textarea>
             <div>Tel: (01) 9023377</div>
           </div>
         </div>
-      </div>
 
-      <!-- top-right badges + title -->
-      <div class="top-right">
-        <div class="badges">
-          <div class="nefpc">
-            <svg class="icon" viewBox="0 0 90 54" xmlns="http://www.w3.org/2000/svg" aria-label="NEFPC">
-              <ellipse cx="45" cy="46" rx="38" ry="4" fill="#6fbf4b"/>
-              <path d="M10 40 Q 18 26 36 24 L 70 24 Q 82 24 82 34 L 82 40 Z" fill="#3ea8e5"/>
-              <circle cx="68" cy="22" r="6" fill="#3ea8e5"/>
-              <path d="M30 24 Q 36 18 44 18 L 48 18" stroke="#3ea8e5" stroke-width="6" fill="none" stroke-linecap="round"/>
-            </svg>
-            <div class="text">
-              <div class="big">N.E.F.P.C</div>
-              <div class="sml">NATIONAL ELITE FITNESS PROFESSIONAL</div>
-              <div class="sml">CERTIFICATE</div>
+        <div class="header-right">
+          <div class="badges">
+            <div class="nefpc">
+              <svg class="icon" viewBox="0 0 90 54" xmlns="http://www.w3.org/2000/svg" aria-label="NEFPC">
+                <ellipse cx="45" cy="46" rx="38" ry="4" fill="#6fbf4b"/>
+                <path d="M10 40 Q 18 26 36 24 L 70 24 Q 82 24 82 34 L 82 40 Z" fill="#3ea8e5"/>
+                <circle cx="68" cy="22" r="6" fill="#3ea8e5"/>
+                <path d="M30 24 Q 36 18 44 18 L 48 18" stroke="#3ea8e5" stroke-width="6" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div class="text">
+                <div class="big">N.E.F.P.C</div>
+                <div class="sml">NATIONAL ELITE FITNESS PROFESSIONAL</div>
+                <div class="sml">CERTIFICATE</div>
+              </div>
             </div>
+            <div class="reps" aria-label="REPs Ireland Approved Provider"></div>
           </div>
-          <div class="reps" aria-label="REPs Ireland Approved Provider"></div>
+          <h1 class="doc-title" id="p-doclabel">QUOTATION</h1>
         </div>
-        <h1 class="doc-title" id="p-doclabel">QUOTATION</h1>
-      </div>
+      </header>
 
-      <!-- student reference -->
-      <div class="student-ref"><span>STUDENT REFERENCE: <em id="p-student" style="font-style:normal">DONALD AZARÍAS WEIL COREA</em></span></div>
-
-      <!-- details row -->
-      <div class="details">
-        <div>
-          <div class="label" id="p-recipient-label">QUOTATION TO :</div>
-          <div class="recipient" id="p-recipient">DEPARTMENT OF SOCIAL PROTECTION</div>
-        </div>
-        <div class="center">
-          <div class="date">Date : <span id="p-date">14/04/2026</span></div>
-          <div class="num"><span id="p-numlabel">Quotation No :</span> <span id="p-num">IFT.S26.105841</span></div>
-        </div>
-        <div class="right">
-          <div class="label">TOTAL DUE :</div>
-          <div class="amount" id="p-total1">€3500</div>
-        </div>
-      </div>
-
-      <!-- description table -->
-      <div class="table">
-        <div class="head"><div>Description</div><div>Total</div></div>
-
-        <div class="row course">
-          <div class="name" id="p-course">THE CAREER PATHWAY</div>
-          <div class="tot"  id="p-total2">€3500</div>
+      <!-- body -->
+      <div class="body">
+        <div class="student-ref">
+          <span class="u">STUDENT REFERENCE: <span id="p-student">DONALD AZARÍAS WEIL COREA</span></span>
         </div>
 
-        <div class="quals"><div class="list" id="p-quals">Fitness Instruction EQF Level 3
+        <div class="details">
+          <div>
+            <div class="label" id="p-recipient-label">QUOTATION TO :</div>
+            <div class="recipient" id="p-recipient">DEPARTMENT OF SOCIAL PROTECTION</div>
+          </div>
+          <div class="center">
+            <div class="date">Date : <span id="p-date">14/04/2026</span></div>
+            <div class="num"><span id="p-numlabel">Quotation No :</span> <span id="p-num">IFT.S26.105841</span></div>
+          </div>
+          <div class="right">
+            <div class="label">TOTAL DUE :</div>
+            <div class="amount" id="p-total1">€3500</div>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="head"><div>Description</div><div>Total</div></div>
+
+          <div class="row course">
+            <div class="name" id="p-course">THE CAREER PATHWAY</div>
+            <div class="tot"  id="p-total2">€3500</div>
+          </div>
+
+          <div class="block-alt">
+            <div class="quals-list" id="p-quals">Fitness Instruction EQF Level 3
 Group Instruction EQF Level 3
 Personal Trainer EQF Level 4
-Fitness Business Accelerator Mentorship</div></div>
+Fitness Business Accelerator Mentorship</div>
+          </div>
 
-        <div class="spacer"></div>
+          <div class="block-alt">
+            <div class="dates-list">
+              <div>Course Start Date: <span id="p-start">25/04/26</span></div>
+              <div>Course End Date: <span id="p-end">08/08/26</span></div>
+              <div>Duration: <span id="p-duration">16 weeks</span></div>
+            </div>
+          </div>
 
-        <div class="dates">
-          <div>Course Start Date: <span id="p-start">25/04/26</span></div>
-          <div>Course End Date: <span id="p-end">08/08/26</span></div>
-          <div>Duration: <span id="p-duration">16 weeks</span></div>
-        </div>
-
-        <div class="row fees">
-          <div class="name">Fees Due</div>
-          <div class="tot" id="p-total3">€3500</div>
-        </div>
-      </div>
-
-      <!-- payment + total -->
-      <div class="pay-grid">
-        <div>
-          <div class="title">Payment Method</div>
-          <div class="body">
-            <div>Please make your cheques and payments payable to:</div>
-            <div>Image Education Ltd (T/A Image Fitness Training)</div>
-            <div>Tax Reg No: 3706146SH C Reg: 585030</div>
-            <div>For bank lodgements:</div>
-            <div>AIB Bank</div>
-            <div>A/c no.: 65895007 Sort code: 93-25-23</div>
-            <div>IBAN: IE84AIBK93252365895007 BIC/SWIFT: AIBKIE2DXXX</div>
+          <div class="fees">
+            <div class="name">Fees Due</div>
+            <div class="tot" id="p-total3">€3500</div>
           </div>
         </div>
-        <div class="right">
-          <div class="total-box"><span>Total :</span><span id="p-total4">€3500</span></div>
+
+        <div class="pay-grid">
+          <div>
+            <div class="title">Payment Method</div>
+            <div class="body-text">
+              <div>Please make your cheques and payments payable to:</div>
+              <div>Image Education Ltd (T/A Image Fitness Training)</div>
+              <div>Tax Reg No: 3706146SH C Reg: 585030</div>
+              <div>For bank lodgements:</div>
+              <div>AIB Bank</div>
+              <div>A/c no.: 65895007 Sort code: 93-25-23</div>
+              <div>IBAN: IE84AIBK93252365895007 BIC/SWIFT: AIBKIE2DXXX</div>
+            </div>
+          </div>
+          <div class="right">
+            <div class="total-box"><span>Total :</span><span id="p-total4">€3500</span></div>
+          </div>
+        </div>
+
+        <div class="sig">
+          <div class="name" id="p-admin">Adam Ward</div>
+          <div class="role">Administrator</div>
         </div>
       </div>
 
-      <!-- signature -->
-      <div class="sig">
-        <div class="name" id="p-admin">Adam Ward</div>
-        <div class="role">Administrator</div>
-      </div>
-
-      <!-- gold ribbon -->
-      <div class="ribbon">
-        <div class="text">
-          Image Education Limited &nbsp;is Trading as Image Fitness Training ·<br/>
-          Tax Registration Number 3706146SH
-        </div>
+      <div class="ribbon-text">
+        Image Education Limited&nbsp; is Trading as Image Fitness Training ·<br/>
+        Tax Registration Number 3706146SH
       </div>
     </div>
   </section>
@@ -451,7 +499,6 @@ Fitness Business Accelerator Mentorship</div></div>
     });
   });
 
-  // Tabs
   var tabs = document.querySelectorAll('#tabs button');
   tabs.forEach(function(btn){
     btn.addEventListener('click', function(){
