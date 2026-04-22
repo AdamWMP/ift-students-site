@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { LocalBusinessJsonLd } from '@/components/seo/json-ld'
+import { MetaPixel } from '@/components/meta-pixel'
 import './globals.css'
 
 export const dynamic = 'force-dynamic'
@@ -80,6 +81,7 @@ export default function RootLayout({
         <LocalBusinessJsonLd />
       </head>
       <body className="bg-charcoal-950 text-white antialiased" suppressHydrationWarning>
+        <MetaPixel />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           {children}
         </ThemeProvider>

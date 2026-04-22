@@ -5,6 +5,7 @@ import NutriCertContent from './nutricert-content'
 import { AddonCheckout } from '@/components/checkout/addon-checkout'
 import { ScrollToTop } from '@/components/scroll-to-top'
 import { CourseJsonLd, BreadcrumbJsonLd } from '@/components/seo/json-ld'
+import MetaViewContent from '@/components/meta-view-content'
 
 export const metadata = {
   title: 'NutriCert Global — Nutrition Coach Certification Ireland | REPs Aligned | €750',
@@ -33,6 +34,7 @@ export const metadata = {
 export default function NutriCertPage() {
   return (
     <main className="min-h-screen bg-charcoal-950">
+      <MetaViewContent contentId="nutricert" contentName="NutriCert Global" value={750} />
       <CourseJsonLd
         name="NutriCert Global — Nutrition Coaching Certification Ireland"
         description="Ireland's most complete nutrition coaching certification. Combines sports nutrition science, coaching psychology and business training. REPs Ireland aligned. 10 units, 100+ lessons, lifetime access."

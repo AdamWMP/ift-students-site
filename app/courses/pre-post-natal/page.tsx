@@ -5,6 +5,7 @@ import PrePostNatalContent from './pre-post-natal-content'
 import { AddonCheckout } from '@/components/checkout/addon-checkout'
 import { ScrollToTop } from '@/components/scroll-to-top'
 import { CourseJsonLd, BreadcrumbJsonLd } from '@/components/seo/json-ld'
+import MetaViewContent from '@/components/meta-view-content'
 
 export const metadata = {
   title: 'Pre & Post Natal Exercise Instructor Course Ireland | REPs Accredited | 16 CPD Points',
@@ -33,6 +34,7 @@ export const metadata = {
 export default function PrePostNatalPage() {
   return (
     <main className="min-h-screen bg-charcoal-950">
+      <MetaViewContent contentId="pre-post-natal" contentName="Pre & Post Natal Exercise Instructor Course" value={697} />
       <CourseJsonLd
         name="Pre & Post Natal Exercise Instructor Course Ireland"
         description="Become a qualified Pre & Post Natal Exercise Instructor. Dual accredited by REPs Ireland and PD:Approval. 11 comprehensive modules, 16 CPD points, 200+ page digital manual. Fully online, self-paced."

@@ -2,11 +2,12 @@
 
 import { MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { track } from '@/lib/meta/events'
 
 export default function WhatsAppButton() {
   const phoneNumber = '353866000001' // Replace with actual number
   const message = 'Hi! I\'m interested in the Personal Trainer course.'
-  
+
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
   return (
@@ -14,6 +15,7 @@ export default function WhatsAppButton() {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => track('Contact', { customData: { content_name: 'WhatsApp Floating', content_category: 'contact' } })}
       className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-green-500 rounded-full shadow-lg hover:bg-green-600 transition-colors whatsapp-btn"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}

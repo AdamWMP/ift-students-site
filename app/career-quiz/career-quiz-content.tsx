@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, ArrowLeft, Sparkles, Dumbbell, Heart, Apple, Baby, Rocket, Check, Star, RotateCcw } from 'lucide-react'
 import CalendlyModal from '@/components/calendly-modal'
+import { track } from '@/lib/meta/events'
 
 interface Question {
   id: number
@@ -169,6 +170,10 @@ export default function CareerQuizContent() {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
+      const topResult = Object.entries(newScores).sort((a, b) => b[1] - a[1])[0]?.[0]
+      track('CompleteRegistration', {
+        customData: { content_name: 'Career Quiz', content_category: topResult || 'quiz' },
+      })
       setShowResult(true)
     }
   }

@@ -23,7 +23,8 @@ import {
   GraduationCap,
   Clock,
 } from 'lucide-react';
-import { packages, locations, timetables, courseStartDates, addOns, getActiveOffer, type AddOn } from '@/lib/course-data';
+import { packages, locations, timetables, courseStartDates, addOns, getActiveOffer, type AddOn, type Package } from '@/lib/course-data';
+import { track, newEventId } from '@/lib/meta/events';
 
 // ─── Types ─────────────────────────────────────────────────────────────
 type Step = 'package' | 'addons' | 'plan' | 'details' | 'payment';
@@ -45,11 +46,13 @@ const COUPON_DEPOSIT_OVERRIDES: Record<string, number> = {
 };
 
 // ─── Main Component ──────────────────────────────────────────────────
-export function CheckoutContent() {
-  return <CheckoutForm />;
+export function CheckoutContent({ packageList, minDepositOverride }: { packageList?: Package[]; minDepositOverride?: number }) {
+  return <CheckoutForm packageList={packageList} minDepositOverride={minDepositOverride} />;
 }
 
-function CheckoutForm() {
+function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Package[]; minDepositOverride?: number }) {
+  // Use the provided packageList, or fall back to the standard 3 packages
+  const availablePackages = packageList ?? packages;
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
   const [depositAmount, setDepositAmount] = useState(300);
@@ -91,7 +94,7 @@ function CheckoutForm() {
   } | null>(null);
 
   const selectedPackage = useMemo(() => {
-    const pkg = packages.find((p) => p.id === selectedPackageId) ?? null;
+    const pkg = availablePackages.find((p) => p.id === selectedPackageId) ?? null;
     if (!pkg) return null;
     const offer = getActiveOffer(pkg.id);
     if (offer) {
@@ -115,16 +118,20 @@ function CheckoutForm() {
     return addOns.filter(a => !a.excludeFromPackages?.includes(selectedPackageId));
   }, [selectedPackageId]);
 
-  // Combined total (package + add-ons)
+  // Combined total (package + add-ons) — uses upfront/full-payment price
   const combinedPrice = (selectedPackage?.price ?? 0) + addOnsTotal;
 
-  // Effective minimum deposit — coupon code may override the package default
+  // Payment-plan total — may be higher than upfront price for some packages
+  const combinedPlanPrice = (selectedPackage?.paymentPlanPrice ?? selectedPackage?.price ?? 0) + addOnsTotal;
+
+  // Effective minimum deposit — minDepositOverride > coupon override > package default
   const effectiveMinDeposit = useMemo(() => {
+    if (minDepositOverride !== undefined) return minDepositOverride;
     if (appliedCoupon?.code && COUPON_DEPOSIT_OVERRIDES[appliedCoupon.code] !== undefined) {
       return COUPON_DEPOSIT_OVERRIDES[appliedCoupon.code];
     }
     return selectedPackage?.minDeposit ?? 500;
-  }, [appliedCoupon, selectedPackage]);
+  }, [minDepositOverride, appliedCoupon, selectedPackage]);
 
   // Snap deposit to the effective minimum whenever package or coupon changes
   useEffect(() => {
@@ -143,9 +150,14 @@ function CheckoutForm() {
     return Math.min(appliedCoupon.discountValue, combinedPrice);
   }, [appliedCoupon, selectedPackage, combinedPrice]);
 
+  // discountedPrice = upfront price (slider max / full-payment amount)
   const discountedPrice = combinedPrice - discount;
   const effectiveDeposit = Math.min(depositAmount, discountedPrice);
-  const remaining = discountedPrice - effectiveDeposit;
+  // isFullPayment = paying the full upfront price at once
+  const isFullPayment = effectiveDeposit >= discountedPrice;
+  // For installment plans, remaining is calculated from the plan total (may be higher)
+  const planPriceAfterDiscount = combinedPlanPrice - discount;
+  const remaining = isFullPayment ? 0 : planPriceAfterDiscount - effectiveDeposit;
   const monthlyPayment = months > 0 ? Math.ceil((remaining / months) * 100) / 100 : 0;
 
   // ─── Coupon Validation ────────────────────────────────────────────
@@ -274,6 +286,19 @@ function CheckoutForm() {
     setIsSubmitting(true);
     setPaymentError(null);
 
+    track('InitiateCheckout', {
+      userData: { email: formData.email, phone: formData.phone, firstName: formData.firstName, lastName: formData.lastName },
+      customData: {
+        currency: 'EUR',
+        value: discountedPrice,
+        content_ids: [selectedPackage.id],
+        content_name: selectedPackage.name,
+        content_category: 'course',
+        content_type: 'product',
+        num_items: 1 + selectedAddOns.size,
+      },
+    });
+
     try {
       const res = await fetch('/api/checkout/create-payment', {
         method: 'POST',
@@ -281,7 +306,8 @@ function CheckoutForm() {
         body: JSON.stringify({
           packageId: selectedPackage.id,
           packageName: selectedPackage.name,
-          packagePrice: selectedPackage.price,
+          packagePrice: discountedPrice,       // upfront / full-payment price (after any coupon)
+          planPrice: planPriceAfterDiscount,   // total if paying by instalments (may differ)
           addOns: Array.from(selectedAddOns),
           addOnsTotal,
           totalPrice: discountedPrice,
@@ -332,6 +358,19 @@ function CheckoutForm() {
         }));
         setCompletedContactId(data.contactId);
       }
+      track('Purchase', {
+        eventId: data?.eventId || newEventId(),
+        userData: { email: formData.email, phone: formData.phone, firstName: formData.firstName, lastName: formData.lastName, externalId: data?.contactId ?? null },
+        customData: {
+          currency: 'EUR',
+          value: effectiveDeposit,
+          content_ids: [selectedPackage.id],
+          content_name: selectedPackage.name,
+          content_category: 'course',
+          content_type: 'product',
+          num_items: 1 + selectedAddOns.size,
+        },
+      });
       setPaymentSuccess(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -481,7 +520,7 @@ function CheckoutForm() {
                   className="overflow-hidden"
                 >
                   <div className="space-y-3 pt-3">
-                    {packages.map((basePkg) => {
+                    {availablePackages.map((basePkg) => {
                       const offer = getActiveOffer(basePkg.id);
                       const pkg = offer ? { ...basePkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit } : basePkg;
                       const isComingSoon = pkg.comingSoon;
@@ -758,7 +797,22 @@ function CheckoutForm() {
                         {selectedPackage.name}
                         {selectedAddOns.size > 0 && ` + ${selectedAddOns.size} add-on${selectedAddOns.size > 1 ? 's' : ''}`}
                       </p>
-                      {discount > 0 ? (
+
+                      {/* Upfront-discount packages: show plan price crossed out, upfront price highlighted */}
+                      {selectedPackage.paymentPlanPrice && !discount ? (
+                        isFullPayment ? (
+                          <>
+                            <p className="text-zinc-500 text-lg line-through">&euro;{combinedPlanPrice.toLocaleString()}</p>
+                            <p className="text-3xl md:text-4xl font-bold text-white">&euro;{combinedPrice.toLocaleString()}</p>
+                            <p className="text-green-400 text-xs mt-1 font-semibold">Save &euro;{(combinedPlanPrice - combinedPrice).toLocaleString()} — paying in full</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-3xl md:text-4xl font-bold text-white">&euro;{planPriceAfterDiscount.toLocaleString()}</p>
+                            <p className="text-gold text-xs mt-1 font-semibold">Pay &euro;{combinedPrice.toLocaleString()} upfront &amp; save &euro;{(combinedPlanPrice - combinedPrice).toLocaleString()}</p>
+                          </>
+                        )
+                      ) : discount > 0 ? (
                         <>
                           <p className="text-zinc-500 text-lg line-through">&euro;{combinedPrice.toLocaleString()}</p>
                           <p className="text-3xl md:text-4xl font-bold text-white">
@@ -789,7 +843,11 @@ function CheckoutForm() {
                       />
                       <div className="flex justify-between text-xs text-zinc-500 mt-1">
                         <span>&euro;{effectiveMinDeposit} min</span>
-                        <span>&euro;{discountedPrice.toLocaleString()} (pay in full)</span>
+                        {selectedPackage.paymentPlanPrice && !discount ? (
+                          <span className="text-gold">&euro;{discountedPrice.toLocaleString()} — pay in full &amp; save</span>
+                        ) : (
+                          <span>&euro;{discountedPrice.toLocaleString()} (pay in full)</span>
+                        )}
                       </div>
                     </div>
 
@@ -924,7 +982,7 @@ function CheckoutForm() {
                       <div className="border-t border-zinc-700 pt-3 flex justify-between">
                         <span className="text-white font-bold">Total</span>
                         <span className="text-gold font-bold text-lg">
-                          &euro;{discountedPrice.toLocaleString()}
+                          &euro;{(effectiveDeposit >= discountedPrice ? discountedPrice : planPriceAfterDiscount).toLocaleString()}
                         </span>
                       </div>
                     </div>

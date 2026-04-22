@@ -3,6 +3,7 @@ import Footer from '@/components/footer'
 import WhatsAppButton from '@/components/whatsapp-button'
 import PilatesCourseContent from './pilates-course-content'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import MetaViewContent from '@/components/meta-view-content'
 
 export const metadata = {
   title: 'Pilates Instructor Course Ireland | REPs Accredited | Image Fitness Training',
@@ -12,6 +13,7 @@ export const metadata = {
 export default function PilatesCoursePage() {
   return (
     <main className="min-h-screen bg-charcoal-950">
+      <MetaViewContent contentId="pilates" contentName="Pilates Instructor Course" />
       <Header />
       <PilatesCourseContent />
       <Footer />

@@ -3,6 +3,7 @@ import Footer from '@/components/footer'
 import WhatsAppButton from '@/components/whatsapp-button'
 import ReformerPilatesCourseContent from './reformer-pilates-content'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import MetaViewContent from '@/components/meta-view-content'
 
 export const metadata = {
   title: 'Reformer Pilates Course Ireland | 6-Day Teacher Training | Image Fitness Training',
@@ -12,6 +13,7 @@ export const metadata = {
 export default function ReformerPilatesCoursePage() {
   return (
     <main className="min-h-screen bg-charcoal-950">
+      <MetaViewContent contentId="reformer-pilates" contentName="Reformer Pilates Teacher Training" value={700} />
       <Header />
       <ReformerPilatesCourseContent />
       <Footer />

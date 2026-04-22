@@ -5,6 +5,7 @@ import SCCourseContent from '@/components/courses/sc-course-content'
 import { AddonCheckout } from '@/components/checkout/addon-checkout'
 import { ScrollToTop } from '@/components/scroll-to-top'
 import { CourseJsonLd, BreadcrumbJsonLd } from '@/components/seo/json-ld'
+import MetaViewContent from '@/components/meta-view-content'
 
 export const metadata = {
   title: 'Strength & Conditioning Course Ireland | Active IQ Level 4 | REPs Accredited',
@@ -33,6 +34,7 @@ export const metadata = {
 export default function SCCoursePage() {
   return (
     <main className="min-h-screen bg-charcoal-950">
+      <MetaViewContent contentId="strength-conditioning" contentName="Strength & Conditioning Course" value={1500} />
       <CourseJsonLd
         name="Strength & Conditioning Coach Certification Ireland"
         description="Active IQ Level 4 Strength & Conditioning Coach certification. REPs Ireland accredited. 12-week intensive programme with live online theory and practical weekends in Dublin."

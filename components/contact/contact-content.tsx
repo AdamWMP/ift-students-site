@@ -3,6 +3,12 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MapPin, Phone, Mail, MessageCircle, Send, CheckCircle, Loader2 } from 'lucide-react'
+import { track } from '@/lib/meta/events'
+
+const splitName = (name: string) => {
+  const parts = name.trim().split(/\s+/)
+  return { firstName: parts[0] ?? null, lastName: parts.slice(1).join(' ') || null }
+}
 
 const locations = [
   { name: 'Swords, Dublin', address: 'The Castle Shopping Centre, Bridge Street, Swords, Co. Dublin' },
@@ -30,6 +36,11 @@ export default function ContactContent() {
       })
 
       if (res?.ok) {
+        const { firstName, lastName } = splitName(formData.name)
+        track('Lead', {
+          userData: { email: formData.email, phone: formData.phone || null, firstName, lastName },
+          customData: { content_name: formData.subject || 'Contact Form', content_category: 'contact' },
+        })
         setStatus('success')
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
       } else {
@@ -74,6 +85,7 @@ export default function ContactContent() {
               href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20your%20fitness%20courses."
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track('Contact', { customData: { content_name: 'WhatsApp', content_category: 'contact' } })}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -86,6 +98,7 @@ export default function ContactContent() {
 
             <motion.a
               href="tel:+353866000001"
+              onClick={() => track('Contact', { customData: { content_name: 'Phone', content_category: 'contact' } })}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -98,6 +111,7 @@ export default function ContactContent() {
 
             <motion.a
               href="mailto:sales@imageft.ie"
+              onClick={() => track('Contact', { customData: { content_name: 'Email', content_category: 'contact' } })}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}

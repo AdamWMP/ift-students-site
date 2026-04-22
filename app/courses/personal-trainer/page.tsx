@@ -3,6 +3,7 @@ import Footer from '@/components/footer'
 import WhatsAppButton from '@/components/whatsapp-button'
 import PTCourseContent from '@/components/courses/pt-course-content'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import MetaViewContent from '@/components/meta-view-content'
 import { CourseJsonLd, BreadcrumbJsonLd, FAQJsonLd } from '@/components/seo/json-ld'
 
 export const metadata = {
@@ -34,6 +35,7 @@ export const metadata = {
 export default function PTCoursePage() {
   return (
     <main className="min-h-screen bg-charcoal-950">
+      <MetaViewContent contentId="personal-trainer" contentName="Personal Trainer Course" value={2800} />
       <CourseJsonLd
         name="Personal Trainer Course Ireland"
         description="Become a certified Personal Trainer in 8–16 weeks. REPs Ireland accredited, EQF Level 3 & 4 certified. Delivered across Dublin, Cork, Galway, Limerick, Wexford and Belfast."
