@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
  *   pilatescheckout.imageft.ie → /checkout  (add more as needed)
  */
 const SUBDOMAIN_ROUTES: Record<string, string> = {
-  'ptcheckout': '/checkout',
+  'ptcheckout': '/checkout/pt',
   // Future: 'pilatescheckout': '/pilates-checkout',
 };
 
