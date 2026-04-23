@@ -97,6 +97,22 @@ const nextConfig = {
         destination: '/courses/personal-trainer',
         permanent: true,
       },
+      {
+        // Marketed PT strategy call URL variants → canonical /ptcall-imageft
+        source: '/PT-call-imageft',
+        destination: '/ptcall-imageft',
+        permanent: true,
+      },
+      {
+        source: '/pt-call-imageft',
+        destination: '/ptcall-imageft',
+        permanent: true,
+      },
+      {
+        source: '/pt-call',
+        destination: '/ptcall-imageft',
+        permanent: true,
+      },
 
       // ── NutriCert ────────────────────────────────────────────────────────
       {
@@ -188,6 +204,13 @@ const nextConfig = {
         source: '/belfast',
         destination: '/locations',
         permanent: true,
+      },
+
+      // ── PT Checkout path migration (cache-bust for ptcheckout.imageft.ie) ─
+      {
+        source: '/checkout/pt',
+        destination: '/checkout/ptstart',
+        permanent: false, // temporary — keep old path redirecting to new clean path
       },
 
       // ── Booking → ptcheckout.imageft.ie ──────────────────────────────────
