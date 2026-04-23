@@ -209,8 +209,13 @@ const nextConfig = {
       // ── PT Checkout path migration (cache-bust for ptcheckout.imageft.ie) ─
       {
         source: '/checkout/pt',
-        destination: '/checkout/ptstart',
-        permanent: false, // temporary — keep old path redirecting to new clean path
+        destination: '/checkout/launch',
+        permanent: false,
+      },
+      {
+        source: '/checkout/ptstart',
+        destination: '/checkout/launch',
+        permanent: false,
       },
 
       // ── Booking → ptcheckout.imageft.ie ──────────────────────────────────
