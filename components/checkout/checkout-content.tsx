@@ -51,8 +51,8 @@ export function CheckoutContent({ packageList, minDepositOverride }: { packageLi
 }
 
 function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Package[]; minDepositOverride?: number }) {
-  // Use the provided packageList, or fall back to the standard 3 packages
   const availablePackages = packageList ?? packages;
+
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
   const [depositAmount, setDepositAmount] = useState(300);
@@ -503,6 +503,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
+
           {/* ──────────── STEP 1: Choose Package ──────────── */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4 md:mb-6">
             <StepHeader

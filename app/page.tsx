@@ -38,6 +38,7 @@ import InvestmentSection from '@/components/home/investment-section'
 import GraduateCommunitySection from '@/components/home/graduate-community-section'
 import FinalCtaSection from '@/components/home/final-cta-section'
 import JourneyVideoSection from '@/components/home/journey-video-section'
+import TeamPreviewSection from '@/components/home/team-preview-section'
 import { ScrollToTop } from '@/components/scroll-to-top'
 
 export default function HomePage() {
@@ -62,6 +63,7 @@ export default function HomePage() {
       <PathwaysSection />
       <JourneySection />
       <ResultsSection />
+      <TeamPreviewSection />
       <JourneyVideoSection />
       <InvestmentSection />
       <QuoteSection

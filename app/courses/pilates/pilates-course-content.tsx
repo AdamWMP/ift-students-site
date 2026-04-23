@@ -420,7 +420,7 @@ export default function PilatesCourseContent() {
                   )}
                 </div>
                 <Link
-                  href="/checkout"
+                  href="https://pilatescheckout.imageft.ie"
                   className={`inline-flex items-center justify-center gap-4 px-8 py-4 text-sm tracking-[0.15em] uppercase font-semibold transition-all w-full sm:w-auto ${
                     pathway.popular
                       ? 'bg-gold text-charcoal-950 hover:bg-gold-400'
@@ -499,7 +499,7 @@ export default function PilatesCourseContent() {
               After six months: €9.99/month. Cancel anytime.
             </p>
             <Link
-              href="/checkout"
+              href="https://pilatescheckout.imageft.ie"
               className="inline-flex items-center gap-4 px-8 py-4 border border-gold/50 text-gold text-sm tracking-[0.15em] uppercase font-semibold hover:bg-gold/10 transition-all"
             >
               JOIN THE CIRCLE

@@ -12,6 +12,7 @@ import {
 import { useState, useEffect } from 'react'
 import GoogleReviewsSlider from '@/components/google-reviews-slider'
 import { ResultsWallSection } from '@/components/home/results-wall-section'
+import TeamPreviewSection from '@/components/home/team-preview-section'
 import AnimatedCounter from '@/components/animated-counter'
 
 // ─── Topics Covered (compact grid) ────────────────────────────────
@@ -489,7 +490,7 @@ export default function PTCourseContent() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/checkout" className="btn-gold flex items-center justify-center gap-2">
+              <Link href="https://ptcheckout.imageft.ie" className="btn-gold flex items-center justify-center gap-2">
                 Enrol Now <ArrowRight className="w-5 h-5" />
               </Link>
               <a
@@ -725,7 +726,7 @@ export default function PTCourseContent() {
                 </div>
 
                 <Link
-                  href="/checkout"
+                  href="https://ptcheckout.imageft.ie"
                   className={`mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all ${
                     intake.urgent
                       ? 'bg-gold text-black hover:bg-gold-400'
@@ -1144,6 +1145,9 @@ export default function PTCourseContent() {
       {/* ── Google Reviews ────────────────────────────────────── */}
       <GoogleReviewsSlider />
 
+      {/* ── Meet Your Tutors (slider) ─────────────────────────── */}
+      <TeamPreviewSection />
+
       {/* ── Final CTA ─────────────────────────────────────────── */}
       <section className="py-16 sm:py-24 bg-charcoal-950">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 text-center">
@@ -1155,7 +1159,7 @@ export default function PTCourseContent() {
             Join the next cohort. 3 qualifications. 8–16 weeks of flexible learning. A career that&apos;s yours to build. Secure your place with a €500 deposit.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
-            <Link href="/checkout" className="btn-gold inline-flex items-center justify-center gap-2 text-lg">
+            <Link href="https://ptcheckout.imageft.ie" className="btn-gold inline-flex items-center justify-center gap-2 text-lg">
               Enrol Now — From €2,800 <ArrowRight className="w-5 h-5" />
             </Link>
             <a
@@ -1193,7 +1197,7 @@ function StickyMobileBar() {
     <div className={`fixed bottom-0 left-0 right-0 z-40 sm:hidden transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
       <div className="bg-charcoal-950 border-t border-gold/20 px-4 py-3 flex gap-3">
         <Link
-          href="/checkout"
+          href="https://ptcheckout.imageft.ie"
           className="flex-1 btn-gold flex items-center justify-center gap-1.5 text-sm py-2.5"
         >
           Enrol Now <ArrowRight className="w-4 h-4" />
