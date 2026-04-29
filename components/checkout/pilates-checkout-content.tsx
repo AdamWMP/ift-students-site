@@ -23,8 +23,8 @@ import {
   GraduationCap,
   Clock,
 } from 'lucide-react';
-import { packages, locations, timetables, courseStartDates, addOns, getActiveOffer, type AddOn, type Package } from '@/lib/course-data';
-import { track, newEventId } from '@/lib/meta/events';
+import { packages, locations, timetables, courseStartDates, addOns, reformerLocations, reformerTimetables, reformerStartDates, REFORMER_PACKAGES, REFORMER_ONLY_PACKAGES, type AddOn } from '@/lib/pilates-course-data';
+import { track } from '@/lib/meta/events';
 
 // ─── Types ─────────────────────────────────────────────────────────────
 type Step = 'package' | 'addons' | 'plan' | 'details' | 'payment';
@@ -37,22 +37,17 @@ interface FormData {
   location: string;
   timetable: string;
   startDate: string;
+  reformerLocation: string;
+  reformerTimetable: string;
+  reformerStartDate: string;
 }
-
-// ─── Coupon deposit overrides ─────────────────────────────────────────
-// Coupon codes that lower the minimum deposit below the package default
-const COUPON_DEPOSIT_OVERRIDES: Record<string, number> = {
-  THECERT200: 350,
-};
 
 // ─── Main Component ──────────────────────────────────────────────────
-export function CheckoutContent({ packageList, minDepositOverride }: { packageList?: Package[]; minDepositOverride?: number }) {
-  return <CheckoutForm packageList={packageList} minDepositOverride={minDepositOverride} />;
+export function PilatesCheckoutContent() {
+  return <CheckoutForm />;
 }
 
-function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Package[]; minDepositOverride?: number }) {
-  const availablePackages = packageList ?? packages;
-
+function CheckoutForm() {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
   const [depositAmount, setDepositAmount] = useState(300);
@@ -65,6 +60,9 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
     location: '',
     timetable: '',
     startDate: '',
+    reformerLocation: '',
+    reformerTimetable: '',
+    reformerStartDate: '',
   });
   const [expandedStep, setExpandedStep] = useState<Step>('package');
   const [completedSteps, setCompletedSteps] = useState<Set<Step>>(new Set());
@@ -90,18 +88,12 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
     discountType: 'flat' | 'percent';
     discountValue: number;
     description: string;
-    minDeposit?: number;
   } | null>(null);
 
-  const selectedPackage = useMemo(() => {
-    const pkg = availablePackages.find((p) => p.id === selectedPackageId) ?? null;
-    if (!pkg) return null;
-    const offer = getActiveOffer(pkg.id);
-    if (offer) {
-      return { ...pkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit };
-    }
-    return pkg;
-  }, [selectedPackageId]);
+  const selectedPackage = useMemo(
+    () => packages.find((p) => p.id === selectedPackageId) ?? null,
+    [selectedPackageId]
+  );
 
   // Add-on total
   const addOnsTotal = useMemo(() => {
@@ -118,28 +110,40 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
     return addOns.filter(a => !a.excludeFromPackages?.includes(selectedPackageId));
   }, [selectedPackageId]);
 
-  // Combined total (package + add-ons) — uses upfront/full-payment price
-  const combinedPrice = (selectedPackage?.price ?? 0) + addOnsTotal;
+  // Combined total (package + add-ons)
+  // Use paymentPlanPrice when paying in instalments, upfront price when paying in full
+  const isPayingUpfront = selectedPackage ? depositAmount >= (selectedPackage.price + addOnsTotal) : false;
+  const activePackagePrice = selectedPackage
+    ? (isPayingUpfront ? selectedPackage.price : (selectedPackage.paymentPlanPrice || selectedPackage.price))
+    : 0;
+  const combinedPrice = activePackagePrice + addOnsTotal;
+  const upfrontSaving = selectedPackage?.paymentPlanPrice
+    ? selectedPackage.paymentPlanPrice - selectedPackage.price
+    : 0;
 
-  // Payment-plan total — may be higher than upfront price for some packages
-  const combinedPlanPrice = (selectedPackage?.paymentPlanPrice ?? selectedPackage?.price ?? 0) + addOnsTotal;
-
-  // Effective minimum deposit — minDepositOverride > coupon override > package default
-  const effectiveMinDeposit = useMemo(() => {
-    if (minDepositOverride !== undefined) return minDepositOverride;
-    if (appliedCoupon?.code && COUPON_DEPOSIT_OVERRIDES[appliedCoupon.code] !== undefined) {
-      return COUPON_DEPOSIT_OVERRIDES[appliedCoupon.code];
-    }
-    return selectedPackage?.minDeposit ?? 500;
-  }, [minDepositOverride, appliedCoupon, selectedPackage]);
-
-  // Snap deposit to the effective minimum whenever package or coupon changes
+  // Recalculate months when package changes
   useEffect(() => {
     if (selectedPackage) {
       setMonths((prev) => Math.min(prev, selectedPackage.maxMonths));
-      setDepositAmount(effectiveMinDeposit);
+      setDepositAmount((prev) => Math.max(prev, selectedPackage.minDeposit));
     }
-  }, [selectedPackage, effectiveMinDeposit]);
+  }, [selectedPackage]);
+
+  // ─── Hash-based deep-link (#reformer → auto-select + scroll) ────────
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (hash === '#reformer') {
+      // Auto-select The Career (mat + reformer) package
+      selectPackage('pilates-career');
+      // Small delay to let the accordion render the card
+      setTimeout(() => {
+        const el = document.getElementById('reformer');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ─── Coupon Discount Calculation ────────────────────────────────────
   const discount = useMemo(() => {
@@ -150,14 +154,9 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
     return Math.min(appliedCoupon.discountValue, combinedPrice);
   }, [appliedCoupon, selectedPackage, combinedPrice]);
 
-  // discountedPrice = upfront price (slider max / full-payment amount)
   const discountedPrice = combinedPrice - discount;
   const effectiveDeposit = Math.min(depositAmount, discountedPrice);
-  // isFullPayment = paying the full upfront price at once
-  const isFullPayment = effectiveDeposit >= discountedPrice;
-  // For installment plans, remaining is calculated from the plan total (may be higher)
-  const planPriceAfterDiscount = combinedPlanPrice - discount;
-  const remaining = isFullPayment ? 0 : planPriceAfterDiscount - effectiveDeposit;
+  const remaining = discountedPrice - effectiveDeposit;
   const monthlyPayment = months > 0 ? Math.ceil((remaining / months) * 100) / 100 : 0;
 
   // ─── Coupon Validation ────────────────────────────────────────────
@@ -170,7 +169,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
       const res = await fetch('/api/checkout/validate-coupon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: couponCode.trim(), productId: 97, packageId: selectedPackageId }),
+        body: JSON.stringify({ code: couponCode.trim(), productId: (selectedPackageId && REFORMER_ONLY_PACKAGES.has(selectedPackageId)) ? 116 : 107 }),
       });
 
       const data = await res.json();
@@ -186,7 +185,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
     } finally {
       setCouponLoading(false);
     }
-  }, [couponCode]);
+  }, [couponCode, selectedPackageId]);
 
   const removeCoupon = useCallback(() => {
     setAppliedCoupon(null);
@@ -228,17 +227,33 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
     setExpandedStep('details');
   }, []);
 
+  const needsReformer = selectedPackageId ? REFORMER_PACKAGES.has(selectedPackageId) : false;
+  const isReformerOnly = selectedPackageId ? REFORMER_ONLY_PACKAGES.has(selectedPackageId) : false;
+
   const isFormValid = useMemo(() => {
-    return (
+    const contactValid = (
       formData.firstName.trim() !== '' &&
       formData.lastName.trim() !== '' &&
       formData.email.trim() !== '' &&
-      formData.phone.trim() !== '' &&
+      formData.phone.trim() !== ''
+    );
+    if (isReformerOnly) {
+      // Reformer-only: no mat fields needed, just reformer location/date
+      return contactValid &&
+        formData.reformerLocation !== '' &&
+        formData.reformerTimetable !== '' &&
+        formData.reformerStartDate !== '';
+    }
+    const matValid = contactValid &&
       formData.location !== '' &&
       formData.timetable !== '' &&
-      (formData.startDate !== '' || formData.timetable === 'online-evenings')
-    );
-  }, [formData]);
+      (formData.startDate !== '' || formData.timetable === 'online-evenings');
+    if (!needsReformer) return matValid;
+    return matValid &&
+      formData.reformerLocation !== '' &&
+      formData.reformerTimetable !== '' &&
+      formData.reformerStartDate !== '';
+  }, [formData, isReformerOnly, needsReformer]);
 
   const confirmDetails = useCallback(() => {
     if (!isFormValid) return;
@@ -293,21 +308,20 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
         value: discountedPrice,
         content_ids: [selectedPackage.id],
         content_name: selectedPackage.name,
-        content_category: 'course',
+        content_category: 'pilates-course',
         content_type: 'product',
         num_items: 1 + selectedAddOns.size,
       },
     });
 
     try {
-      const res = await fetch('/api/checkout/create-payment', {
+      const res = await fetch('/api/checkout/pilates-create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           packageId: selectedPackage.id,
           packageName: selectedPackage.name,
-          packagePrice: discountedPrice,       // upfront / full-payment price (after any coupon)
-          planPrice: planPriceAfterDiscount,   // total if paying by instalments (may differ)
+          packagePrice: selectedPackage.price,
           addOns: Array.from(selectedAddOns),
           addOnsTotal,
           totalPrice: discountedPrice,
@@ -355,18 +369,21 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
           location: formData.location,
           timetable: formData.timetable,
           startDate: formData.startDate,
+          reformerLocation: formData.reformerLocation,
+          reformerTimetable: formData.reformerTimetable,
+          reformerStartDate: formData.reformerStartDate,
         }));
         setCompletedContactId(data.contactId);
       }
       track('Purchase', {
-        eventId: data?.eventId || newEventId(),
-        userData: { email: formData.email, phone: formData.phone, firstName: formData.firstName, lastName: formData.lastName, externalId: data?.contactId ?? null },
+        eventId: data?.metaEventId,
+        userData: { email: formData.email, phone: formData.phone, firstName: formData.firstName, lastName: formData.lastName, externalId: data?.contactId ? String(data.contactId) : null },
         customData: {
           currency: 'EUR',
           value: effectiveDeposit,
           content_ids: [selectedPackage.id],
           content_name: selectedPackage.name,
-          content_category: 'course',
+          content_category: 'pilates-course',
           content_type: 'product',
           num_items: 1 + selectedAddOns.size,
         },
@@ -436,7 +453,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
 
   if (paymentSuccess) {
     return (
-      <section className="relative pt-20 pb-32 md:py-28 bg-gradient-to-b from-charcoal-950 to-black min-h-screen">
+      <section className="relative pt-20 pb-32 md:py-28 min-h-screen bg-[#FAF8F5]">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -461,8 +478,8 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
 
   // ─── Main Render ──────────────────────────────────────────────────
   return (
-    <section className="relative pt-20 pb-40 md:pb-32 md:py-28 bg-gradient-to-b from-charcoal-950 to-black min-h-screen">
-      <div className="container mx-auto px-4">
+    <section className="relative pt-20 pb-36 md:pb-32 md:py-28 min-h-screen bg-[#FAF8F5]">
+      <div className="container mx-auto px-3 sm:px-4">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6 md:mb-12">
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -471,13 +488,13 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                 <Star key={i} className="w-4 h-4 md:w-5 md:h-5 fill-gold text-gold" />
               ))}
             </div>
-            <span className="text-zinc-400 text-xs md:text-sm">500+ Graduates</span>
+            <span className="text-zinc-400 text-xs md:text-sm">5,000+ Coaches Made · Ireland&apos;s #1 Pilates Educator</span>
           </div>
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4">
-            BOOK YOUR <span className="text-gold">COURSE</span>
+            BOOK YOUR <span className="text-gold">PILATES COURSE</span>
           </h1>
           <p className="text-zinc-400 text-sm md:text-lg max-w-2xl mx-auto">
-            Choose your package, customise your payment plan, and secure your place
+            Choose your pathway, customise your payment plan, and secure your place
           </p>
         </motion.div>
 
@@ -486,24 +503,22 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="flex justify-center gap-3 md:gap-6 mb-6 md:mb-12 overflow-x-auto pb-2 scrollbar-hide"
+          className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 sm:gap-4 md:gap-6 mb-6 md:mb-12"
         >
-          <div className="flex items-center gap-1.5 text-zinc-400 whitespace-nowrap">
-            <Shield className="w-4 h-4 text-gold" />
-            <span className="text-xs md:text-sm">REPS Accredited</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-zinc-400 whitespace-nowrap">
-            <Lock className="w-4 h-4 text-gold" />
-            <span className="text-xs md:text-sm">Secure Payment</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-zinc-400 whitespace-nowrap">
-            <CreditCard className="w-4 h-4 text-gold" />
-            <span className="text-xs md:text-sm">0% Finance</span>
-          </div>
+          {[
+            { icon: <Shield className="w-3.5 h-3.5 text-gold flex-shrink-0" />, label: 'REPs Accredited' },
+            { icon: <Shield className="w-3.5 h-3.5 text-gold flex-shrink-0" />, label: 'EHFA Recognised' },
+            { icon: <Lock className="w-3.5 h-3.5 text-gold flex-shrink-0" />, label: 'Secure Payment' },
+            { icon: <CreditCard className="w-3.5 h-3.5 text-gold flex-shrink-0" />, label: '0% Finance' },
+          ].map(({ icon, label }) => (
+            <div key={label} className="flex items-center justify-center gap-1.5 text-zinc-400 bg-zinc-900/40 border border-zinc-800 rounded-lg px-3 py-2">
+              {icon}
+              <span className="text-[11px] sm:text-xs font-medium whitespace-nowrap">{label}</span>
+            </div>
+          ))}
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
-
           {/* ──────────── STEP 1: Choose Package ──────────── */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4 md:mb-6">
             <StepHeader
@@ -521,13 +536,13 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                   className="overflow-hidden"
                 >
                   <div className="space-y-3 pt-3">
-                    {availablePackages.map((basePkg) => {
-                      const offer = getActiveOffer(basePkg.id);
-                      const pkg = offer ? { ...basePkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit } : basePkg;
+                    {packages.map((pkg) => {
                       const isComingSoon = pkg.comingSoon;
+                      const saving = pkg.paymentPlanPrice ? pkg.paymentPlanPrice - pkg.price : 0;
                       return (
                         <motion.button
                           key={pkg.id}
+                          id={pkg.id === 'pilates-career' ? 'reformer' : undefined}
                           whileTap={isComingSoon ? undefined : { scale: 0.98 }}
                           onClick={() => !isComingSoon && selectPackage(pkg.id)}
                           disabled={isComingSoon}
@@ -549,12 +564,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                               COMING SOON
                             </div>
                           )}
-                          {offer && !isComingSoon && (
-                            <div className="absolute -top-2.5 right-4 px-2 py-0.5 bg-red-500/90 text-white text-[10px] md:text-xs font-bold rounded-full animate-pulse">
-                              {offer.label}
-                            </div>
-                          )}
-                          {pkg.badge && !offer && !isComingSoon && (
+                          {pkg.badge && !isComingSoon && (
                             <div className="absolute -top-2.5 right-4 px-2 py-0.5 bg-red-500/90 text-white text-[10px] md:text-xs font-bold rounded-full">
                               {pkg.badge}
                             </div>
@@ -572,18 +582,28 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                                 ))}
                               </ul>
                               {!isComingSoon && (
-                                <p className="text-zinc-500 text-xs">
-                                  Up to {pkg.maxMonths} months &bull; Min &euro;{pkg.minDeposit} deposit
-                                </p>
+                                <div className="space-y-1">
+                                  {saving > 0 && (
+                                    <p className="text-green-400 text-xs font-semibold">
+                                      Save &euro;{saving} when you pay upfront
+                                    </p>
+                                  )}
+                                  <p className="text-zinc-500 text-xs">
+                                    {pkg.paymentPlanPrice
+                                      ? `€${pkg.price.toLocaleString()} upfront · €${pkg.paymentPlanPrice.toLocaleString()} with payment plan`
+                                      : `Up to ${pkg.maxMonths} months`}
+                                    {' '}&bull; Min &euro;{pkg.minDeposit} deposit
+                                  </p>
+                                </div>
                               )}
                             </div>
                             <div className="text-right flex-shrink-0">
-                              {offer && (
-                                <span className="text-sm text-zinc-500 line-through block">
-                                  &euro;{offer.originalPrice.toLocaleString()}
+                              {pkg.originalPrice && !isComingSoon && (
+                                <span className="text-zinc-500 text-sm line-through block">
+                                  &euro;{pkg.originalPrice.toLocaleString()}
                                 </span>
                               )}
-                              <span className={`text-xl md:text-2xl font-bold block ${isComingSoon ? 'text-zinc-600' : offer ? 'text-gold' : 'text-white'}`}>
+                              <span className={`text-xl md:text-2xl font-bold block ${isComingSoon ? 'text-zinc-600' : 'text-white'}`}>
                                 &euro;{pkg.price.toLocaleString()}
                               </span>
                               {!isComingSoon && (
@@ -687,11 +707,6 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                                   <span className="text-lg font-bold text-white block">
                                     &euro;{addon.price.toLocaleString()}
                                   </span>
-                                  {addon.paymentPlanTotal && addon.paymentPlanMonths && (
-                                    <span className="text-[10px] text-zinc-500 block leading-tight">
-                                      or &euro;{Math.round(addon.paymentPlanTotal / addon.paymentPlanMonths)}/mo &times; {addon.paymentPlanMonths}
-                                    </span>
-                                  )}
                                   <div
                                     className={`w-5 h-5 rounded-md border-2 flex items-center justify-center mt-1.5 ml-auto transition-colors ${
                                       isSelected ? 'bg-gold border-gold' : 'border-zinc-600'
@@ -798,22 +813,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                         {selectedPackage.name}
                         {selectedAddOns.size > 0 && ` + ${selectedAddOns.size} add-on${selectedAddOns.size > 1 ? 's' : ''}`}
                       </p>
-
-                      {/* Upfront-discount packages: show plan price crossed out, upfront price highlighted */}
-                      {selectedPackage.paymentPlanPrice && !discount ? (
-                        isFullPayment ? (
-                          <>
-                            <p className="text-zinc-500 text-lg line-through">&euro;{combinedPlanPrice.toLocaleString()}</p>
-                            <p className="text-3xl md:text-4xl font-bold text-white">&euro;{combinedPrice.toLocaleString()}</p>
-                            <p className="text-green-400 text-xs mt-1 font-semibold">Save &euro;{(combinedPlanPrice - combinedPrice).toLocaleString()} — paying in full</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-3xl md:text-4xl font-bold text-white">&euro;{planPriceAfterDiscount.toLocaleString()}</p>
-                            <p className="text-gold text-xs mt-1 font-semibold">Pay &euro;{combinedPrice.toLocaleString()} upfront &amp; save &euro;{(combinedPlanPrice - combinedPrice).toLocaleString()}</p>
-                          </>
-                        )
-                      ) : discount > 0 ? (
+                      {discount > 0 ? (
                         <>
                           <p className="text-zinc-500 text-lg line-through">&euro;{combinedPrice.toLocaleString()}</p>
                           <p className="text-3xl md:text-4xl font-bold text-white">
@@ -835,7 +835,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                       </div>
                       <input
                         type="range"
-                        min={effectiveMinDeposit}
+                        min={selectedPackage.minDeposit}
                         max={discountedPrice}
                         step={50}
                         value={depositAmount}
@@ -843,12 +843,8 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                         className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-gold slider-gold"
                       />
                       <div className="flex justify-between text-xs text-zinc-500 mt-1">
-                        <span>&euro;{effectiveMinDeposit} min</span>
-                        {selectedPackage.paymentPlanPrice && !discount ? (
-                          <span className="text-gold">&euro;{discountedPrice.toLocaleString()} — pay in full &amp; save</span>
-                        ) : (
-                          <span>&euro;{discountedPrice.toLocaleString()} (pay in full)</span>
-                        )}
+                        <span>&euro;{selectedPackage.minDeposit} min</span>
+                        <span>&euro;{discountedPrice.toLocaleString()} (pay in full)</span>
                       </div>
                     </div>
 
@@ -906,7 +902,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                               onChange={(e) => { setCouponCode(e.target.value); setCouponError(null); }}
                               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); validateCoupon(); } }}
                               placeholder="Enter code"
-                              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-zinc-500 focus:border-gold focus:outline-none transition-colors"
+                              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm placeholder-zinc-500 focus:border-gold focus:outline-none transition-colors"
                             />
                             <button
                               type="button"
@@ -983,7 +979,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                       <div className="border-t border-zinc-700 pt-3 flex justify-between">
                         <span className="text-white font-bold">Total</span>
                         <span className="text-gold font-bold text-lg">
-                          &euro;{(effectiveDeposit >= discountedPrice ? discountedPrice : planPriceAfterDiscount).toLocaleString()}
+                          &euro;{discountedPrice.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -1033,10 +1029,11 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                         </label>
                         <input
                           type="text"
+                          autoComplete="given-name"
                           value={formData.firstName}
                           onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                          placeholder="John"
-                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
+                          placeholder="First name"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
                         />
                       </div>
                       <div>
@@ -1045,10 +1042,11 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                         </label>
                         <input
                           type="text"
+                          autoComplete="family-name"
                           value={formData.lastName}
                           onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                          placeholder="Doe"
-                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
+                          placeholder="Last name"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
                         />
                       </div>
                     </div>
@@ -1060,10 +1058,12 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                       </label>
                       <input
                         type="email"
+                        inputMode="email"
+                        autoComplete="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@example.com"
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
+                        placeholder="your@email.com"
+                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -1074,57 +1074,64 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                       </label>
                       <input
                         type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+353 86 123 4567"
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
+                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
                       />
                     </div>
 
-                    {/* Location */}
-                    <div>
-                      <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
-                        <MapPin className="w-3.5 h-3.5" /> Training Location *
-                      </label>
-                      <select
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value, startDate: '' })}
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm focus:border-gold focus:outline-none transition-colors"
-                      >
-                        <option value="" className="text-zinc-600">
-                          Select a location...
-                        </option>
-                        {locations.map((loc) => (
-                          <option key={loc.id} value={loc.id}>
-                            {loc.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    {/* Mat Location/Timetable/Date — hidden for reformer-only */}
+                    {!isReformerOnly && (
+                      <>
+                        {/* Location */}
+                        <div>
+                          <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
+                            <MapPin className="w-3.5 h-3.5" /> Training Location *
+                          </label>
+                          <select
+                            value={formData.location}
+                            onChange={(e) => setFormData({ ...formData, location: e.target.value, startDate: '' })}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
+                          >
+                            <option value="" className="text-zinc-600">
+                              Select a location...
+                            </option>
+                            {locations.map((loc) => (
+                              <option key={loc.id} value={loc.id}>
+                                {loc.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                    {/* Timetable */}
-                    <div>
-                      <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
-                        <Calendar className="w-3.5 h-3.5" /> Course Timetable *
-                      </label>
-                      <select
-                        value={formData.timetable}
-                        onChange={(e) => setFormData({ ...formData, timetable: e.target.value, startDate: '' })}
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm focus:border-gold focus:outline-none transition-colors"
-                      >
-                        <option value="" className="text-zinc-600">
-                          Select a timetable...
-                        </option>
-                        {timetables.map((tt) => (
-                          <option key={tt.id} value={tt.id}>
-                            {tt.name} — {tt.schedule}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                        {/* Timetable */}
+                        <div>
+                          <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
+                            <Calendar className="w-3.5 h-3.5" /> Course Timetable *
+                          </label>
+                          <select
+                            value={formData.timetable}
+                            onChange={(e) => setFormData({ ...formData, timetable: e.target.value, startDate: '' })}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
+                          >
+                            <option value="" className="text-zinc-600">
+                              Select a timetable...
+                            </option>
+                            {timetables.map((tt) => (
+                              <option key={tt.id} value={tt.id}>
+                                {tt.name} — {tt.schedule}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </>
+                    )}
 
-                    {/* Start Date */}
-                    {formData.location && formData.timetable && formData.timetable !== 'online-evenings' && (
+                    {/* Start Date — mat courses only */}
+                    {!isReformerOnly && formData.location && formData.timetable && formData.timetable !== 'online-evenings' && (
                       <div>
                         <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
                           <Calendar className="w-3.5 h-3.5" /> Course Start Date *
@@ -1152,7 +1159,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                               <select
                                 value={formData.startDate}
                                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm focus:border-gold focus:outline-none transition-colors"
+                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
                               >
                                 <option value="" className="text-zinc-600">
                                   Select a start date...
@@ -1176,6 +1183,113 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                           );
                         })()}
                       </div>
+                    )}
+
+                    {/* ── Reformer Course Details (Career & Studio only) ── */}
+                    {needsReformer && (
+                      <>
+                        <div className="border-t border-zinc-700 pt-4 mt-2">
+                          <p className="text-gold text-xs font-semibold uppercase tracking-wider mb-3">Reformer Course Details</p>
+                        </div>
+
+                        {/* Reformer Location */}
+                        <div>
+                          <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
+                            <MapPin className="w-3.5 h-3.5" /> Reformer Location *
+                          </label>
+                          <select
+                            value={formData.reformerLocation}
+                            onChange={(e) => setFormData({ ...formData, reformerLocation: e.target.value, reformerStartDate: '' })}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
+                          >
+                            <option value="" className="text-zinc-600">Select reformer location...</option>
+                            {reformerLocations.map((loc) => (
+                              <option key={loc.id} value={loc.id}>{loc.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Reformer Timetable */}
+                        <div>
+                          <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
+                            <Calendar className="w-3.5 h-3.5" /> Reformer Timetable *
+                          </label>
+                          <select
+                            value={formData.reformerTimetable}
+                            onChange={(e) => setFormData({ ...formData, reformerTimetable: e.target.value, reformerStartDate: '' })}
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
+                          >
+                            <option value="" className="text-zinc-600">Select reformer timetable...</option>
+                            {reformerTimetables.map((tt) => (
+                              <option key={tt.id} value={tt.id}>{tt.name} — {tt.schedule}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Reformer Start Date */}
+                        {formData.reformerLocation && formData.reformerTimetable && (
+                          <div>
+                            <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
+                              <Calendar className="w-3.5 h-3.5" /> Reformer Start Date *
+                            </label>
+                            {(() => {
+                              const now = new Date();
+                              const lateBookingCutoff = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
+                              const available = reformerStartDates.filter(
+                                (sd) =>
+                                  sd.locations.includes(formData.reformerLocation) &&
+                                  sd.timetable === formData.reformerTimetable &&
+                                  (new Date(sd.date) > lateBookingCutoff || sd.comingSoon)
+                              );
+                              if (available.length === 0) {
+                                return <p className="text-zinc-500 text-sm py-2">No upcoming dates. Please contact us.</p>;
+                              }
+                              return (
+                                <div className="space-y-2">
+                                  {available.map((sd) => {
+                                    const isDisabled = sd.soldOut || sd.comingSoon;
+                                    const isLate = !sd.comingSoon && new Date(sd.date) < now;
+                                    return (
+                                      <button
+                                        key={sd.date}
+                                        type="button"
+                                        disabled={isDisabled}
+                                        onClick={() => !isDisabled && setFormData({ ...formData, reformerStartDate: sd.date })}
+                                        className={`w-full text-left rounded-lg px-3 py-2.5 text-sm border transition-colors ${
+                                          sd.soldOut
+                                            ? 'bg-zinc-800/50 border-zinc-700/50 text-zinc-500 cursor-not-allowed opacity-50 line-through'
+                                            : sd.comingSoon
+                                              ? 'bg-zinc-800/50 border-zinc-700/50 text-zinc-500 cursor-not-allowed'
+                                              : formData.reformerStartDate === sd.date
+                                                ? 'bg-gold/10 border-gold text-white'
+                                                : 'bg-zinc-800 border-zinc-700 text-white hover:border-zinc-500'
+                                        }`}
+                                      >
+                                        <span>{sd.label}</span>
+                                        {sd.soldOut && (
+                                          <span className="ml-2 text-xs font-semibold text-red-400 no-underline inline-block" style={{ textDecoration: 'none' }}>SOLD OUT</span>
+                                        )}
+                                        {sd.comingSoon && (
+                                          <span className="ml-2 text-xs font-semibold text-gold">Dates coming soon — register interest</span>
+                                        )}
+                                        {isLate && !sd.soldOut && (
+                                          <span className="ml-2 text-xs font-semibold text-orange-400">⚡ Late booking — still available!</span>
+                                        )}
+                                        {sd.spotsLeft != null && sd.spotsLeft <= 5 && !sd.soldOut && !sd.comingSoon && !isLate && (
+                                          <span className="ml-2 text-xs font-semibold text-orange-400">⚠️ {sd.spotsLeft} places remaining</span>
+                                        )}
+                                        {sd.highDemand && sd.spotsLeft == null && !sd.soldOut && !sd.comingSoon && !isLate && (
+                                          <span className="ml-2 text-xs font-semibold text-orange-400">🔥 High demand — selling fast!</span>
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
+                      </>
                     )}
 
                     {/* Continue Button */}
@@ -1212,7 +1326,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <form onSubmit={handlePayment} className="pt-3 space-y-4 bg-zinc-900/30 rounded-xl border border-zinc-800 p-4 md:p-6 mt-3">
+                  <form id="checkout-payment-form" onSubmit={handlePayment} className="pt-3 space-y-4 bg-zinc-900/30 rounded-xl border border-zinc-800 p-4 md:p-6 mt-3">
                     {/* Order Summary */}
                     <div className="bg-zinc-800/50 rounded-xl p-4 space-y-2">
                       <h4 className="text-white font-semibold text-sm mb-3">Order Summary</h4>
@@ -1297,17 +1411,17 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                             setCardNumber(v.replace(/(\d{4})(?=\d)/g, '$1 '));
                           }}
                           placeholder="Card number"
-                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors tracking-wider"
+                          className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3.5 text-white text-[16px] md:text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors tracking-wider"
                         />
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         <select
                           value={cardExpMonth}
                           onChange={(e) => setCardExpMonth(e.target.value)}
                           autoComplete="cc-exp-month"
-                          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-sm focus:border-gold focus:outline-none transition-colors"
+                          className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 sm:px-3 py-3.5 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
                         >
-                          <option value="" className="text-zinc-600">Month</option>
+                          <option value="" className="text-zinc-600">MM</option>
                           {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map(m => (
                             <option key={m} value={m}>{m}</option>
                           ))}
@@ -1316,11 +1430,11 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                           value={cardExpYear}
                           onChange={(e) => setCardExpYear(e.target.value)}
                           autoComplete="cc-exp-year"
-                          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-sm focus:border-gold focus:outline-none transition-colors"
+                          className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 sm:px-3 py-3.5 text-white text-[16px] md:text-sm focus:border-gold focus:outline-none transition-colors"
                         >
-                          <option value="" className="text-zinc-600">Year</option>
+                          <option value="" className="text-zinc-600">YY</option>
                           {Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() + i)).map(y => (
-                            <option key={y} value={y}>{y}</option>
+                            <option key={y} value={y}>{String(y).slice(-2)}</option>
                           ))}
                         </select>
                         <input
@@ -1330,7 +1444,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                           value={cardCvc}
                           onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
                           placeholder="CVC"
-                          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
+                          className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 sm:px-3 py-3.5 text-white text-[16px] md:text-sm placeholder:text-zinc-600 focus:border-gold focus:outline-none transition-colors"
                         />
                       </div>
                     </div>
@@ -1407,15 +1521,15 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
               transition={{ delay: 0.5 }}
               className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
             >
-              <div className="bg-charcoal-950/98 backdrop-blur-xl border-t border-zinc-800 p-4 shadow-2xl safe-area-bottom">
-                <div className="flex items-center justify-between gap-3">
+              <div className="bg-[#0d0d0d]/95 backdrop-blur-xl border-t border-white/10 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
+                <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs text-zinc-400 block truncate">
+                    <span className="text-[11px] text-zinc-400 block truncate">
                       {selectedPackage.name}
-                      {selectedAddOns.size > 0 && ` + ${selectedAddOns.size} extra${selectedAddOns.size > 1 ? 's' : ''}`}
+                      {selectedAddOns.size > 0 && ` + ${selectedAddOns.size} add-on${selectedAddOns.size > 1 ? 's' : ''}`}
                     </span>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-white">
+                      <span className="text-xl font-bold text-white">
                         &euro;{discountedPrice.toLocaleString()}
                       </span>
                       {effectiveDeposit < discountedPrice && (
@@ -1423,10 +1537,22 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                       )}
                     </div>
                   </div>
-                  <span className="text-xs text-zinc-500 px-2 py-1 bg-zinc-800 rounded-md">
-                    &euro;{depositAmount} today
-                  </span>
+                  <div className="text-right">
+                    <span className="text-[11px] text-zinc-500 block">Due today</span>
+                    <span className="text-gold font-bold text-base">&euro;{depositAmount}</span>
+                  </div>
                 </div>
+                {expandedStep === 'payment' && completedSteps.has('details') && (
+                  <button
+                    form="checkout-payment-form"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3 rounded-lg bg-gold text-black font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    {isSubmitting ? 'Processing...' : `Pay €${effectiveDeposit} Now`}
+                  </button>
+                )}
               </div>
             </motion.div>
           )}

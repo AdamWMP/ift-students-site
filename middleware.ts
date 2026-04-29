@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 const SUBDOMAIN_ROUTES: Record<string, string> = {
   'ptcheckout': '/checkout/launch',
+  'checkout': '/enrol',
   // Future: 'pilatescheckout': '/pilates-checkout',
 };
 

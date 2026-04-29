@@ -146,8 +146,9 @@ function CheckoutForm() {
   const availableStartDates = useMemo(() => {
     if (!formData.location || !formData.timetable) return [];
     const now = new Date();
+    const lateBookingCutoff = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
     return getStartDatesForSelection(formData.location, formData.timetable).filter(
-      (sd) => new Date(sd.date) > now
+      (sd) => new Date(sd.date) > lateBookingCutoff
     );
   }, [formData.location, formData.timetable]);
 
@@ -1219,20 +1220,42 @@ function CheckoutForm() {
                               </span>
                             </div>
                           ) : (
-                            <select
-                              value={formData.startDate}
-                              onChange={(e) =>
-                                setFormData({ ...formData, startDate: e.target.value })
-                              }
-                              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-[#D4A836] focus:outline-none transition-colors"
-                            >
-                              <option value="">Select a start date...</option>
-                              {availableStartDates.map((sd) => (
-                                <option key={sd.date} value={sd.date}>
-                                  {sd.label}
-                                </option>
-                              ))}
-                            </select>
+                            (() => {
+                              const now = new Date();
+                              const selectedSd = availableStartDates.find(
+                                (sd) => sd.date === formData.startDate
+                              );
+                              const selectedIsLate = selectedSd
+                                ? new Date(selectedSd.date) < now
+                                : false;
+                              return (
+                                <>
+                                  <select
+                                    value={formData.startDate}
+                                    onChange={(e) =>
+                                      setFormData({ ...formData, startDate: e.target.value })
+                                    }
+                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-3 text-white text-[16px] md:text-sm focus:border-[#D4A836] focus:outline-none transition-colors"
+                                  >
+                                    <option value="">Select a start date...</option>
+                                    {availableStartDates.map((sd) => {
+                                      const isLate = new Date(sd.date) < now;
+                                      return (
+                                        <option key={sd.date} value={sd.date}>
+                                          {sd.label}
+                                          {isLate ? ' — ⚡ Late booking still available!' : ''}
+                                        </option>
+                                      );
+                                    })}
+                                  </select>
+                                  {selectedIsLate && (
+                                    <p className="mt-2 text-xs font-semibold text-orange-400">
+                                      ⚡ Late booking — this course has just started, but you can still join now!
+                                    </p>
+                                  )}
+                                </>
+                              );
+                            })()
                           )}
                         </div>
                       )}
