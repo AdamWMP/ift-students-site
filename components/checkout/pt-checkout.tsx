@@ -24,13 +24,19 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import {
-  packages,
+  packages as ALL_PACKAGES,
   locations,
   addOns,
   getTimetablesForLocation,
   getStartDatesForSelection,
   type AddOn,
 } from '@/lib/course-data';
+
+// ptcheckout.imageft.ie shows ONLY the three flagship packages.
+// The four standalone/bundle packages (PT-only, Group-only, Launch Pad,
+// Online Coaching) are unique to checkout.imageft.ie/enrol.
+const PTCHECKOUT_PACKAGE_IDS = new Set(['pro-coach', 'complete-coach', 'fitness-business-coach']);
+const packages = ALL_PACKAGES.filter((p) => PTCHECKOUT_PACKAGE_IDS.has(p.id));
 
 // ─── Types ─────────────────────────────────────────────────────────────
 type Step = 'package' | 'addons' | 'plan' | 'details' | 'payment';
