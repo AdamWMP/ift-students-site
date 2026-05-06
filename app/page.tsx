@@ -37,8 +37,15 @@ import ResultsSection from '@/components/home/results-section'
 import InvestmentSection from '@/components/home/investment-section'
 import GraduateCommunitySection from '@/components/home/graduate-community-section'
 import FinalCtaSection from '@/components/home/final-cta-section'
-import JourneyVideoSection from '@/components/home/journey-video-section'
 import TeamPreviewSection from '@/components/home/team-preview-section'
+// Reputation/review-heavy panels imported from the iftstudents.com layout.
+// JourneyVideoSection has been replaced by EducationProviderSection (laptop
+// mockup with the better-laid-out video).
+import GraduatesBanner from '@/components/graduates-banner'
+import GoogleReviewsSlider from '@/components/google-reviews-slider'
+import ReputationSection from '@/components/home/reputation-section'
+import { EducationProviderSection } from '@/components/home/education-provider-section'
+import { CourseCarouselSection } from '@/components/home/course-carousel-section'
 import { ScrollToTop } from '@/components/scroll-to-top'
 
 export default function HomePage() {
@@ -46,6 +53,12 @@ export default function HomePage() {
     <main className="min-h-screen bg-charcoal-950">
       <Header />
       <HeroSection />
+      {/* iftstudents.com graduates trust strip (avatars + "Join Ireland's largest...") */}
+      <section className="py-8 sm:py-12 bg-charcoal-950 border-b border-charcoal-800/50">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <GraduatesBanner />
+        </div>
+      </section>
       <QuoteSection
         lines={[
           { text: "Every fitness school in this country will take your money," },
@@ -61,10 +74,17 @@ export default function HomePage() {
       </div>
       <StatsSection />
       <PathwaysSection />
+      {/* iftstudents.com "Most Popular Courses" carousel — sits right after the pathway pick */}
+      <CourseCarouselSection />
       <JourneySection />
       <ResultsSection />
+      {/* iftstudents.com reputation + Google reviews block (review-heavy) */}
+      <ReputationSection />
+      <GoogleReviewsSlider />
       <TeamPreviewSection />
-      <JourneyVideoSection />
+      {/* Replaces the old JourneyVideoSection with the iftstudents.com laptop-mockup
+          video layout — same /education-provider-video-compressed.mp4 asset. */}
+      <EducationProviderSection />
       <InvestmentSection />
       <QuoteSection
         lines={[
