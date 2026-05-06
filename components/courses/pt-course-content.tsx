@@ -46,17 +46,19 @@ const categoryColour: Record<string, string> = {
 }
 
 // ─── Upcoming Intakes (raw data) ──────────────────────────────────
-// Grace period: keep showing for 10 days after start date
+// Grace period: keep showing for 14 days after start date (matches the
+// checkout's late-booking window — see components/checkout/pt-checkout.tsx).
+// Source of truth for these dates lives in edu-imageft-ie + lib/course-data.ts.
 const RAW_INTAKES = [
   {
     month: 'April 2026',
-    badge: 'Filling Now',
+    badge: 'Late Bookings',
     urgent: true,
     dates: [
       {
         isoDate: '2026-04-25',
         date: '25 Apr',
-        format: '16-Week · Saturday',
+        format: '16-Week · Saturday (PT iSAT)',
         schedule: 'Sat 10:00 AM – 4:30 PM',
         locations: ['Cork', 'Galway', 'Limerick', 'Wexford'],
       },
@@ -70,26 +72,69 @@ const RAW_INTAKES = [
     ],
   },
   {
-    month: 'July 2026',
-    badge: 'Limited Places',
-    urgent: false,
+    month: 'Summer 2026',
+    badge: 'Selling Fast: Limited Places',
+    urgent: true,
     dates: [
       {
         isoDate: '2026-07-02',
         date: '2 Jul',
-        format: '8-Week Full Time',
+        format: 'PT Summer · 8-Week Full Time',
         schedule: 'Thu & Fri 10:00 AM – 4:30 PM',
         locations: ['Dublin Swords', 'Dublin Tallaght', 'Cork', 'Galway', 'Limerick', 'Wexford'],
+      },
+      {
+        isoDate: '2026-08-31',
+        date: '31 Aug',
+        format: '8-Week · Evenings + Saturday',
+        schedule: 'Mon & Wed 7–10 PM · Sat 10 AM–4:30 PM',
+        locations: ['Dublin Swords', 'Dublin Tallaght'],
+      },
+    ],
+  },
+  {
+    month: 'Autumn 2026',
+    badge: 'Book Now: Start Theory Now',
+    urgent: false,
+    dates: [
+      {
+        isoDate: '2026-09-06',
+        date: '6 Sep',
+        format: 'Sunday (16 Weeks)',
+        schedule: 'Sun 10:00 AM – 4:30 PM',
+        locations: ['Dublin Swords', 'Dublin Tallaght'],
+      },
+      {
+        isoDate: '2026-10-01',
+        date: '1 Oct',
+        format: 'PT Intensive · 8-Week Full Time',
+        schedule: 'Thu & Fri 10:00 AM – 4:30 PM',
+        locations: ['Dublin Swords', 'Dublin Tallaght', 'Cork', 'Galway', 'Limerick', 'Wexford'],
+      },
+      {
+        isoDate: '2026-10-24',
+        date: '24 Oct',
+        format: '16-Week · Saturday (PT iSAT)',
+        schedule: 'Sat 10:00 AM – 4:30 PM',
+        locations: ['Cork', 'Galway', 'Limerick', 'Wexford'],
+      },
+      {
+        isoDate: '2026-10-26',
+        date: '26 Oct',
+        format: '8-Week · Evenings + Saturday',
+        schedule: 'Mon & Wed 7–10 PM · Sat 10 AM–4:30 PM',
+        locations: ['Dublin Swords', 'Dublin Tallaght'],
       },
     ],
   },
 ]
 
-// Filter out dates that are more than 10 days past
+// Filter out dates that are more than 14 days past — matches the late-booking
+// window on the checkout side (so a date hidden here is also unbookable there).
 function getActiveIntakes() {
   const now = new Date()
   const cutoff = new Date(now)
-  cutoff.setDate(cutoff.getDate() - 10)
+  cutoff.setDate(cutoff.getDate() - 14)
 
   return RAW_INTAKES
     .map(group => ({
