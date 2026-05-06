@@ -47,14 +47,12 @@ interface CheckoutRequest {
 // ─── Ontraport Dropdown Mappings (PILATES) ────────────────────────────
 // f2303: Pilates Course Location (mat courses)
 // f2303: Pilates Course Location (mat courses)
-// TODO[adam]: paste Ontraport option ID for the new "Online" Pilates location.
-// Add it under Administration → Custom Objects → Contacts → f2303.
 const LOCATION_TO_ONTRAPORT: Record<string, string> = {
   'dublin-swords':   '516',
   'dublin-tallaght': '515',
   'cork':            '514',
   'galway':          '513',
-  'online':          '',  // TODO[adam]: f2303 option for "Online" — paste ID here
+  'online':          '634',
 };
 
 // f2593: Reformer Course Location (reformer-specific field)

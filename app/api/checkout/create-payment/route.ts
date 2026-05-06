@@ -38,10 +38,10 @@ const LOCATION_TO_ONTRAPORT: Record<string, string> = {
 };
 
 const TIMETABLE_TO_ONTRAPORT: Record<string, string> = {
-  '8-week-intensive':     '505',
-  '16-week-evening-sat':  '597',
-  '16-week-saturday':     '504',
-  'pt-sun16':             '',     // TODO[adam]: add "16 Week Sunday" option to f2292 in Ontraport admin → paste ID here
+  '8-week-intensive':     '505',  // Thursday & Friday (8 Weeks)
+  '16-week-evening-sat':  '597',  // Evening & Weekend - Mon + Wed + Sat (8 Weeks)
+  '16-week-saturday':     '504',  // Saturday (16 Weeks)
+  'pt-sun16':             '633',  // Sunday (16 Weeks)
   'online-self-paced':    '544',
 };
 
@@ -80,18 +80,15 @@ const PACKAGE_TO_ONTRAPORT_COURSE: Record<string, string> = {
   'online-coaching-bundle': '97',
 };
 
-// f2290 (PT course qualifications) — Ontraport option IDs.
-// Adam: please paste the IDs for the four new options below once added in
-// Ontraport admin (Administration → Custom Objects → Contacts → f2290).
+// f2290 (PT course qualifications) — Ontraport option IDs (resolved via API).
 const PACKAGE_TO_ONTRAPORT_QUALIFICATIONS: Record<string, string> = {
-  'pro-coach':              '497',
-  'complete-coach':         '569',
-  'fitness-business-coach': '627',
-  // TODO[adam]: paste IDs once added to f2290:
-  'pt-only':                '',  // Ontraport option label: "Personal Trainer Course Only"
-  'group-instruction-only': '',  // Ontraport option label: "Group Instruction Only"
-  'launch-pad-bundle':      '',  // Ontraport option label: "Fitness Instructor & Personal Trainer"
-  'online-coaching-bundle': '',  // Ontraport option label: "Fitness, PT, Nutrition, Advanced Nutrition Coaching, Fitness Business Accelerator"
+  'pro-coach':              '497',  // The Cert (FI, GI, PT)
+  'complete-coach':         '569',  // The Career (FI, GI, PT, Nutrition, FBA)
+  'fitness-business-coach': '627',  // The Business (full + workshops + photoshoot)
+  'pt-only':                '567',  // Personal Trainer Course Only
+  'group-instruction-only': '566',  // Group Instruction Only
+  'launch-pad-bundle':      '495',  // (Launchpad Bundle) Fitness Instructor & Personal Trainer
+  'online-coaching-bundle': '570',  // Online Coaching Course (Fitness, PT, Nutrition, Advanced Nutrition, FBA)
 };
 
 // Self-paced packages: location + timetable + start date are forced server-side

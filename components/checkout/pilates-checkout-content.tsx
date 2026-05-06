@@ -603,9 +603,12 @@ function CheckoutForm() {
                                   &euro;{pkg.originalPrice.toLocaleString()}
                                 </span>
                               )}
-                              <span className={`text-xl md:text-2xl font-bold block ${isComingSoon ? 'text-zinc-600' : 'text-white'}`}>
-                                &euro;{pkg.price.toLocaleString()}
-                              </span>
+                              {/* Coming-soon packages don't show a price (e.g. The Studio) */}
+                              {!isComingSoon && (
+                                <span className="text-xl md:text-2xl font-bold block text-white">
+                                  &euro;{pkg.price.toLocaleString()}
+                                </span>
+                              )}
                               {!isComingSoon && (
                                 <div
                                   className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mt-2 ml-auto ${
