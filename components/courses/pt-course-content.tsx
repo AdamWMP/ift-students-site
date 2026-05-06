@@ -109,7 +109,7 @@ const RAW_INTAKES = [
         date: '1 Oct',
         format: 'PT Intensive · 8-Week Full Time',
         schedule: 'Thu & Fri 10:00 AM – 4:30 PM',
-        locations: ['Dublin Swords', 'Dublin Tallaght', 'Cork', 'Galway', 'Limerick', 'Wexford'],
+        locations: ['Cork', 'Galway'],
       },
       {
         isoDate: '2026-10-24',

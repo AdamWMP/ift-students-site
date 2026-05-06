@@ -453,7 +453,7 @@ function CheckoutForm() {
 
   if (paymentSuccess) {
     return (
-      <section className="relative pt-20 pb-32 md:py-28 min-h-screen bg-[#FAF8F5]">
+      <section className="relative pt-20 pb-32 md:py-28 min-h-screen bg-gradient-to-b from-charcoal-950 to-black">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -478,7 +478,7 @@ function CheckoutForm() {
 
   // ─── Main Render ──────────────────────────────────────────────────
   return (
-    <section className="relative pt-20 pb-36 md:pb-32 md:py-28 min-h-screen bg-[#FAF8F5]">
+    <section className="relative pt-20 pb-36 md:pb-32 md:py-28 min-h-screen bg-gradient-to-b from-charcoal-950 to-black">
       <div className="container mx-auto px-3 sm:px-4">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6 md:mb-12">

@@ -294,8 +294,8 @@ export const courseStartDates: CourseStartDate[] = [
   // ── September 2026 — PT Sun16 (Dublin Sundays) ──────────────────
   { date: '2026-09-06', label: '6 September 2026', locations: ['swords', 'tallaght'], timetable: 'pt-sun16' },
 
-  // ── October 2026 — Autumn PT Intensive (all locations) ──────────
-  { date: '2026-10-01', label: '1 October 2026', locations: ['swords', 'tallaght', 'cork', 'galway', 'limerick', 'wexford'], timetable: '8-week-intensive' },
+  // ── October 2026 — Autumn PT Intensive (Cork + Galway only) ──────
+  { date: '2026-10-01', label: '1 October 2026', locations: ['cork', 'galway'], timetable: '8-week-intensive' },
   // PT iSAT Autumn (continues into Feb 2027)
   { date: '2026-10-24', label: '24 October 2026', locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '16-week-saturday' },
   // Dublin Eve/Weekend October intake
@@ -365,7 +365,10 @@ export function getActiveOffer(packageId: string): SpecialOffer | null {
 export function getTimetablesForLocation(locationId: string): Timetable[] {
   if (locationId === 'online') return timetables.filter(t => t.id === 'online-self-paced');
   if (locationId === 'swords' || locationId === 'tallaght') {
-    return timetables.filter(t => t.id === '16-week-evening-sat' || t.id === '8-week-intensive');
+    // Dublin: Eve+Sat, Full-Time (Thu/Fri), and Sunday-only (16 weeks)
+    return timetables.filter(
+      (t) => t.id === '16-week-evening-sat' || t.id === '8-week-intensive' || t.id === 'pt-sun16',
+    );
   }
   return timetables.filter(t => t.id === '16-week-saturday' || t.id === '8-week-intensive');
 }
