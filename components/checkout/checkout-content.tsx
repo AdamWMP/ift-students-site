@@ -214,9 +214,21 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
       excluded.forEach(eid => next.delete(eid));
       return next;
     });
+    // Self-paced bundles (Launch Pad / Online Coaching): auto-fill location,
+    // timetable and start date to today's date — there is no fixed schedule.
+    const picked = availablePackages.find(p => p.id === id);
+    if (picked?.selfPaced) {
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      setFormData(prev => ({
+        ...prev,
+        location: 'online',
+        timetable: 'online-self-paced',
+        startDate: today,
+      }));
+    }
     setCompletedSteps((prev) => new Set(prev).add('package'));
     setExpandedStep('addons');
-  }, []);
+  }, [availablePackages]);
 
   const confirmAddOns = useCallback(() => {
     setCompletedSteps((prev) => new Set(prev).add('addons'));
@@ -521,7 +533,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                   className="overflow-hidden"
                 >
                   <div className="space-y-3 pt-3">
-                    {availablePackages.map((basePkg) => {
+                    {availablePackages.filter(p => !p.deemphasized).map((basePkg) => {
                       const offer = getActiveOffer(basePkg.id);
                       const pkg = offer ? { ...basePkg, price: offer.price, originalPrice: offer.originalPrice, minDeposit: offer.minDeposit } : basePkg;
                       const isComingSoon = pkg.comingSoon;
@@ -563,6 +575,11 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                             <div className="flex-1">
                               <h3 className={`text-lg md:text-xl font-bold mb-1 ${isComingSoon ? 'text-zinc-500' : 'text-white'}`}>{pkg.name}</h3>
                               <p className="text-zinc-400 text-xs md:text-sm mb-3">{pkg.description}</p>
+                              {pkg.prerequisites && (
+                                <p className="text-amber-300/80 text-[11px] md:text-xs mb-2 italic">
+                                  Prerequisite: {pkg.prerequisites}
+                                </p>
+                              )}
                               <ul className="space-y-1.5 mb-3">
                                 {pkg.features.map((feature, i) => (
                                   <li key={i} className={`flex items-start gap-2 text-xs md:text-sm ${isComingSoon ? 'text-zinc-600' : 'text-zinc-300'}`}>
@@ -574,6 +591,9 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                               {!isComingSoon && (
                                 <p className="text-zinc-500 text-xs">
                                   Up to {pkg.maxMonths} months &bull; Min &euro;{pkg.minDeposit} deposit
+                                  {pkg.paymentPlanPrice && pkg.paymentPlanPrice !== pkg.price && (
+                                    <> &bull; Plan total &euro;{pkg.paymentPlanPrice.toLocaleString()}</>
+                                  )}
                                 </p>
                               )}
                             </div>
@@ -600,6 +620,63 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                         </motion.button>
                       );
                     })}
+
+                    {/* ── De-emphasised online self-paced bundles (only if a location/timetable doesn't suit) ── */}
+                    {availablePackages.some(p => p.deemphasized) && (
+                      <div className="pt-6 mt-2 border-t border-zinc-800">
+                        <p className="text-zinc-500 text-[11px] md:text-xs mb-3 italic">
+                          Can&apos;t make it to a location or timetable above? These fully-online self-paced bundles
+                          are available — but you&apos;ll lose the live in-person experience and graduate community
+                          benefits, so consider them a last resort.
+                        </p>
+                        <div className="space-y-2">
+                          {availablePackages.filter(p => p.deemphasized).map((basePkg) => {
+                            const pkg = basePkg;
+                            return (
+                              <motion.button
+                                key={pkg.id}
+                                whileTap={{ scale: 0.99 }}
+                                onClick={() => selectPackage(pkg.id)}
+                                className={`relative w-full p-3 md:p-4 rounded-lg border text-left transition-all ${
+                                  selectedPackageId === pkg.id
+                                    ? 'border-gold/70 bg-gold/5'
+                                    : 'border-zinc-800/70 bg-zinc-900/15 hover:border-zinc-700'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className={`text-sm md:text-base font-semibold mb-0.5 ${selectedPackageId === pkg.id ? 'text-white' : 'text-zinc-300'}`}>
+                                      {pkg.name}
+                                    </h4>
+                                    <p className="text-zinc-500 text-[11px] md:text-xs leading-snug">
+                                      {pkg.description}
+                                    </p>
+                                    <p className="text-zinc-600 text-[10px] md:text-[11px] mt-1.5">
+                                      Up to {pkg.maxMonths} months &bull; Min &euro;{pkg.minDeposit} deposit
+                                      {pkg.paymentPlanPrice && pkg.paymentPlanPrice !== pkg.price && (
+                                        <> &bull; Plan total &euro;{pkg.paymentPlanPrice.toLocaleString()}</>
+                                      )}
+                                    </p>
+                                  </div>
+                                  <div className="text-right flex-shrink-0">
+                                    <span className={`text-base md:text-lg font-semibold block ${selectedPackageId === pkg.id ? 'text-gold' : 'text-zinc-400'}`}>
+                                      &euro;{pkg.price.toLocaleString()}
+                                    </span>
+                                    <div
+                                      className={`w-5 h-5 rounded-full border flex items-center justify-center mt-1.5 ml-auto ${
+                                        selectedPackageId === pkg.id ? 'bg-gold border-gold' : 'border-zinc-600'
+                                      }`}
+                                    >
+                                      {selectedPackageId === pkg.id && <Check className="w-3 h-3 text-black" />}
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -1131,7 +1208,7 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                         </label>
                         {(() => {
                           const now = new Date();
-                          const lateBookingCutoff = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
+                          const lateBookingCutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
                           const available = courseStartDates.filter(
                             (sd) =>
                               sd.locations.includes(formData.location) &&
@@ -1159,10 +1236,15 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                                 </option>
                                 {available.map((sd) => {
                                   const isLate = new Date(sd.date) < now;
+                                  const m = new Date(sd.date).getMonth() + 1;
+                                  const sellingFast = !isLate && (m === 6 || m === 7);
+                                  const startTheory = !isLate && (m === 9 || m === 10);
                                   return (
                                     <option key={sd.date} value={sd.date}>
                                       {sd.label}
                                       {isLate ? ' — ⚡ Late booking still available!' : ''}
+                                      {sellingFast ? ' — 🔥 Selling Fast: Limited Places' : ''}
+                                      {startTheory ? ' — 📚 Book Now: Start Theory Now' : ''}
                                     </option>
                                   );
                                 })}
@@ -1172,6 +1254,20 @@ function CheckoutForm({ packageList, minDepositOverride }: { packageList?: Packa
                                   ⚡ Late booking — this course has just started, but you can still join now!
                                 </p>
                               )}
+                              {(() => {
+                                const sd = available.find((s) => s.date === formData.startDate);
+                                if (!sd) return null;
+                                const m = new Date(sd.date).getMonth() + 1;
+                                const isLatePicked = new Date(sd.date) < now;
+                                if (isLatePicked) return null;
+                                if (m === 6 || m === 7) {
+                                  return <p className="mt-2 text-xs font-semibold text-red-400">🔥 Selling fast — limited places remaining for this intake.</p>;
+                                }
+                                if (m === 9 || m === 10) {
+                                  return <p className="mt-2 text-xs font-semibold text-emerald-400">📚 Book now and start the theory portion early — get a head start before classes begin.</p>;
+                                }
+                                return null;
+                              })()}
                             </>
                           );
                         })()}

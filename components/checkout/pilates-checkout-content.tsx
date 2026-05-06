@@ -247,7 +247,7 @@ function CheckoutForm() {
     const matValid = contactValid &&
       formData.location !== '' &&
       formData.timetable !== '' &&
-      (formData.startDate !== '' || formData.timetable === 'online-evenings');
+      formData.startDate !== '';
     if (!needsReformer) return matValid;
     return matValid &&
       formData.reformerLocation !== '' &&
@@ -1130,15 +1130,15 @@ function CheckoutForm() {
                       </>
                     )}
 
-                    {/* Start Date — mat courses only */}
-                    {!isReformerOnly && formData.location && formData.timetable && formData.timetable !== 'online-evenings' && (
+                    {/* Start Date — mat courses only (incl. online evenings cohort) */}
+                    {!isReformerOnly && formData.location && formData.timetable && (
                       <div>
                         <label className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1.5">
                           <Calendar className="w-3.5 h-3.5" /> Course Start Date *
                         </label>
                         {(() => {
                           const now = new Date();
-                          const lateBookingCutoff = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
+                          const lateBookingCutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
                           const available = courseStartDates.filter(
                             (sd) =>
                               sd.locations.includes(formData.location) &&
@@ -1166,10 +1166,15 @@ function CheckoutForm() {
                                 </option>
                                 {available.map((sd) => {
                                   const isLate = new Date(sd.date) < now;
+                                  const m = new Date(sd.date).getMonth() + 1;
+                                  const sellingFast = !isLate && (m === 6 || m === 7);
+                                  const startTheory = !isLate && (m === 9 || m === 10);
                                   return (
                                     <option key={sd.date} value={sd.date}>
                                       {sd.label}
                                       {isLate ? ' — ⚡ Late booking still available!' : ''}
+                                      {sellingFast ? ' — 🔥 Selling Fast: Limited Places' : ''}
+                                      {startTheory ? ' — 📚 Book Now: Start Theory Now' : ''}
                                     </option>
                                   );
                                 })}
@@ -1179,6 +1184,19 @@ function CheckoutForm() {
                                   ⚡ Late booking — this course has just started, but you can still join now!
                                 </p>
                               )}
+                              {(() => {
+                                const sd = available.find((s) => s.date === formData.startDate);
+                                if (!sd) return null;
+                                const m = new Date(sd.date).getMonth() + 1;
+                                if (new Date(sd.date) < now) return null;
+                                if (m === 6 || m === 7) {
+                                  return <p className="mt-2 text-xs font-semibold text-red-400">🔥 Selling fast — limited places remaining for this intake.</p>;
+                                }
+                                if (m === 9 || m === 10) {
+                                  return <p className="mt-2 text-xs font-semibold text-emerald-400">📚 Book now and start the theory portion early — get a head start before classes begin.</p>;
+                                }
+                                return null;
+                              })()}
                             </>
                           );
                         })()}
@@ -1234,7 +1252,7 @@ function CheckoutForm() {
                             </label>
                             {(() => {
                               const now = new Date();
-                              const lateBookingCutoff = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
+                              const lateBookingCutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
                               const available = reformerStartDates.filter(
                                 (sd) =>
                                   sd.locations.includes(formData.reformerLocation) &&
@@ -1281,6 +1299,17 @@ function CheckoutForm() {
                                         {sd.highDemand && sd.spotsLeft == null && !sd.soldOut && !sd.comingSoon && !isLate && (
                                           <span className="ml-2 text-xs font-semibold text-orange-400">🔥 High demand — selling fast!</span>
                                         )}
+                                        {(() => {
+                                          if (sd.soldOut || sd.comingSoon || isLate) return null;
+                                          const m = new Date(sd.date).getMonth() + 1;
+                                          if ((m === 6 || m === 7) && !sd.highDemand && sd.spotsLeft == null) {
+                                            return <span className="ml-2 text-xs font-semibold text-red-400">🔥 Selling Fast: Limited Places</span>;
+                                          }
+                                          if (m === 9 || m === 10) {
+                                            return <span className="ml-2 text-xs font-semibold text-emerald-400">📚 Book Now: Start Theory Now</span>;
+                                          }
+                                          return null;
+                                        })()}
                                       </button>
                                     );
                                   })}

@@ -87,6 +87,11 @@ function formatSaleMessage(sale: SaleDetails): string {
   const name  = `${sale.firstName} ${sale.lastName}`.toUpperCase();
   const email = sale.email.toUpperCase();
 
+  // Add-ons line — only renders when at least one add-on was bought
+  const addOnsLine = (sale.addOns && sale.addOns.length > 0)
+    ? `Add-ons: ${sale.addOns.join(', ')}${sale.addOnsTotal ? ` (+€${sale.addOnsTotal.toFixed(2)})` : ''}`
+    : '';
+
   return [
     `Ding Ding Sale 🔔🔔🔔💶💶💶`,
     `Someone just enrolled`,
@@ -95,6 +100,7 @@ function formatSaleMessage(sale: SaleDetails): string {
     `Email: ${email}`,
     `Number: ${sale.phone}`,
     `Course: ${sale.packageName}`,
+    addOnsLine,
     `Day: ${sale.timetable || ''}`,
     `Location: ${sale.location || ''}`,
     `Term: ${termLabel}`,
@@ -236,23 +242,51 @@ const ONTRAPORT_TIMETABLE_LABELS: Record<string, string> = {
   '597': '16 Week Evening + Saturday',
 };
 
+const ONTRAPORT_TERM_LABELS: Record<string, string> = {
+  '492': 'Autumn (A26)',
+  '494': 'Spring (S26)',
+};
+
+const ONTRAPORT_QUALIFICATION_LABELS: Record<string, string> = {
+  '497': 'Pro Coach (PT)',
+  '569': 'Complete Coach (PT)',
+  '627': 'Fitness Business Coach',
+};
+
+const ONTRAPORT_TAG_LABELS: Record<string, string> = {
+  '50':   'Customers',
+  '2336': 'Skool Enrolment',
+  '2337': 'Skool Enrolment',
+  '2495': 'Sale',
+  '2505': 'S26 Combo Course Sale',
+  '2526': 'Sale',
+};
+
 interface OntraportContactFields {
   firstname?: string;
   lastname?: string;
   email?: string;
   sms_number?: string;
+  spent?: string;             // Total amount paid so far
+  mrcAmount?: string;         // Most recent charge amount (typically the deposit)
+  num_purchased?: string;
+  date?: string;              // Contact creation date (unix)
+  contact_cat?: string;       // */* delimited tag IDs
   f1428?: string;  // Package/course name
-  f2294?: string;  // Price
-  f2296?: string;  // Payment plan text
+  f2293?: string;  // Course start date (unix)
+  f2294?: string;  // Total price
+  f2296?: string;  // Payment plan text (free-form, sometimes raw "500 + 383 * 6")
   f1612?: string;  // Payment plan text (mirror)
-  f2604?: string;  // Deposit
+  f2334?: string;  // Deposit amount (older flow)
+  f2604?: string;  // Deposit (newer flow)
   f2605?: string;  // Monthly
   f2606?: string;  // Months
-  f2607?: string;  // First instalment date
+  f2607?: string;  // First instalment date (free-form text)
   f2168?: string;  // Marketing Campaign
   f2169?: string;  // Ad Set
   f2170?: string;  // Ad Name
   f2289?: string;  // Term option ID
+  f2290?: string;  // Qualifications option ID — fallback for course name
   f2291?: string;  // Location option ID
   f2292?: string;  // Timetable option ID
   f2456?: string;  // PT Course Fees status (541=paid, 542=plan)
@@ -286,6 +320,65 @@ async function fetchOntraportContact(contactId: string | number): Promise<Ontrap
   }
 }
 
+// ─── Helpers for tag-driven message rendering ────────────────────────
+
+function formatPlanLine(c: OntraportContactFields, isFullPayment: boolean): string {
+  if (isFullPayment) {
+    return c.f2294 ? `Paid in Full — €${Number(c.f2294).toFixed(2)}` : 'Paid in Full';
+  }
+  // Prefer the structured fields written by the new checkout flow.
+  const deposit = c.f2604 || c.f2334 || c.mrcAmount || c.spent;
+  const monthly = c.f2605;
+  const months = c.f2606;
+  const total = c.f2294;
+  if (deposit && monthly && months) {
+    const totalPart = total ? ` (total €${Number(total).toFixed(2)})` : '';
+    return `Payment Plan — €${Number(deposit).toFixed(2)} deposit + €${Number(monthly).toFixed(2)}/mo × ${months}${totalPart}`;
+  }
+  // Older records have a free-form text like "500 + 383 * 6" — try to parse.
+  const raw = (c.f2296 || c.f1612 || '').trim();
+  const m = raw.match(/^(\d+(?:\.\d+)?)\s*\+\s*(\d+(?:\.\d+)?)\s*[×x*]\s*(\d+)\s*$/);
+  if (m) {
+    const [, dep, mo, n] = m;
+    const totalPart = total ? ` (total €${Number(total).toFixed(2)})` : '';
+    return `Payment Plan — €${Number(dep).toFixed(2)} deposit + €${Number(mo).toFixed(2)}/mo × ${n}${totalPart}`;
+  }
+  if (raw) return `Payment Plan — ${raw}`;
+  if (deposit && total) return `Payment Plan — €${Number(deposit).toFixed(2)} deposit, total €${Number(total).toFixed(2)}`;
+  return 'Payment Plan';
+}
+
+function deriveCourseName(c: OntraportContactFields): string {
+  if (c.f1428 && c.f1428 !== '0') return c.f1428;
+  const qual = ONTRAPORT_QUALIFICATION_LABELS[c.f2290 || ''];
+  if (qual) return qual;
+  return '';
+}
+
+function deriveTags(c: OntraportContactFields): string[] {
+  const raw = c.contact_cat || '';
+  const ids = raw.split('*/*').map(s => s.trim()).filter(Boolean);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const id of ids) {
+    const label = ONTRAPORT_TAG_LABELS[id];
+    if (!label || seen.has(label)) continue;
+    seen.add(label);
+    out.push(label);
+  }
+  return out;
+}
+
+function formatStartDate(unix?: string): string {
+  if (!unix) return '';
+  const n = Number(unix);
+  if (!n || Number.isNaN(n)) return '';
+  const d = new Date(n * 1000);
+  if (Number.isNaN(d.getTime())) return '';
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 export async function notifySaleFromOntraportContact(
   contactId: string | number,
 ): Promise<{ ok: boolean; reason?: string }> {
@@ -295,8 +388,13 @@ export async function notifySaleFromOntraportContact(
   const isFullPayment = c.f2456 === '541';
   const locationLabel = ONTRAPORT_LOCATION_LABELS[c.f2291 || ''] || c.f2291 || '';
   const timetableLabel = ONTRAPORT_TIMETABLE_LABELS[c.f2292 || ''] || c.f2292 || '';
-  const paymentLine = c.f2296 || c.f1612 || (isFullPayment ? 'Paid in Full' : 'Payment Plan');
+  const termLabel = ONTRAPORT_TERM_LABELS[c.f2289 || ''] || (c.f2289 || '');
+  const courseName = deriveCourseName(c);
+  const planLine = formatPlanLine(c, isFullPayment);
+  const startDate = formatStartDate(c.f2293);
+  const tagLabels = deriveTags(c);
   const name = `${c.firstname || ''} ${c.lastname || ''}`.trim().toUpperCase();
+  const totalPaid = c.spent ? `€${Number(c.spent).toFixed(2)}` : '';
 
   const text = [
     `Ding Ding Sale 🔔🔔🔔💶💶💶  (Ontraport tag-fired)`,
@@ -305,16 +403,17 @@ export async function notifySaleFromOntraportContact(
     `Name: ${name}`,
     `Email: ${(c.email || '').toUpperCase()}`,
     `Number: ${c.sms_number || ''}`,
-    `Course: ${c.f1428 || ''}`,
+    courseName ? `Course: ${courseName}` : '',
     timetableLabel ? `Day: ${timetableLabel}` : '',
     locationLabel ? `Location: ${locationLabel}` : '',
-    `Payment: ${paymentLine}`,
-    !isFullPayment && c.f2604 ? `Deposit: €${c.f2604}` : '',
-    !isFullPayment && c.f2605 && c.f2606 ? `Plan: €${c.f2605}/mo × ${c.f2606} months` : '',
-    !isFullPayment && c.f2607 ? `First instalment: ${c.f2607}` : '',
+    termLabel ? `Term: ${termLabel}` : '',
+    startDate ? `Start date: ${startDate}` : '',
+    `Payment: ${planLine}`,
+    totalPaid ? `Paid so far: ${totalPaid}` : '',
     `Marketing Campaign: ${c.f2168 || 'N/A'}`,
     `Ad Set: ${c.f2169 || 'N/A'}`,
     `Ad Name: ${c.f2170 || 'N/A'}`,
+    tagLabels.length ? `Tags: ${tagLabels.join(', ')}` : '',
     ``,
     `Ontraport: https://app.ontraport.com/#!/contacts/view?id=${contactId}`,
     `Onboarding: https://ptcheckout.imageft.ie/onboarding/${contactId}`,

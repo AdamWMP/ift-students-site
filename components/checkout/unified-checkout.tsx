@@ -7,6 +7,20 @@ import { packages as ptPackages } from '@/lib/course-data';
 
 type Track = 'pt' | 'pilates';
 
+// /enrol-only minimum deposit override for the three flagship packages.
+// ptcheckout.imageft.ie keeps the €500 floor defined in lib/course-data.ts.
+const ENROL_PT_MIN_DEPOSIT_OVERRIDES: Record<string, number> = {
+  'pro-coach': 200,
+  'complete-coach': 200,
+  'fitness-business-coach': 200,
+};
+
+const enrolPtPackages = ptPackages.map((p) =>
+  ENROL_PT_MIN_DEPOSIT_OVERRIDES[p.id] !== undefined
+    ? { ...p, minDeposit: ENROL_PT_MIN_DEPOSIT_OVERRIDES[p.id] }
+    : p,
+);
+
 export function UnifiedCheckout() {
   const [track, setTrack] = useState<Track>('pt');
 
@@ -38,7 +52,9 @@ export function UnifiedCheckout() {
       </div>
 
       {track === 'pt' ? (
-        <CheckoutContent packageList={ptPackages} minDepositOverride={300} />
+        // /enrol uses an overridden package list: Cert/Career/Business min
+        // deposit dropped to €200 here only; standalone PT/Group/Bundles keep €300.
+        <CheckoutContent packageList={enrolPtPackages} />
       ) : (
         <PilatesCheckoutContent />
       )}

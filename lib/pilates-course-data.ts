@@ -87,7 +87,7 @@ export const packages: Package[] = [
     price: 1800,
     paymentPlanPrice: 2000,
     maxMonths: 6,
-    minDeposit: 300,
+    minDeposit: 200,
     popular: false,
     features: [
       'Mat Pilates Instructor — REPs Ireland EQF Level 4 Aligned',
@@ -107,7 +107,7 @@ export const packages: Package[] = [
     paymentPlanPrice: new Date() < new Date('2026-04-01') ? 2700 : 3000,
     originalPrice: new Date() < new Date('2026-04-01') ? 3000 : undefined,
     maxMonths: 10,
-    minDeposit: 300,
+    minDeposit: 200,
     popular: true,
     badge: new Date() < new Date('2026-04-01') ? 'Offer ends 31st March' : undefined,
     features: [
@@ -129,7 +129,7 @@ export const packages: Package[] = [
     paymentPlanPrice: 1200,
     originalPrice: undefined,
     maxMonths: 4,
-    minDeposit: 300,
+    minDeposit: 200,
     popular: false,
     badge: undefined,
     features: [
@@ -209,8 +209,10 @@ export const courseStartDates: CourseStartDate[] = [
       'Tue 4 Aug', 'Thu 6 Aug',
     ],
   },
-  // Cork City — Every second Saturday
+  // Cork City — Every second Saturday (Summer)
   { date: '2026-06-06', label: '6 June 2026', locations: ['cork'], timetable: 'every-second-saturday' },
+  // Autumn intake — Dublin Swords & Tallaght + Cork (every 2nd Saturday)
+  { date: '2026-09-19', label: '19 September 2026', locations: ['dublin-swords', 'dublin-tallaght', 'cork'], timetable: 'every-second-saturday' },
 ];
 
 // ─── Welcome Videos (per timetable type) ────────────────────────────
@@ -270,21 +272,11 @@ export const reformerStartDates: CourseStartDate[] = [
       'Weekend 4: Sat 8 & Sun 9 August — Final Exam',
     ],
   },
-  // Intake 4: October 2026 — IFT Swords Academy
-  {
-    date: '2026-10-10',
-    label: '10 October 2026 — IFT Swords Academy, Dublin (Final Exam Weekend: 14–15 November)',
-    locations: ['dublin-swords'],
-    timetable: 'reformer-3-weekend',
-    sessions: [
-      'Weekend 1: Sat 10 & Sun 11 October',
-      'Weekend 2: Sat 24 & Sun 25 October',
-      'Weekend 3: Sat 7 & Sun 8 November',
-      'Weekend 4 (Exam): Sat 14 & Sun 15 November',
-    ],
-  },
+  // (No October Dublin Swords intake — date brought forward to 12 September below)
   // Cork — Himalaya Yoga Valley — follows 6th June Mat start
   { date: '2026-09-05', label: '5 September 2026 — follows 6th June Mat start', locations: ['cork'], timetable: 'reformer-3-weekend' },
+  // Cork (Sept 5) noted above; adding extra Dublin Swords September intake here
+  { date: '2026-09-12', label: '12 September 2026 — IFT Swords Academy, Dublin', locations: ['dublin-swords'], timetable: 'reformer-3-weekend' },
   // Clare — The Pilates Playground — dates TBC
   { date: '2026-12-31', label: 'Dates coming soon', locations: ['clare'], timetable: 'reformer-3-weekend', comingSoon: true },
   // Kerry — Halo Reformer Pilates Studio — 4 weekends Jun–Jul 2026

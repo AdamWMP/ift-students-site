@@ -6,6 +6,7 @@ export interface Package {
   id: string;
   name: string;
   price: number;
+  paymentPlanPrice?: number;     // Optional higher total when paying via plan (e.g. PT 1300 upfront / 1500 plan)
   originalPrice?: number;
   maxMonths: number;
   minDeposit: number;
@@ -14,6 +15,12 @@ export interface Package {
   description: string;
   badge?: string;
   comingSoon?: boolean;
+  /** Self-paced fully-online package: auto-set location=online + timetable=online-self-paced + startDate=today */
+  selfPaced?: boolean;
+  /** Render below the main grid in a smaller, lower-emphasis style (Launch Pad / Online Coaching) */
+  deemphasized?: boolean;
+  /** Prerequisites the buyer must already hold before booking */
+  prerequisites?: string;
 }
 
 export interface Location {
@@ -169,6 +176,83 @@ export const packages: Package[] = [
     ],
     description: 'Build the career. Then build the empire.',
   },
+
+  // ─── Standalone PT-track qualifications (use same locations + timetables as The Career / The Business) ──
+  {
+    id: 'pt-only',
+    name: 'Personal Training Course',
+    price: 1300,
+    paymentPlanPrice: 1500,
+    maxMonths: 6,
+    minDeposit: 300,
+    popular: false,
+    features: [
+      'REPs Ireland-approved PT qualification (EQF Level 4)',
+      'Practical training & assessment',
+      'Same locations & timetables as The Career and The Business',
+      'For coaches who already hold a Fitness Instruction qualification',
+    ],
+    description: 'Add a Personal Training qualification to an existing Fitness Instruction or Gym Instruction certification.',
+    prerequisites: 'Existing Fitness Instruction / Gym Instruction qualification required to book.',
+  },
+  {
+    id: 'group-instruction-only',
+    name: 'Group Instruction Only',
+    price: 1000,
+    paymentPlanPrice: 1200,
+    maxMonths: 6,
+    minDeposit: 300,
+    popular: false,
+    features: [
+      'Group Instruction certification',
+      'Teach big groups & classes confidently',
+      'Practical assessment included',
+      'Same locations & timetables as The Career and The Business',
+    ],
+    description: 'For Fitness Instructors and Personal Trainers who want to add a Group Instruction qualification — teach classes and large groups.',
+    prerequisites: 'Existing Fitness Instruction + Personal Training qualifications required.',
+  },
+
+  // ─── De-emphasised online fallbacks (placed at the very bottom of the list) ──────────────────
+  // These are interest-free fully-online self-paced bundles offered when a practical
+  // location or timetable doesn't suit. Start date is always set to today.
+  {
+    id: 'launch-pad-bundle',
+    name: 'Launch Pad Bundle',
+    price: 2000,
+    paymentPlanPrice: 2000,
+    maxMonths: 8,
+    minDeposit: 300,
+    popular: false,
+    features: [
+      'Fitness Instruction qualification',
+      'Personal Training qualification',
+      'Fully online & self-paced — start any time',
+      'Interest-free payment plan',
+    ],
+    description: 'Fully online, self-paced Fitness Instruction + Personal Training. Only recommended when a practical location or timetable cannot work — you lose the live in-person experience.',
+    selfPaced: true,
+    deemphasized: true,
+  },
+  {
+    id: 'online-coaching-bundle',
+    name: 'Online Coaching Bundle',
+    price: 2600,
+    paymentPlanPrice: 2600,
+    maxMonths: 10,
+    minDeposit: 300,
+    popular: false,
+    features: [
+      'Everything in Launch Pad Bundle',
+      'Fitness Business Accelerator (FBA) mentorship',
+      '8-week Zoom mentorship programme (live, not self-paced)',
+      'Extra support to launch into the fitness industry',
+      'Interest-free payment plan',
+    ],
+    description: 'Self-paced FI + PT online plus an 8-week live FBA mentorship via Zoom. For people who genuinely cannot attend in person but still want guidance.',
+    selfPaced: true,
+    deemphasized: true,
+  },
 ];
 
 // ─── Training Locations ─────────────────────────────────────────────
@@ -187,19 +271,35 @@ export const timetables: Timetable[] = [
   { id: '16-week-evening-sat', name: '8-Week Part-Time (Evenings + Saturday)', schedule: 'Mon & Wed 7:00–10:00 PM + Sat 10:00 AM–4:30 PM', duration: '8 weeks' },
   { id: '16-week-saturday',    name: '16-Week Part-Time (Saturday)',             schedule: 'Saturday, 10:00 AM–4:30 PM',                    duration: '16 weeks' },
   { id: '8-week-intensive',    name: '8-Week Full Time',                         schedule: 'Thursday & Friday, 10:00 AM–4:30 PM',           duration: '8 weeks' },
+  { id: 'pt-sun16',            name: 'Sunday (16 Weeks)',                        schedule: 'Sunday, 10:00 AM–4:30 PM',                      duration: '16 weeks' },
   { id: 'online-self-paced',   name: 'Online (Self-Paced)',                      schedule: 'Flexible — study at your own pace',             duration: 'Up to 6 months' },
 ];
 
 // ─── Course Start Dates ─────────────────────────────────────────────
+// Synced from edu-imageft-ie (master timetable). Ordered by ascending start
+// date — the late-booking filter in the UI hides anything > 14 days past.
 export const courseStartDates: CourseStartDate[] = [
+  // ── April 2026 ──────────────────────────────────────────────────
+  // Cork, Galway, Limerick, Wexford — Saturday 16-Week (PT iSAT)
+  { date: '2026-04-25', label: '25 April 2026', locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '16-week-saturday' },
   // Dublin (Swords & Tallaght) — Evenings + Saturday
   { date: '2026-04-27', label: '27 April 2026', locations: ['swords', 'tallaght'], timetable: '16-week-evening-sat' },
-  // Dublin (Swords & Tallaght) — 8-Week Full Time
-  { date: '2026-07-02', label: '2 July 2026',   locations: ['swords', 'tallaght'], timetable: '8-week-intensive' },
-  // Cork, Galway, Limerick, Wexford — Saturday 16-Week
-  { date: '2026-04-25', label: '25 April 2026', locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '16-week-saturday' },
-  // Cork, Galway, Limerick, Wexford — 8-Week Full Time
-  { date: '2026-07-02', label: '2 July 2026',   locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '8-week-intensive' },
+
+  // ── July 2026 — PT Summer (8-Week Full Time, all locations) ─────
+  { date: '2026-07-02', label: '2 July 2026',   locations: ['swords', 'tallaght', 'cork', 'galway', 'limerick', 'wexford'], timetable: '8-week-intensive' },
+
+  // ── August 2026 — Dublin Eve/Weekend autumn intake ─────────────
+  { date: '2026-08-31', label: '31 August 2026', locations: ['swords', 'tallaght'], timetable: '16-week-evening-sat' },
+
+  // ── September 2026 — PT Sun16 (Dublin Sundays) ──────────────────
+  { date: '2026-09-06', label: '6 September 2026', locations: ['swords', 'tallaght'], timetable: 'pt-sun16' },
+
+  // ── October 2026 — Autumn PT Intensive (all locations) ──────────
+  { date: '2026-10-01', label: '1 October 2026', locations: ['swords', 'tallaght', 'cork', 'galway', 'limerick', 'wexford'], timetable: '8-week-intensive' },
+  // PT iSAT Autumn (continues into Feb 2027)
+  { date: '2026-10-24', label: '24 October 2026', locations: ['cork', 'galway', 'limerick', 'wexford'], timetable: '16-week-saturday' },
+  // Dublin Eve/Weekend October intake
+  { date: '2026-10-26', label: '26 October 2026', locations: ['swords', 'tallaght'], timetable: '16-week-evening-sat' },
 ];
 
 // ─── Welcome Videos (per timetable type) ────────────────────────────
@@ -213,6 +313,10 @@ export const welcomeVideos: Record<string, { url: string; embedUrl: string }> = 
     embedUrl: 'https://player.vimeo.com/video/1072160124?h=23a1c3fe7b',
   },
   '16-week-evening-sat': {
+    url: 'https://vimeo.com/1072160538/fe53c7acb3',
+    embedUrl: 'https://player.vimeo.com/video/1072160538?h=fe53c7acb3',
+  },
+  'pt-sun16': {
     url: 'https://vimeo.com/1072160538/fe53c7acb3',
     embedUrl: 'https://player.vimeo.com/video/1072160538?h=fe53c7acb3',
   },

@@ -146,7 +146,7 @@ function CheckoutForm() {
   const availableStartDates = useMemo(() => {
     if (!formData.location || !formData.timetable) return [];
     const now = new Date();
-    const lateBookingCutoff = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
+    const lateBookingCutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     return getStartDatesForSelection(formData.location, formData.timetable).filter(
       (sd) => new Date(sd.date) > lateBookingCutoff
     );
@@ -1240,10 +1240,15 @@ function CheckoutForm() {
                                     <option value="">Select a start date...</option>
                                     {availableStartDates.map((sd) => {
                                       const isLate = new Date(sd.date) < now;
+                                      const m = new Date(sd.date).getMonth() + 1;
+                                      const sellingFast = !isLate && (m === 6 || m === 7);
+                                      const startTheory = !isLate && (m === 9 || m === 10);
                                       return (
                                         <option key={sd.date} value={sd.date}>
                                           {sd.label}
                                           {isLate ? ' — ⚡ Late booking still available!' : ''}
+                                          {sellingFast ? ' — 🔥 Selling Fast: Limited Places' : ''}
+                                          {startTheory ? ' — 📚 Book Now: Start Theory Now' : ''}
                                         </option>
                                       );
                                     })}
@@ -1253,6 +1258,19 @@ function CheckoutForm() {
                                       ⚡ Late booking — this course has just started, but you can still join now!
                                     </p>
                                   )}
+                                  {(() => {
+                                    const sd = availableStartDates.find((s) => s.date === formData.startDate);
+                                    if (!sd) return null;
+                                    const m = new Date(sd.date).getMonth() + 1;
+                                    if (new Date(sd.date) < now) return null;
+                                    if (m === 6 || m === 7) {
+                                      return <p className="mt-2 text-xs font-semibold text-red-400">🔥 Selling fast — limited places remaining for this intake.</p>;
+                                    }
+                                    if (m === 9 || m === 10) {
+                                      return <p className="mt-2 text-xs font-semibold text-emerald-400">📚 Book now and start the theory portion early — get a head start before classes begin.</p>;
+                                    }
+                                    return null;
+                                  })()}
                                 </>
                               );
                             })()

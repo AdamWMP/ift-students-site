@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notifySale } from '@/lib/pilates-sale-notifications';
 import { sendCapiEvent, newEventId } from '@/lib/meta/capi';
+import { addOns as ALL_PILATES_ADDONS } from '@/lib/pilates-course-data';
 
 const parseCookie = (header: string | null, name: string): string | undefined => {
   if (!header) return undefined;
@@ -45,12 +46,15 @@ interface CheckoutRequest {
 
 // ─── Ontraport Dropdown Mappings (PILATES) ────────────────────────────
 // f2303: Pilates Course Location (mat courses)
+// f2303: Pilates Course Location (mat courses)
+// TODO[adam]: paste Ontraport option ID for the new "Online" Pilates location.
+// Add it under Administration → Custom Objects → Contacts → f2303.
 const LOCATION_TO_ONTRAPORT: Record<string, string> = {
   'dublin-swords':   '516',
   'dublin-tallaght': '515',
   'cork':            '514',
   'galway':          '513',
-  'online':          '',
+  'online':          '',  // TODO[adam]: f2303 option for "Online" — paste ID here
 };
 
 // f2593: Reformer Course Location (reformer-specific field)
@@ -453,54 +457,32 @@ export async function POST(request: NextRequest) {
         });
       }
     } else {
-      // Payment plan — deposit now, then monthly instalments starting on the 30th
-      const now = new Date();
-      const dayOfMonth = now.getDate();
-      let targetMonth = now.getMonth();
-      let targetYear = now.getFullYear();
-      if (dayOfMonth >= 15) {
-        targetMonth += 1;
-        if (targetMonth > 11) { targetMonth = 0; targetYear += 1; }
-      }
-      let next30th = new Date(targetYear, targetMonth, 30);
-      if (next30th.getMonth() !== targetMonth) {
-        next30th = new Date(targetYear, targetMonth + 1, 0);
-      }
-      const trialDays = Math.max(1, Math.ceil((next30th.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-
-      const buildPlanProduct = (productId: string, productTotal: number, depositShare: number, monthlyShare: number) => ({
+      // Payment plan — DEPOSIT-ONLY products. The recurring plan is created
+      // in a separate processManual call AFTER the deposit succeeds (Step 2B
+      // below). This prevents Ontraport from leaving phantom subscriptions
+      // when the deposit charge fails.
+      const buildDepositProduct = (productId: string, depositShare: number) => ({
         id: productId,
-        type: 'payment_plan',
+        type: '',  // one-time line item
         quantity: 1,
-        total: String(productTotal.toFixed(2)),
+        total: String(depositShare.toFixed(2)),
         price: [{
-          price: String(monthlyShare.toFixed(2)),
-          payment_count: months,
+          price: String(depositShare.toFixed(2)),
+          payment_count: 1,
           unit: 'month',
         }],
-        trial: {
-          price: String(depositShare.toFixed(2)),
-          payment_count: trialDays,
-          unit: 'day',
-        },
       });
 
       if (isReformerOnly) {
-        // Reformer only — product 116
-        offerProducts.push(buildPlanProduct(PRODUCT_ID_REFORMER, effectiveTotal, effectiveDeposit, monthlyPayment));
+        offerProducts.push(buildDepositProduct(PRODUCT_ID_REFORMER, effectiveDeposit));
       } else if (includesReformer) {
-        // Career/Studio — split deposit + monthly proportionally
         const ratio = CERT_BASE_PRICE / (CERT_BASE_PRICE + REFORMER_BASE_PRICE);
-        const certDeposit   = parseFloat((effectiveDeposit * ratio).toFixed(2));
+        const certDeposit     = parseFloat((effectiveDeposit * ratio).toFixed(2));
         const reformerDeposit = parseFloat((effectiveDeposit - certDeposit).toFixed(2));
-        const certMonthly   = parseFloat((monthlyPayment * ratio).toFixed(2));
-        const reformerMonthly = parseFloat((monthlyPayment - certMonthly).toFixed(2));
-
-        offerProducts.push(buildPlanProduct(PRODUCT_ID_PILATES,  certTotal,     certDeposit,     certMonthly));
-        offerProducts.push(buildPlanProduct(PRODUCT_ID_REFORMER,  reformerTotal, reformerDeposit, reformerMonthly));
+        offerProducts.push(buildDepositProduct(PRODUCT_ID_PILATES,  certDeposit));
+        offerProducts.push(buildDepositProduct(PRODUCT_ID_REFORMER, reformerDeposit));
       } else {
-        // Cert only — product 107
-        offerProducts.push(buildPlanProduct(PRODUCT_ID_PILATES, effectiveTotal, effectiveDeposit, monthlyPayment));
+        offerProducts.push(buildDepositProduct(PRODUCT_ID_PILATES, effectiveDeposit));
       }
     }
 
@@ -591,10 +573,102 @@ export async function POST(request: NextRequest) {
     }
 
     // ════════════════════════════════════════════════════════════════════
-    // ✅ PAYMENT SUCCESSFUL — now set tags, payment plan fields, etc.
+    // ✅ DEPOSIT CHARGED — schedule the recurring plan (separate call)
     // ════════════════════════════════════════════════════════════════════
 
-    console.log(`[Checkout] ✅ Payment successful for ${email}! Invoice: ${invoiceId}`);
+    console.log(`[Checkout] ✅ Deposit charged for ${email}! Invoice: ${invoiceId}`);
+
+    // ── Step 2B: Schedule recurring plan ONLY after deposit success ─────
+    // This is a deliberately-separate processManual call so a declined
+    // deposit can never leave a phantom subscription behind. If this call
+    // errors we DON'T roll back the deposit (the customer paid) — we log
+    // loudly and continue tagging so support can finish the plan setup
+    // manually in Ontraport.
+    if (!isFullPayment) {
+      const planNow = new Date();
+      const planDay = planNow.getDate();
+      let planMonth = planNow.getMonth();
+      let planYear = planNow.getFullYear();
+      if (planDay >= 15) {
+        planMonth += 1;
+        if (planMonth > 11) { planMonth = 0; planYear += 1; }
+      }
+      let planNext30th = new Date(planYear, planMonth, 30);
+      if (planNext30th.getMonth() !== planMonth) {
+        planNext30th = new Date(planYear, planMonth + 1, 0);
+      }
+      const daysUntilFirstCharge = Math.max(1, Math.ceil((planNext30th.getTime() - planNow.getTime()) / (1000 * 60 * 60 * 24)));
+
+      const buildRecurringProduct = (productId: string, productTotal: number, monthlyShare: number) => ({
+        id: productId,
+        type: 'payment_plan',
+        quantity: 1,
+        total: String((monthlyShare * months).toFixed(2)),
+        price: [{
+          price: String(monthlyShare.toFixed(2)),
+          payment_count: months,
+          unit: 'month',
+        }],
+      });
+
+      const planProducts: Record<string, unknown>[] = [];
+      if (isReformerOnly) {
+        planProducts.push(buildRecurringProduct(PRODUCT_ID_REFORMER, effectiveTotal, monthlyPayment));
+      } else if (includesReformer) {
+        const ratio = CERT_BASE_PRICE / (CERT_BASE_PRICE + REFORMER_BASE_PRICE);
+        const certMonthly     = parseFloat((monthlyPayment * ratio).toFixed(2));
+        const reformerMonthly = parseFloat((monthlyPayment - certMonthly).toFixed(2));
+        planProducts.push(buildRecurringProduct(PRODUCT_ID_PILATES,  certTotal,     certMonthly));
+        planProducts.push(buildRecurringProduct(PRODUCT_ID_REFORMER, reformerTotal, reformerMonthly));
+      } else {
+        planProducts.push(buildRecurringProduct(PRODUCT_ID_PILATES, effectiveTotal, monthlyPayment));
+      }
+
+      const planOffer: Record<string, unknown> = {
+        products: planProducts,
+        subTotal: '0.00',
+        grandTotal: '0.00',
+        hasTaxes: false,
+        hasShipping: false,
+        delay: daysUntilFirstCharge,  // schedule first charge for next 30th
+        send_recurring_invoice: true,
+      };
+      if (INVOICE_TEMPLATE_ID > 0) {
+        planOffer.invoice_template = INVOICE_TEMPLATE_ID;
+      }
+
+      const planTxnBody = {
+        contact_id: Number(contactId),
+        chargeNow: 'chargeLater',  // do NOT charge now — schedule per delay
+        gateway_id: ONTRAPORT_GATEWAY_ID,
+        offer: planOffer,
+        payer: {
+          ccnumber: cleanCardNumber,
+          code: cardCvc,
+          expire_month: cardExpMonth,
+          expire_year: cardExpYear,
+        },
+      };
+
+      console.log(`[Checkout] Scheduling recurring plan for ${email}: €${monthlyPayment} x ${months} months, first charge in ${daysUntilFirstCharge} day(s)`);
+
+      try {
+        const planRes = await fetch('https://api.ontraport.com/1/transaction/processManual', {
+          method: 'POST',
+          headers: ontraportHeaders(),
+          body: JSON.stringify(planTxnBody),
+        });
+        const planText = await planRes.text();
+        let planResult: Record<string, unknown> = {};
+        try { planResult = JSON.parse(planText); } catch { /* keep raw */ }
+        console.log('[Checkout] plan processManual response:', JSON.stringify(planResult).slice(0, 600));
+        if (planResult.code !== undefined && planResult.code !== 0) {
+          console.error(`[Checkout] ⚠️ Recurring plan creation FAILED for ${email} after deposit charged. Manual setup needed in Ontraport. Response:`, planResult);
+        }
+      } catch (e) {
+        console.error(`[Checkout] ⚠️ Recurring plan request errored for ${email} after deposit charged:`, e);
+      }
+    }
 
     // ── Step 2b: Send IFT Global Receipt to customer ────────────────────
     if (invoiceId) {
@@ -631,11 +705,23 @@ export async function POST(request: NextRequest) {
 
     // ── Step 4: Update contact with ALL course + payment details ─────────
     // PILATES FIELDS — f2300-f2309 series for mat, f2590-f2599 for reformer
+    // Resolve add-on IDs → records → names (server-side source of truth) so
+    // the Ontraport contact + Slack ding both reflect what was actually
+    // bought. Frontend sends just IDs.
+    const selectedAddOnRecords = ALL_PILATES_ADDONS.filter((a) =>
+      (selectedAddOns || []).includes(a.id),
+    );
+    const selectedAddOnNames = selectedAddOnRecords.map((a) => a.name);
+    const packageNameWithAddOns = selectedAddOnNames.length
+      ? `${packageName} + ${selectedAddOnNames.join(' + ')}`
+      : packageName;
+
     const updateBody: Record<string, string> = {
       id: contactId,
-      f1834: courseOptionId,        // Shared course type dropdown
-      f2537: PAYMENT_METHOD_STRIPE, // Payment method: Stripe
-      f1544: String(effectiveTotal),// Total course cost
+      f1834: courseOptionId,                  // Shared course type dropdown
+      f1428: packageNameWithAddOns,           // Package label (with add-ons appended)
+      f2537: PAYMENT_METHOD_STRIPE,           // Payment method: Stripe
+      f1544: String(effectiveTotal),          // Total course cost (already includes addOnsTotal)
     };
 
     if (!isReformerOnly) {
@@ -713,7 +799,7 @@ export async function POST(request: NextRequest) {
       lastName,
       email,
       phone,
-      packageName,
+      packageName: packageNameWithAddOns,
       packagePrice,
       effectiveTotal,
       depositAmount: effectiveDeposit,
@@ -725,7 +811,7 @@ export async function POST(request: NextRequest) {
       startDate: notifyStartDate,
       term: termCode,
       year: currentYear,
-      addOns: selectedAddOns || [],
+      addOns: selectedAddOnNames,   // resolved names, not IDs
       addOnsTotal,
       couponCode: coupon?.code,
       discount: coupon?.discount,

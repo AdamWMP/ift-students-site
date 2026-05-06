@@ -56,6 +56,11 @@ function formatSaleMessage(sale: SaleDetails): { text: string; slackBlocks: obje
   const name  = `${sale.firstName} ${sale.lastName}`.toUpperCase();
   const email = sale.email.toUpperCase();
 
+  // Add-ons line — only renders when at least one add-on was bought
+  const addOnsLine = (sale.addOns && sale.addOns.length > 0)
+    ? `Add-ons: ${sale.addOns.join(', ')}${sale.addOnsTotal ? ` (+€${sale.addOnsTotal.toFixed(2)})` : ''}`
+    : '';
+
   const text = [
     `Ding Ding Sale 🔔🔔🔔💶💶💶`,
     `Someone just enrolled`,
@@ -64,6 +69,7 @@ function formatSaleMessage(sale: SaleDetails): { text: string; slackBlocks: obje
     `Email: ${email}`,
     `Number: ${sale.phone}`,
     `Course: ${sale.packageName}`,
+    addOnsLine,
     `Day: ${sale.timetable || ''}`,
     `Location: ${sale.location || ''}`,
     `Term: ${termLabel}`,
@@ -76,7 +82,7 @@ function formatSaleMessage(sale: SaleDetails): { text: string; slackBlocks: obje
     ``,
     `Ontraport: https://app.ontraport.com/#!/contacts/view?id=${sale.contactId}`,
     `Onboarding: https://pilatescheckout.imageft.ie/onboarding/${sale.contactId}`,
-  ].filter(line => line !== undefined && line !== null).join('\n');
+  ].filter(line => line !== undefined && line !== null && line !== '').join('\n');
 
   const slackBlocks: object[] = [];
 
