@@ -137,9 +137,9 @@ export const packages: Package[] = [
       'Align–Flow–Empower Reformer framework — beginner to intermediate repertoire',
       '8 full days across 4 weekends of practical training, plus a dedicated exam weekend',
       'You\'ll be ready to hit the ground running from day one',
-      'Entry requirement: Mat Pilates, Group Instructor, or PT qualification',
+      'Entry requirement: Mat Pilates qualification',
     ],
-    description: 'Mat, Group Instructor, or PT qualified? Add Reformer to your toolkit — covering beginner to intermediate repertoire so you\'re ready to teach from day one.',
+    description: 'Mat Pilates qualified? Add Reformer to your toolkit — covering beginner to intermediate repertoire so you\'re ready to teach from day one.',
   },
   {
     id: 'pilates-studio',

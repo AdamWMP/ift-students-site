@@ -78,7 +78,7 @@ const courses = [
       'Reformer Pilates Instructor — REPs Ireland Approved',
       'Beginner to intermediate repertoire, ready to teach day one',
       '4 weekends of hands-on practical training',
-      'Entry requirement: Mat Pilates, Group Instructor, or PT',
+      'Entry requirement: Mat Pilates qualification',
     ],
     planNote: 'From €300 deposit · 0% finance up to 4 months',
   },
@@ -117,7 +117,7 @@ const faqs = [
   },
   {
     q: "What's the entry requirement for Reformer?",
-    a: "A Mat Pilates Instructor, Group Exercise Instructor, or Personal Trainer qualification is required. If you're not there yet, the Mat course is your starting point.",
+    a: "A Mat Pilates Instructor qualification is required. If you're not there yet, the Mat course is your starting point.",
   },
   {
     q: 'What earning potential does a Reformer qualification unlock?',

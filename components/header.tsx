@@ -58,6 +58,19 @@ export default function Header() {
     return () => window?.removeEventListener?.('scroll', handleScroll)
   }, [])
 
+  // Body scroll lock while the mobile menu is open — without this, the
+  // menu's internal scroll fights the page underneath it on iOS Safari.
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    const prev = document.body.style.overflow
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    }
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [mobileMenuOpen])
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -186,16 +199,18 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — internally scrollable; the page underneath is locked
+          via the body-scroll-lock effect below so the menu doesn't fight
+          with background scroll on small phones. */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-charcoal-900 border-t border-charcoal-800"
+            className="lg:hidden bg-charcoal-900 border-t border-charcoal-800 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
           >
-            <nav className="max-w-[1200px] mx-auto px-4 py-4 space-y-1">
+            <nav className="max-w-[1200px] mx-auto px-4 py-4 pb-safe space-y-1">
               {navItems?.map?.((item, index) => (
                 <div key={index}>
                   {item?.children ? (
