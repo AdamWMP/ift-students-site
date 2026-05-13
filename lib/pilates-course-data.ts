@@ -217,25 +217,25 @@ export const courseStartDates: CourseStartDate[] = [
   // Dublin (Swords) — 3 Weekend Intensive (Summer 2026)
   {
     date: '2026-07-25',
-    label: '25 July 2026 — IFT Swords Academy (Practical Exam Weekend: 29–30 August)',
+    label: '25 July 2026 — IFT Swords Academy (Practical Exam: Sun 30 August)',
     locations: ['dublin-swords'],
     timetable: '3-weekend-intensive',
     sessions: [
       'Weekend 1: Sat 25 & Sun 26 July',
       'Weekend 2: Sat 15 & Sun 16 August',
-      'Weekend 3: Sat 29 & Sun 30 August — Practical Exam',
+      'Weekend 3: Sat 29 August (training) · Sun 30 August — Practical Exam',
     ],
   },
   // Derry (Gateway Studio) — 3 Weekend Intensive (Autumn 2026)
   {
     date: '2026-09-05',
-    label: '5 September 2026 — Gateway Studio, Co. Derry / L\'Derry',
+    label: '5 September 2026 — Gateway Studio, Co. Derry / L\'Derry (Practical Exam: Sun 4 October)',
     locations: ['derry'],
     timetable: '3-weekend-intensive',
     sessions: [
       'Weekend 1: Sat 5 & Sun 6 September',
       'Weekend 2: Sat 19 & Sun 20 September',
-      'Weekend 3: Sat 3 & Sun 4 October',
+      'Weekend 3: Sat 3 October (training) · Sun 4 October — Practical Exam',
     ],
   },
 ];
