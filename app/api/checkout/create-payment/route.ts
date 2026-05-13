@@ -267,7 +267,7 @@ async function sendInvoiceReceipt(invoiceId: string | number): Promise<boolean> 
         method: 'PUT',
         headers: ontraportHeaders(),
         body: JSON.stringify({
-          id: String(invoiceId),
+          ids: [String(invoiceId)],
           invoice_template: INVOICE_TEMPLATE_ID,
         }),
       });

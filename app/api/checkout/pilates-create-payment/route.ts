@@ -222,7 +222,7 @@ async function sendInvoiceReceipt(invoiceId: string | number) {
       method: 'PUT',
       headers: ontraportHeaders(),
       body: JSON.stringify({
-        id: String(invoiceId),
+        ids: [String(invoiceId)],
         invoice_template: INVOICE_TEMPLATE_ID,
       }),
     });
@@ -288,7 +288,7 @@ async function voidInvoice(invoiceId: string | number) {
     await fetch('https://api.ontraport.com/1/transaction/void', {
       method: 'PUT',
       headers: ontraportHeaders(),
-      body: JSON.stringify({ id: String(invoiceId) }),
+      body: JSON.stringify({ ids: [String(invoiceId)] }),
     });
     console.log(`[Checkout] Voided declined invoice ${invoiceId}`);
   } catch (e) {
