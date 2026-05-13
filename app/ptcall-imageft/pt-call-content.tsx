@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  CheckCircle, Clock, Users, Award, TrendingUp,
-  MapPin, Calendar, ArrowRight, Star, MessageCircle,
+  CheckCircle, Users, Award, TrendingUp,
+  MapPin, Calendar, Star, MessageCircle,
   Briefcase, Shield, Zap,
 } from 'lucide-react'
+import { getUpcomingPtIntakes } from '@/lib/upcoming-intakes'
 
 // ── What happens on the call ───────────────────────────────────────
 const callPoints = [
@@ -84,13 +85,6 @@ const courses = [
   },
 ]
 
-// ── Next intakes ───────────────────────────────────────────────────
-const intakes = [
-  { date: '25 April', location: 'Cork · Galway · Limerick · Wexford', format: 'Saturday Only', spots: 4, urgent: true },
-  { date: '27 April', location: 'Dublin (Swords & Tallaght)', format: 'Evenings + Saturday', spots: 3, urgent: true },
-  { date: '2 July',   location: 'Nationwide', format: 'Full Time Thu & Fri', spots: 8, urgent: false },
-]
-
 // ── Trust signals ──────────────────────────────────────────────────
 const trust = [
   { icon: Shield,    text: 'REPs Ireland accredited — EQF Level 4' },
@@ -126,10 +120,33 @@ const faqs = [
 ]
 
 // ── OnceHub inline widget ─────────────────────────────────────────
-function OnceHubCalendar() {
+// Lazy-loaded: embed.js (~80 KB + 3rd-party fonts) is deferred until the
+// browser is idle after first paint, so it doesn't compete with the hero
+// render. Tap-to-load fallback shows immediately if the visitor wants the
+// calendar before the idle callback fires.
+function OnceHubCalendar({ heightClass = 'h-[600px] md:h-[680px]' }: { heightClass?: string }) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const [shouldMount, setShouldMount] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
+  // Defer mount until the browser is idle after first paint. Safari lacks
+  // requestIdleCallback, so fall back to a short timeout.
   useEffect(() => {
+    if (shouldMount) return
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback
+    const timer = ric
+      ? ric(() => setShouldMount(true), { timeout: 2500 })
+      : window.setTimeout(() => setShouldMount(true), 1500)
+    return () => {
+      const cic = (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback
+      if (ric && cic) cic(timer as number)
+      else clearTimeout(timer as number)
+    }
+  }, [shouldMount])
+
+  // Inject the embed.js once we've decided to mount
+  useEffect(() => {
+    if (!shouldMount) return
     const existing = document.querySelector('script[src="https://cdn.oncehub.com/cal/embed.js"]')
     if (existing) { setLoaded(true); return }
     const s = document.createElement('script')
@@ -137,26 +154,84 @@ function OnceHubCalendar() {
     s.async = true
     s.onload = () => setLoaded(true)
     document.body.appendChild(s)
-  }, [])
+  }, [shouldMount])
 
   return (
-    <div className="w-full bg-white rounded-2xl overflow-hidden border border-charcoal-800 shadow-2xl shadow-black/30">
-      {!loaded && (
-        <div className="flex items-center justify-center h-[500px]">
+    <div
+      ref={wrapperRef}
+      className={`w-full bg-white rounded-2xl overflow-hidden border border-charcoal-800 shadow-2xl shadow-black/30 ${heightClass}`}
+    >
+      {!shouldMount && (
+        <button
+          type="button"
+          onClick={() => setShouldMount(true)}
+          className="w-full h-full flex flex-col items-center justify-center gap-3 text-charcoal-950 font-medium hover:bg-charcoal-50 transition-colors"
+        >
+          <Calendar className="w-8 h-8 text-gold" />
+          <span className="text-sm font-semibold">Tap to load calendar</span>
+          <span className="text-xs text-charcoal-600">Available today · 15-minute call</span>
+        </button>
+      )}
+      {shouldMount && !loaded && (
+        <div className="flex items-center justify-center h-full">
           <div className="w-8 h-8 border-4 border-gold/30 border-t-gold rounded-full animate-spin" />
         </div>
       )}
-      <div
-        data-oh-booking-calendar-id="BKC-PDJR9D0K6W"
-        style={{ minWidth: '320px', height: '680px' }}
-      />
+      {shouldMount && (
+        <div
+          data-oh-booking-calendar-id="BKC-PDJR9D0K6W"
+          style={{ minWidth: '320px', height: '100%' }}
+        />
+      )}
     </div>
   )
 }
 
+// Wrapped calendar block — header + iframe + caption. Rendered twice (once
+// for mobile, once sticky on desktop) so we can put the calendar above the
+// content on small screens without duplicating styling.
+function CalendarBlock() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.5 }}
+    >
+      <div className="bg-charcoal-900 border border-charcoal-800 rounded-t-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3">
+        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gold/15 border border-gold/25 flex items-center justify-center flex-shrink-0">
+          <Calendar className="w-4 h-4 text-gold" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-white font-semibold text-sm">Book Your Strategy Call</p>
+          <p className="text-white/40 text-[11px] sm:text-xs">Choose a date and time that suits you</p>
+        </div>
+        <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <span className="text-green-400 text-[11px] sm:text-xs font-medium">Available today</span>
+        </div>
+      </div>
+      <div className="-mt-px">
+        <OnceHubCalendar />
+      </div>
+      <p className="text-center text-white/25 text-xs mt-3">
+        No commitment · 15 minutes · Phone or WhatsApp
+      </p>
+    </motion.div>
+  )
+}
+
 export default function PtCallContent() {
+  // Compute upcoming intakes once at render time. SSR-safe — uses Date.now()
+  // on the server, then re-renders on the client; for marketing copy this is
+  // fine (no hydration mismatch concerns since spotsLine is text-only).
+  const intakes = getUpcomingPtIntakes(3)
+
   return (
     <div className="min-h-screen bg-charcoal-950">
+      {/* Preconnect speeds up the inevitable OnceHub fetch by warming up the
+          TLS handshake while the rest of the page renders. */}
+      <link rel="preconnect" href="https://cdn.oncehub.com" crossOrigin="anonymous" />
+      <link rel="dns-prefetch" href="https://cdn.oncehub.com" />
 
       {/* ── Minimal header ─────────────────────────────────────── */}
       <header className="border-b border-charcoal-800/50">
@@ -167,6 +242,7 @@ export default function PtCallContent() {
               alt="Image Fitness Training"
               width={120} height={36}
               className="h-8 w-auto"
+              priority
             />
           </Link>
           <a
@@ -181,37 +257,46 @@ export default function PtCallContent() {
         </div>
       </header>
 
-      {/* ── Hero + Calendar ────────────────────────────────────── */}
-      <section className="relative overflow-hidden py-12 sm:py-16">
+      {/* ── Hero ────────────────────────────────────── */}
+      <section className="relative overflow-hidden pt-10 sm:pt-16 pb-6 sm:pb-10">
         {/* Glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gold/7 rounded-full blur-[160px]" />
         </div>
 
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid lg:grid-cols-[1fr_500px] gap-10 lg:gap-16 items-start">
+          {/* Mobile-only layout (< lg): Headline → Calendar → CallPoints → Stats */}
+          {/* Desktop layout (>= lg): two-column grid with Calendar sticky in the right column */}
+          <div className="lg:grid lg:grid-cols-[1fr_500px] lg:gap-16 lg:items-start">
 
-            {/* Left — headline + call points */}
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <p className="text-xs tracking-[0.25em] text-gold uppercase font-semibold mb-4">
-                  Free 15-Minute Call
-                </p>
-                <h1 className="font-serif text-4xl sm:text-5xl md:text-[3.5rem] text-white leading-tight mb-6">
-                  Book your free<br />
-                  <span className="text-gold italic">PT Strategy Call.</span>
-                </h1>
-                <p className="text-white/55 text-lg leading-relaxed mb-10 max-w-lg">
-                  Not sure which course is right for you? Book a no-pressure call with the Image
-                  team — we'll map out the fastest path to your PT career and answer every question
-                  before you commit to anything.
-                </p>
-              </motion.div>
+            {/* Headline — always first */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-start-1 lg:row-start-1"
+            >
+              <p className="text-xs tracking-[0.25em] text-gold uppercase font-semibold mb-4">
+                Free 15-Minute Call
+              </p>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-[3.5rem] text-white leading-tight mb-6">
+                Book your free<br />
+                <span className="text-gold italic">PT Strategy Call.</span>
+              </h1>
+              <p className="text-white/55 text-base sm:text-lg leading-relaxed mb-6 lg:mb-10 max-w-lg">
+                Not sure which course is right for you? Book a no-pressure call with the Image
+                team — we'll map out the fastest path to your PT career and answer every question
+                before you commit to anything.
+              </p>
+            </motion.div>
 
+            {/* Mobile calendar — between headline and content on mobile only */}
+            <div className="lg:hidden mt-2 mb-10">
+              <CalendarBlock />
+            </div>
+
+            {/* CallPoints + Stats — third on mobile, second row of left col on desktop */}
+            <div className="lg:col-start-1 lg:row-start-2">
               {/* What happens on the call */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -251,87 +336,55 @@ export default function PtCallContent() {
               </motion.div>
             </div>
 
-            {/* Right — calendar */}
-            <motion.div
-              initial={{ opacity: 0, y: 24, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 0.1, duration: 0.7 }}
-              className="lg:sticky lg:top-8"
-            >
-              {/* Calendar header */}
-              <div className="bg-charcoal-900 border border-charcoal-800 rounded-t-2xl px-6 py-4 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gold/15 border border-gold/25 flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-gold" />
-                </div>
-                <div>
-                  <p className="text-white font-semibold text-sm">Book Your Strategy Call</p>
-                  <p className="text-white/40 text-xs">Choose a date and time that suits you</p>
-                </div>
-                <div className="ml-auto flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-green-400 text-xs font-medium">Available today</span>
-                </div>
-              </div>
-
-              {/* Inline OnceHub */}
-              <div className="-mt-px">
-                <OnceHubCalendar />
-              </div>
-
-              <p className="text-center text-white/25 text-xs mt-3">
-                No commitment required · 15 minutes · We come to you (phone or WhatsApp)
-              </p>
-            </motion.div>
+            {/* Desktop calendar — sticky right column, spans both rows */}
+            <div className="hidden lg:block lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-8">
+              <CalendarBlock />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Upcoming intakes urgency bar ────────────────────────── */}
-      <section className="border-y border-charcoal-800/40 bg-charcoal-900/60 py-8">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-          <p className="text-xs tracking-[0.22em] text-gold uppercase font-semibold text-center mb-6">
-            Upcoming Intakes — Places Filling Now
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4">
-            {intakes.map((intake, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className={`rounded-xl border p-4 flex items-start gap-3 ${
-                  intake.urgent
-                    ? 'border-red-500/20 bg-red-500/5'
-                    : 'border-charcoal-700 bg-charcoal-900/40'
-                }`}
-              >
-                <div className="flex-shrink-0 mt-0.5">
-                  {intake.urgent ? (
+      {/* ── Upcoming intakes urgency bar (auto-synced from course-data) ─── */}
+      {intakes.length > 0 && (
+        <section className="border-y border-charcoal-800/40 bg-charcoal-900/60 py-8">
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+            <p className="text-xs tracking-[0.22em] text-gold uppercase font-semibold text-center mb-6">
+              Upcoming Intakes — Places Filling Now
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {intakes.map((intake, i) => (
+                <motion.div
+                  key={intake.startISO + intake.location}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className={`rounded-xl border p-4 flex items-start gap-3 ${
+                    intake.urgent
+                      ? 'border-red-500/20 bg-red-500/5'
+                      : 'border-charcoal-700 bg-charcoal-900/40'
+                  }`}
+                >
+                  <div className="flex-shrink-0 mt-0.5">
                     <span className="flex h-2.5 w-2.5 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-60" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-60 ${intake.urgent ? 'bg-red-400' : 'bg-amber-400'}`} />
+                      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${intake.urgent ? 'bg-red-500' : 'bg-amber-400'}`} />
                     </span>
-                  ) : (
-                    <span className="flex h-2.5 w-2.5 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400" />
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <p className="text-white font-semibold text-sm">{intake.date}</p>
-                  <p className="text-white/50 text-xs mt-0.5">{intake.location}</p>
-                  <p className="text-white/35 text-xs">{intake.format}</p>
-                  <p className={`text-xs font-semibold mt-1.5 ${intake.urgent ? 'text-red-400' : 'text-amber-400'}`}>
-                    {intake.spots} places remaining
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold text-sm">{intake.date}</p>
+                    <p className="text-white/50 text-xs mt-0.5">{intake.location}</p>
+                    <p className="text-white/35 text-xs">{intake.format}</p>
+                    <p className={`text-xs font-semibold mt-1.5 ${intake.urgent ? 'text-red-400' : 'text-amber-400'}`}>
+                      {intake.spotsLine}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Course guide ────────────────────────────────────────── */}
       <section className="py-16 sm:py-20">
@@ -532,6 +585,18 @@ export default function PtCallContent() {
           <p className="text-xs text-white/20">© {new Date().getFullYear()} Image Fitness Training Global</p>
         </div>
       </footer>
+
+      {/* ── Mobile sticky CTA — scrolls back to calendar ─────────── */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 px-4 pb-4 pointer-events-none">
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="w-full pointer-events-auto inline-flex items-center justify-center gap-2 bg-gold text-charcoal-950 font-bold text-sm uppercase tracking-[0.08em] py-3.5 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+        >
+          <Calendar className="w-4 h-4" />
+          Book Your Call
+        </button>
+      </div>
     </div>
   )
 }
