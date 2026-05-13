@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     default: 'Image Fitness Training | Ireland\'s #1 Personal Trainer & Pilates Course',
     template: '%s | Image Fitness Training',
   },
-  description: 'Get qualified as a Personal Trainer or Pilates Instructor in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Locations in Dublin, Cork, Galway, Limerick & more.',
+  description: 'Get qualified as a Personal Trainer or Pilates Instructor in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Courses in Swords, Tallaght, Cork, Galway, Tuam, Limerick, Wexford. Derry launching September 2026.',
   keywords: [
     'personal trainer course ireland',
     'personal trainer course dublin',
@@ -40,8 +40,11 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: 'Image Fitness Training',
     title: 'Image Fitness Training | Ireland\'s #1 Personal Trainer Course',
-    description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates across Dublin, Cork, Galway, Limerick & more.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
+    description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates across Swords, Tallaght, Cork, Galway, Tuam, Limerick, Wexford. Derry launching September 2026.',
+    // Canonical share image: dark IFT logo (1600×1066) — used consistently
+    // across all 4 properties for brand recognition. The previous og-image.png
+    // (1200×630) is kept in public/ as a fallback.
+    images: [{ url: '/logo-dark.jpg', width: 1600, height: 1066, alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator (REPs Ireland Accredited)' }],
     type: 'website',
     locale: 'en_IE',
     url: 'https://imageft.ie',
@@ -50,7 +53,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Image Fitness Training | Ireland\'s #1 Personal Trainer Course',
     description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates.',
-    images: [{ url: '/og-image.png', alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
+    images: [{ url: '/logo-dark.jpg', alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
+    site: '@imageft',
+    creator: '@imageft',
   },
   icons: {
     icon: [
