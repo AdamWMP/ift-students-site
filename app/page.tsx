@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Personal Trainer & Pilates Courses Ireland | Get Qualified in 8–16 Weeks | Image Fitness Training',
-  description: 'Ireland\'s #1 fitness educator. Become a certified Personal Trainer or Pilates Instructor in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Locations in Dublin, Cork, Galway, Limerick, Wexford & Belfast.',
+  description: 'Ireland\'s #1 fitness educator. Become a certified Personal Trainer or Pilates Instructor in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Courses in Swords, Tallaght, Cork, Galway, Tuam, Limerick, Wexford. Derry launching September 2026.',
   keywords: [
     'personal trainer course ireland',
     'pilates instructor course ireland',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: 'Personal Trainer & Pilates Courses Ireland | Image Fitness Training',
     description: 'Ireland\'s #1 fitness educator. Get qualified in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates.',
     url: 'https://imageft.ie',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
+    images: [{ url: '/logo-dark.jpg', width: 1600, height: 1066, alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator (REPs Ireland Accredited)' }],
     type: 'website',
   },
 }
