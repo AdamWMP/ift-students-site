@@ -47,11 +47,13 @@ const TIMETABLE_TO_ONTRAPORT: Record<string, string> = {
 
 // Human-readable timetable labels — mirror the Ontraport dropdown option labels
 // so the Slack "Day" line reads in plain English instead of the slug.
+// Note: '16-week-evening-sat' is a legacy slug — the actual course duration
+// is 8 weeks (Ontraport option 597 = "Evening & Weekend - Mon + Wed + Sat (8 Weeks)").
 const TIMETABLE_TO_LABEL: Record<string, string> = {
-  '8-week-intensive':     '8 Week Intensive',
-  '16-week-evening-sat':  '16 Week Evening + Saturday',
-  '16-week-saturday':     '16 Week Saturday',
-  'pt-sun16':             '16 Week Sunday',
+  '8-week-intensive':     'Thursday & Friday (8 Weeks)',
+  '16-week-evening-sat':  'Evening & Weekend — Mon + Wed + Sat (8 Weeks)',
+  '16-week-saturday':     'Saturday (16 Weeks)',
+  'pt-sun16':             'Sunday (16 Weeks)',
   'online-self-paced':    'Online (Self-Paced)',
 };
 
@@ -67,17 +69,37 @@ const LOCATION_TO_LABEL: Record<string, string> = {
   'online':   'Online',
 };
 
-// All PT-track packages share the same f1834 parent course (97). The
-// distinguishing detail (which qualification(s) the customer is buying)
-// lives in f2290 below.
+// f1834 "New IFT Choose your course" — Ontraport DROPDOWN option IDs.
+// CRITICAL: must be valid option IDs from the dropdown. Sending an unknown
+// value (e.g. the old code sent '97') causes Ontraport to silently store 0,
+// which is the root cause of the 7 May 2026 lost-data incident.
+// Resolved against live Ontraport meta on 29 Apr 2026:
+//   308=S&C, 309=PT Only, 310=Combo (Fitness, Group, PT), 363=GI+PT,
+//   369=FI+GI, 420=PPN, 441=Advanced Nutrition,
+//   447=BUNDLE Combo + Nutrition, 448=BUNDLE Combo + PPN,
+//   449=BUNDLE Combo + S&C, 452=Pilates, 459=BUNDLE Combo + Pilates, 472=IFTG
 const PACKAGE_TO_ONTRAPORT_COURSE: Record<string, string> = {
-  'pro-coach':              '97',
-  'complete-coach':         '97',
-  'fitness-business-coach': '97',
-  'pt-only':                '97',
-  'group-instruction-only': '97',
-  'launch-pad-bundle':      '97',
-  'online-coaching-bundle': '97',
+  'pro-coach':              '310',  // The Cert  = Combination Course (FI, GI, PT)
+  'complete-coach':         '447',  // The Career = BUNDLE Combo + Nutrition (FBA tracked via f2614)
+  'fitness-business-coach': '447',  // The Business = BUNDLE Combo + Nutrition (workshops/photoshoot via f2611-2613 + tags)
+  'pt-only':                '309',  // Personal Training Only
+  'group-instruction-only': '369',  // Fitness & Group Instruction
+  'launch-pad-bundle':      '472',  // IFTG
+  'online-coaching-bundle': '472',  // IFTG
+};
+
+// f1428 "Choose your Course / Package" — Ontraport DROPDOWN. Was being sent
+// free-text (e.g. "Pro Coach") which Ontraport silently rejected. Must be one
+// of: 20=Sports Massage, 23=PT only, 166=FI+GI Only, 231=Combination Course,
+// 240=INTENSIVE, 262=Online Coaching.
+const PACKAGE_TO_ONTRAPORT_PACKAGE: Record<string, string> = {
+  'pro-coach':              '231',  // Combination Course
+  'complete-coach':         '231',  // Combination Course (+ extras tracked elsewhere)
+  'fitness-business-coach': '231',
+  'pt-only':                '23',   // Personal Training only
+  'group-instruction-only': '166',  // Fitness & Group Instruction Only
+  'launch-pad-bundle':      '262',  // Online Coaching
+  'online-coaching-bundle': '262',  // Online Coaching
 };
 
 // f2290 (PT course qualifications) — Ontraport option IDs (resolved via API).
@@ -181,21 +203,124 @@ async function fetchMarketingAttribution(contactId: string | number): Promise<{
   }
 }
 
-// ─── Send IFT Global Receipt for a successful invoice ────────────────
-async function sendInvoiceReceipt(invoiceId: string | number) {
+// ─── Failsafe pre-flight booking log ─────────────────────────────────
+// Posts the full booking payload to Slack the moment a booking starts,
+// BEFORE any Ontraport call. This is our last-resort record — even if
+// Ontraport is offline, the contact update silently drops fields, or
+// downstream code crashes, the customer's choices are captured in Slack.
+// Card details are stripped (PCI). Falls back to console-only logging
+// if no webhook is configured.
+async function logRawBookingAttempt(payload: Record<string, unknown>): Promise<void> {
+  const safe: Record<string, unknown> = { ...payload };
+  delete safe.cardNumber;
+  delete safe.cardExpMonth;
+  delete safe.cardExpYear;
+  delete safe.cardCvc;
+
+  const stamp = new Date().toISOString();
+  const line =
+    `🗂 RAW BOOKING ATTEMPT (failsafe log)\n` +
+    `Time: ${stamp}\n` +
+    `Name: ${(safe.firstName as string) || ''} ${(safe.lastName as string) || ''}\n` +
+    `Email: ${(safe.email as string) || ''}\n` +
+    `Phone: ${(safe.phone as string) || ''}\n` +
+    `Course: ${(safe.packageName as string) || (safe.packageId as string) || ''}\n` +
+    `Location: ${(safe.location as string) || ''}\n` +
+    `Timetable: ${(safe.timetable as string) || ''}\n` +
+    `Start Date: ${(safe.startDate as string) || ''}\n` +
+    `Total Price: €${(safe.packagePrice as number) ?? '?'}` +
+      (safe.addOnsTotal ? ` + €${safe.addOnsTotal} add-ons` : '') + `\n` +
+    `Deposit: €${(safe.depositAmount as number) ?? '?'}\n` +
+    `Months: ${(safe.months as number) ?? '?'}\n` +
+    `Monthly: €${(safe.monthlyPayment as number) ?? '?'}\n` +
+    `Add-ons: ${Array.isArray(safe.addOns) && (safe.addOns as unknown[]).length ? (safe.addOns as unknown[]).join(', ') : 'none'}\n` +
+    `\nFull payload (cards stripped):\n` +
+    '```\n' + JSON.stringify(safe, null, 2) + '\n```';
+
+  // Always log to server stdout — Vercel keeps these for 24h+
+  console.log('[Checkout][RAW]', line);
+
+  // Also fire to Slack so it's visible without log access
+  const url = (process.env.SLACK_BOOKING_LOG_WEBHOOK_URL || process.env.SLACK_SALES_WEBHOOK_URL || '').trim();
+  if (!url) return;
   try {
-    const res = await fetch('https://api.ontraport.com/1/transaction/sendInvoice', {
-      method: 'PUT',
-      headers: ontraportHeaders(),
-      body: JSON.stringify({
-        id: String(invoiceId),
-        invoice_template: INVOICE_TEMPLATE_ID,
-      }),
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: line, username: 'IFT Booking Failsafe', icon_emoji: ':floppy_disk:' }),
     });
-    const text = await res.text();
-    console.log(`[Checkout] sendInvoice for ${invoiceId}:`, text.slice(0, 200));
   } catch (e) {
-    console.error(`[Checkout] Failed to send invoice receipt for ${invoiceId}:`, e);
+    console.error('[Checkout] failsafe Slack log failed:', e);
+  }
+}
+
+// ─── Send IFT Global Receipt for a successful invoice ────────────────
+// CRITICAL: customers regularly contacted support unsure if their payment
+// went through — this is the receipt they were waiting on. We:
+//   1. Fire sendInvoice for the given invoiceId.
+//   2. If it errors or returns code !== 0, retry once after 1s.
+//   3. Log loudly so a missing receipt always shows in Vercel logs.
+async function sendInvoiceReceipt(invoiceId: string | number): Promise<boolean> {
+  const attempt = async (n: number): Promise<boolean> => {
+    try {
+      const res = await fetch('https://api.ontraport.com/1/transaction/sendInvoice', {
+        method: 'PUT',
+        headers: ontraportHeaders(),
+        body: JSON.stringify({
+          id: String(invoiceId),
+          invoice_template: INVOICE_TEMPLATE_ID,
+        }),
+      });
+      const text = await res.text();
+      let parsed: Record<string, unknown> = {};
+      try { parsed = JSON.parse(text); } catch { /* keep raw */ }
+      const ok = res.ok && (parsed.code === undefined || parsed.code === 0);
+      if (ok) {
+        console.log(`[Checkout] ✅ IFT Global Receipt sent for invoice ${invoiceId} (attempt ${n})`);
+        return true;
+      }
+      console.error(`[Receipt-FAIL] sendInvoice for ${invoiceId} attempt ${n} returned HTTP ${res.status} body: ${text.slice(0, 200)}`);
+      return false;
+    } catch (e) {
+      console.error(`[Receipt-FAIL] sendInvoice for ${invoiceId} attempt ${n} threw:`, e);
+      return false;
+    }
+  };
+
+  if (await attempt(1)) return true;
+  await new Promise((r) => setTimeout(r, 1000));
+  if (await attempt(2)) return true;
+  console.error(`[Receipt-FAIL] ❌ IFT Global Receipt FAILED to send for invoice ${invoiceId} after 2 attempts. Customer may not know their payment succeeded.`);
+  return false;
+}
+
+// Look up the most recent invoice for a contact (fallback when the create
+// transaction response didn't include an invoice ID — happens occasionally
+// with Ontraport's processManual).
+async function findLatestInvoiceForContact(contactId: string | number): Promise<string | undefined> {
+  try {
+    const apiKey = process.env.ONTRAPORT_API_KEY || '';
+    const appId = process.env.ONTRAPORT_APP_ID || '';
+    // Ontraport invoice objectID is 46. Filter by contact_id, sort newest first.
+    const url = new URL('https://api.ontraport.com/1/objects');
+    url.searchParams.set('objectID', '46');
+    url.searchParams.set('range', '1');
+    url.searchParams.set('sort', 'date');
+    url.searchParams.set('sortDir', 'desc');
+    url.searchParams.set('condition', JSON.stringify([
+      { field: { field: 'contact_id' }, op: '=', value: { value: String(contactId) } },
+    ]));
+    const res = await fetch(url.toString(), {
+      method: 'GET',
+      headers: { 'Api-Key': apiKey, 'Api-Appid': appId },
+    });
+    const json = await res.json() as { data?: Array<Record<string, unknown>> };
+    const rows = json.data || [];
+    const id = rows[0]?.id as string | number | undefined;
+    return id ? String(id) : undefined;
+  } catch (e) {
+    console.error('[Receipt] findLatestInvoiceForContact errored:', e);
+    return undefined;
   }
 }
 
@@ -212,6 +337,11 @@ async function sendInvoiceReceipt(invoiceId: string | number) {
 export async function POST(request: NextRequest) {
   try {
     const body: CheckoutRequest = await request.json();
+
+    // FAILSAFE: log raw booking attempt the moment it lands — fire-and-forget
+    // so a slow Slack webhook doesn't block checkout, but await it so the
+    // log is sent before we call Ontraport. If Slack is down, we still try.
+    await logRawBookingAttempt(body as unknown as Record<string, unknown>);
 
     const {
       packageId,
@@ -270,33 +400,58 @@ export async function POST(request: NextRequest) {
 
     const isFullPayment = depositAmount >= packagePrice;
 
-    // Determine current term
-    const currentMonth = new Date().getMonth() + 1;
-    const yearShort = String(new Date().getFullYear()).slice(-2);
-    const termPrefix = (currentMonth >= 2 && currentMonth <= 7) ? 'S' : 'A';
+    // ── Term classification (Spring vs Autumn) ───────────────────────────
+    // Rule: Aug → end of Jan (following year) = Autumn, anything else = Spring.
+    // Term tracks the COURSE START date (not the booking date) — so a course
+    // starting October booked in May is an Autumn sale, not Spring.
+    // Jan edge case: courses starting in January are part of the prior
+    // calendar year's Autumn term (e.g. course start Jan 2027 → A26).
+    const termSource = startDate ? new Date(startDate) : new Date();
+    const termMonth = termSource.getMonth() + 1; // 1..12
+    const termCalendarYear = termSource.getFullYear();
+    // Spring covers Feb–July; everything else (Aug–Jan) is Autumn.
+    const isSpring = termMonth >= 2 && termMonth <= 7;
+    // For January Autumn entries, anchor to the previous calendar year.
+    const termAnchorYear = isSpring
+      ? termCalendarYear
+      : (termMonth === 1 ? termCalendarYear - 1 : termCalendarYear);
+    const yearShort = String(termAnchorYear).slice(-2);
+    const termPrefix = isSpring ? 'S' : 'A';
     const termCode = `${termPrefix}${yearShort}`;
-    const termOptionId = (currentMonth >= 2 && currentMonth <= 7) ? '494' : '492';
+    // Ontraport f2289 dropdown option IDs: Spring = 494, Autumn = 492
+    const termOptionId = isSpring ? '494' : '492';
 
     // Map frontend values to Ontraport option IDs
     const locationOptionId = LOCATION_TO_ONTRAPORT[location] || '';
     const timetableOptionId = TIMETABLE_TO_ONTRAPORT[timetable] || '';
     const courseOptionId = PACKAGE_TO_ONTRAPORT_COURSE[packageId] || '';
+    const packageOptionId = PACKAGE_TO_ONTRAPORT_PACKAGE[packageId] || '';
     const qualificationsOptionId = PACKAGE_TO_ONTRAPORT_QUALIFICATIONS[packageId] || '';
 
     const paymentPlanText = isFullPayment
       ? `Paid in Full — €${packagePrice}`
       : `€${depositAmount} deposit + €${monthlyPayment.toFixed(2)}/mo x ${months} months (billed 30th)`;
 
-    // ── Step 1: Create/update Ontraport contact — IDENTITY ONLY ──────────
-    // Defence-in-depth: course / location / timetable / start date / payment-plan
-    // fields are deferred to Step 4 so a declined card can never leave a contact
-    // record looking like an enrolled student. This is the order the business
-    // requires — payment confirmed first, enrolment data + plan written second.
+    // ── Step 1: Create/update Ontraport contact ──────────────────────────
+    // Identity + course-enrolment fields go in here. Step 4 (post-payment)
+    // adds the payment-plan-specific fields (deposit / monthly / instalment
+    // dates) and qualification dropdown. The actual recurring billing is
+    // gated on payment success in Step 2B — so writing course/location
+    // here is informational, not the same as enrolling them in a paid plan.
+    // CRITICAL: course/location/timetable MUST go in this step. If they
+    // were deferred to Step 4 and that PUT silently fails, we lose all
+    // enrolment context (root cause of the 7 May 2026 lost-data incident).
+    const startDateUnix = startDate ? String(Math.floor(new Date(startDate).getTime() / 1000)) : '';
     const contactBody: Record<string, string> = {
       firstname: firstName,
       lastname: lastName,
       email,
       sms_number: phone,
+      f1834: courseOptionId,            // New IFT Choose your course (dropdown option ID)
+      f2291: locationOptionId,          // PT Course Location dropdown
+      f2292: timetableOptionId,         // PT Course Timetable dropdown
+      f2293: startDateUnix,             // Course Start Date (unix seconds)
+      f1428: packageOptionId,           // Choose your Course / Package (dropdown — NOT free-text)
     };
 
     const contactRes = await fetch('https://api.ontraport.com/1/Contacts/saveorupdate', {
@@ -440,6 +595,15 @@ export async function POST(request: NextRequest) {
       }
       const daysUntilFirstCharge = Math.max(1, Math.ceil((next30th.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
+      // Pattern: free trial of `daysUntilFirstCharge` days at €0.00, then
+      // monthly recurring at `monthlyPayment`. This is the only Ontraport
+      // billing pattern that reliably defers the first real charge to a
+      // specific date — `delay` + `chargeLater` was observed firing the first
+      // charge on the next billing-engine cron tick instead of the 30th.
+      //
+      // Using `donotCharge` ensures the trial €0 is never billed (it just
+      // shifts the recurring start). The deposit was already charged in
+      // Step 2A; this is purely scheduling.
       const planOffer = {
         products: [{
           id: DEPOSIT_PRODUCT_ID,
@@ -451,25 +615,34 @@ export async function POST(request: NextRequest) {
             payment_count: months,
             unit: 'month',
           }],
+          trial: {
+            price: '0.00',
+            payment_count: daysUntilFirstCharge,
+            unit: 'day',
+          },
         }],
         subTotal: '0.00',
         grandTotal: '0.00',
         hasTaxes: false,
         hasShipping: false,
-        delay: daysUntilFirstCharge,  // first recurring charge = next 30th
+        delay: 0,
         invoice_template: INVOICE_TEMPLATE_ID,
         send_recurring_invoice: true,
       };
 
       const planTxnBody = {
         contact_id: Number(contactId),
-        chargeNow: 'chargeLater',  // do NOT charge now — schedule first charge per delay
+        // donotCharge: create the subscription but don't charge anything now.
+        // The €0 trial means nothing is charged until daysUntilFirstCharge days
+        // have elapsed, at which point monthly billing begins.
+        chargeNow: 'donotCharge',
         gateway_id: ONTRAPORT_GATEWAY_ID,
         offer: planOffer,
-        payer: cardPayer,  // card is now saved on contact, but pass for safety
+        payer: cardPayer,
       };
 
-      console.log(`[Checkout] Scheduling recurring plan for ${email}: €${monthlyPayment} x ${months} months, first charge in ${daysUntilFirstCharge} day(s)`);
+      const firstChargeDate = next30th.toISOString().slice(0, 10);
+      console.log(`[Checkout] Scheduling recurring plan for ${email}: €${monthlyPayment} x ${months} months, first charge on ${firstChargeDate} (${daysUntilFirstCharge} days from now, via €0 trial)`);
 
       try {
         const planRes = await fetch('https://api.ontraport.com/1/transaction/processManual', {
@@ -482,11 +655,13 @@ export async function POST(request: NextRequest) {
         try { planResult = JSON.parse(planText); } catch { /* keep raw */ }
         console.log('[Checkout] plan processManual response:', JSON.stringify(planResult).slice(0, 500));
         if (planResult.code !== undefined && planResult.code !== 0) {
-          console.error(`[Checkout] ⚠️ Recurring plan creation failed for ${email} AFTER deposit was charged. Manual setup needed in Ontraport. Response:`, planResult);
-          // Continue anyway — the deposit is paid, support will fix the plan
+          console.error(`[Checkout] ⚠️ Recurring plan creation FAILED for ${email} after deposit was charged. Manual setup needed in Ontraport. Response:`, JSON.stringify(planResult).slice(0, 800));
+          // Continue — deposit is paid; support will fix the plan
+        } else {
+          console.log(`[Checkout] ✅ Recurring plan scheduled for ${email}, first charge on ${firstChargeDate}`);
         }
       } catch (e) {
-        console.error(`[Checkout] ⚠️ Recurring plan request errored for ${email} AFTER deposit was charged:`, e);
+        console.error(`[Checkout] ⚠️ Recurring plan request ERRORED for ${email} AFTER deposit was charged:`, e);
       }
     }
 
@@ -498,9 +673,22 @@ export async function POST(request: NextRequest) {
 
     // Extract invoice ID from the charge response for receipt + logs
     const txnData = (txnResult.data || {}) as Record<string, unknown>;
-    const invoiceId = (txnData.invoice_id || txnData.id || txnResult.invoice_id) as string | number | undefined;
+    let invoiceId = (txnData.invoice_id || txnData.id || txnResult.invoice_id) as string | number | undefined;
 
-    // ── Send IFT Global Receipt to customer ─────────────────────────────
+    // Fallback: if processManual didn't surface an invoice ID (happens
+    // occasionally), look up the contact's most recent invoice. The deposit
+    // we just charged should always have produced an invoice.
+    if (!invoiceId) {
+      console.warn(`[Checkout] No invoiceId in deposit response for ${email}; looking up by contact_id ${contactId}`);
+      invoiceId = await findLatestInvoiceForContact(contactId);
+      if (invoiceId) {
+        console.log(`[Checkout] Resolved invoice ${invoiceId} for ${email} via contact lookup`);
+      } else {
+        console.error(`[Receipt-FAIL] Could NOT resolve any invoice for ${email} (contact ${contactId}) — receipt cannot be sent.`);
+      }
+    }
+
+    // ── Send IFT Global Receipt to customer (with retry) ────────────────
     if (invoiceId) {
       await sendInvoiceReceipt(invoiceId as string | number);
     }
@@ -537,22 +725,12 @@ export async function POST(request: NextRequest) {
     });
     console.log(`[Checkout] Tags added: ${tagIds.join(', ')}`);
 
-    // ── Step 4: Update contact with enrolment + full payment-plan details ───
-    // Includes the course / location / timetable / start-date fields that were
-    // intentionally NOT written pre-payment (Step 1). At this point we know the
-    // charge has succeeded, so it's safe to mark the contact as enrolled and
-    // record the recurring plan terms.
-    const startDateUnix = startDate ? String(Math.floor(new Date(startDate).getTime() / 1000)) : '';
+    // ── Step 4: Update contact with payment-plan + qualification details ───
+    // Course / location / timetable / start-date / packageName were already
+    // written by Step 1's saveorupdate (single round-trip, more reliable).
+    // This step only adds fields that depend on the charge actually clearing.
     const updateBody: Record<string, string> = {
       id: contactId,
-      // Enrolment fields (deferred from pre-payment for defence-in-depth)
-      f1834: courseOptionId,
-      f2291: locationOptionId,
-      f2292: timetableOptionId,
-      f2293: startDateUnix,
-      // f1428 includes any selected add-ons so the contact view shows the
-      // full package the customer bought (e.g. "The Cert + Pre & Post Natal").
-      f1428: packageNameWithAddOns,
       // Plan / qualification / accounting fields
       f2288: '586',
       f2289: termOptionId,
@@ -600,11 +778,41 @@ export async function POST(request: NextRequest) {
       updateBody.f2613 = 'true';
     }
 
-    await fetch('https://api.ontraport.com/1/Contacts', {
-      method: 'PUT',
-      headers: ontraportHeaders(),
-      body: JSON.stringify(updateBody),
-    });
+    // CRITICAL: capture the response so we know if this PUT actually
+    // landed. The 7 May 2026 incident (Emily Doyle, contact 107136) was
+    // caused by a silently-dropped PUT here — Slack fired correctly from
+    // the in-memory variables but the contact's course fields stayed
+    // empty. We now log the response, retry once on failure, and log
+    // loudly if it still fails so support can be alerted.
+    try {
+      const updRes = await fetch('https://api.ontraport.com/1/Contacts', {
+        method: 'PUT',
+        headers: ontraportHeaders(),
+        body: JSON.stringify(updateBody),
+      });
+      const updText = await updRes.text();
+      let updJson: Record<string, unknown> = {};
+      try { updJson = JSON.parse(updText); } catch { /* keep raw text */ }
+      if (updJson.code !== undefined && updJson.code !== 0) {
+        console.error(`[Checkout] ⚠️ Step 4 contact update FAILED for ${email} (contact ${contactId}). Retrying once. Response:`, updText.slice(0, 600));
+        await new Promise((r) => setTimeout(r, 1000));
+        const retryRes = await fetch('https://api.ontraport.com/1/Contacts', {
+          method: 'PUT',
+          headers: ontraportHeaders(),
+          body: JSON.stringify(updateBody),
+        });
+        const retryText = await retryRes.text();
+        let retryJson: Record<string, unknown> = {};
+        try { retryJson = JSON.parse(retryText); } catch { /* keep raw */ }
+        if (retryJson.code !== undefined && retryJson.code !== 0) {
+          console.error(`[Checkout] 🚨 Step 4 contact update STILL FAILED after retry for ${email} (contact ${contactId}). Manual fix required in Ontraport. Body sent:`, JSON.stringify(updateBody), 'Response:', retryText.slice(0, 600));
+        } else {
+          console.log(`[Checkout] Step 4 retry succeeded for ${email}`);
+        }
+      }
+    } catch (e) {
+      console.error(`[Checkout] 🚨 Step 4 contact update threw for ${email} (contact ${contactId}):`, e);
+    }
 
     console.log(`[Checkout] ✅ Checkout complete! Invoice: ${invoiceId}, Contact: ${contactId}`);
 

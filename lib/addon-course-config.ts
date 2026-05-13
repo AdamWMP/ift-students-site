@@ -39,6 +39,24 @@ export interface Intake {
 }
 
 // ─── Course Config ────────────────────────────────────────────────────────────
+// Per-course Ontraport field mapping. These are the *course-specific* dropdown /
+// tick fields that live alongside the generic enrolment fields (f1428, f1834,
+// f2291, f2293, f2294, f2296, etc.). They are populated whenever the course is
+// purchased — directly or as an add-on — except `priceField`, which is only set
+// when the course is purchased *directly* (not as part of a bundle).
+//
+// Ontraport tick fields are stored as booleans (CSV export shows `true`/`false`),
+// so we write the literal string "true".
+export interface CourseSpecificOntraportFields {
+  startDateField?: string       // e.g. f2315 (S&C Start Date)
+  locationField?: string        // e.g. f2316 (S&C Location) — receives the
+                                // standard Ontraport location option ID
+  qualificationField?: string   // e.g. f2317 (S&C Qualification)
+  qualificationOptionId?: string // option ID written into the qualification field
+  courseField?: string          // e.g. f2318 (S&C Course) — boolean tick
+  priceField?: string           // e.g. f2319 (S&C Price) — direct-sale only
+}
+
 export interface AddonCourseConfig {
   id: AddonCourseId
   name: string
@@ -53,6 +71,7 @@ export interface AddonCourseConfig {
   saleTagId: string
   features: string[]
   intakes: Intake[]
+  ontraport?: CourseSpecificOntraportFields
 }
 
 // ─── Courses ──────────────────────────────────────────────────────────────────
@@ -71,6 +90,15 @@ export const ADDON_COURSES: Record<AddonCourseId, AddonCourseConfig> = {
     productId: '88',
     courseOptionId: '308',
     saleTagId: '2530',  // "A26 S&C Sale"
+    ontraport: {
+      // S&C-specific Ontraport fields — set on every S&C sale (direct or add-on)
+      startDateField:        'f2315',
+      locationField:         'f2316',
+      qualificationField:    'f2317',
+      qualificationOptionId: '308',  // S&C course option (same dropdown as f1834)
+      courseField:           'f2318',
+      priceField:            'f2319',  // direct-sale only
+    },
     features: [
       '12-week intensive programme',
       'Live online theory sessions (Mon 7–9pm)',
@@ -114,6 +142,10 @@ export const ADDON_COURSES: Record<AddonCourseId, AddonCourseConfig> = {
     productId: '98',
     courseOptionId: '420',
     saleTagId: '2266',  // "Pre And Post Natal Online Course Sale"
+    ontraport: {
+      // PPN-specific Ontraport fields
+      courseField: 'f2323',  // PPN Course tick
+    },
     features: [
       '11 comprehensive learning modules',
       'REPs Ireland + PD:Approval dual accreditation',
@@ -147,6 +179,10 @@ export const ADDON_COURSES: Record<AddonCourseId, AddonCourseConfig> = {
     productId: '103',
     courseOptionId: '441',
     saleTagId: '2306',  // "NutriCert Global Sale"
+    ontraport: {
+      // NutriCert (Advanced Nutrition) specific Ontraport fields
+      courseField: 'f2329',  // AN Course tick
+    },
     features: [
       '10 comprehensive units',
       '23+ coaching psychology lessons',

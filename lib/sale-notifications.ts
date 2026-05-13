@@ -92,6 +92,15 @@ function formatSaleMessage(sale: SaleDetails): string {
     ? `Add-ons: ${sale.addOns.join(', ')}${sale.addOnsTotal ? ` (+€${sale.addOnsTotal.toFixed(2)})` : ''}`
     : '';
 
+  // Start date — format the ISO date as "DD Month YYYY" or pass through "TBC"
+  const startDateLine = (() => {
+    if (!sale.startDate || sale.startDate === 'TBC') return 'Start date: TBC';
+    const d = new Date(sale.startDate);
+    if (Number.isNaN(d.getTime())) return `Start date: ${sale.startDate}`;
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return `Start date: ${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  })();
+
   return [
     `Ding Ding Sale 🔔🔔🔔💶💶💶`,
     `Someone just enrolled`,
@@ -104,7 +113,9 @@ function formatSaleMessage(sale: SaleDetails): string {
     `Day: ${sale.timetable || ''}`,
     `Location: ${sale.location || ''}`,
     `Term: ${termLabel}`,
+    startDateLine,
     `Payment: ${paymentLine}`,
+    `Payment Method: Stripe`,
     couponLine,
     `Marketing Campaign: ${campaignLine}`,
     `Ad Set: ${adSetLine}`,
@@ -247,10 +258,48 @@ const ONTRAPORT_TERM_LABELS: Record<string, string> = {
   '494': 'Spring (S26)',
 };
 
+// f2290 PT Course Qualifications — labels copied verbatim from Ontraport meta
+// so the Slack ding shows the real package name customers see in Ontraport.
 const ONTRAPORT_QUALIFICATION_LABELS: Record<string, string> = {
-  '497': 'Pro Coach (PT)',
-  '569': 'Complete Coach (PT)',
-  '627': 'Fitness Business Coach',
+  '495': '(Launchpad Bundle) Fitness Instructor & Personal Trainer',
+  '496': 'Group Instructor & Personal Trainer',
+  '497': 'The Cert (Fitness Instructor, Group Instructor, Personal Trainer)',
+  '540': 'High Performance Bundle (Fitness Instructor, Personal Trainer, S&C)',
+  '564': 'Launchpad & The Fitness Business Accelerator',
+  '565': 'Leader & The Fitness Business Accelerator',
+  '566': 'Group Instruction Only',
+  '567': 'Personal Trainer Course Only',
+  '568': 'Fitness Business Accelerator Only',
+  '569': 'The Career (Fitness, Group, PT, Nutrition, Fitness Business Accelerator)',
+  '570': 'Online Coaching Course (Fitness, PT, Nutrition, Advanced Nutrition, FBA)',
+  '627': 'The Business (FI, GI, PT, Nutrition, FBA + AI & Programming Workshops + Brand Launch Photoshoot)',
+};
+
+// f1428 Choose your Course / Package — fallback when f2290 isn't set
+const ONTRAPORT_PACKAGE_LABELS: Record<string, string> = {
+  '20':  'Sports Massage — Dublin',
+  '23':  'Personal Training only',
+  '166': 'Fitness & Group Instruction Only',
+  '231': 'Combination Course',
+  '240': 'INTENSIVE',
+  '262': 'Online Coaching',
+};
+
+// f1834 New IFT Choose your course — second fallback
+const ONTRAPORT_COURSE_LABELS: Record<string, string> = {
+  '308': 'Strength & Conditioning Course',
+  '309': 'Personal Training Only Course',
+  '310': 'Combination Course (Fitness, Group, PT)',
+  '363': 'Group Instruction & PT Course',
+  '369': 'Fitness & Group Instruction',
+  '420': 'Pre & Post Natal',
+  '441': 'Advanced Nutrition',
+  '447': 'BUNDLE: Combo Course + Nutrition Course',
+  '448': 'BUNDLE: Combo Course + PPN',
+  '449': 'BUNDLE: Combo Course + S&C Course',
+  '452': 'Pilates Course (EQF Level 4)',
+  '459': 'BUNDLE: Combo Course + Pilates Course',
+  '472': 'IFTG',
 };
 
 const ONTRAPORT_TAG_LABELS: Record<string, string> = {
@@ -348,10 +397,18 @@ function formatPlanLine(c: OntraportContactFields, isFullPayment: boolean): stri
   return 'Payment Plan';
 }
 
+// Course name priority — most specific English label first:
+//   1. f2290 (PT Course Qualifications) — most specific, names like "The Cert"
+//   2. f1834 (New IFT course) — bundle/combo level
+//   3. f1428 (Choose your Course / Package) — coarse package category
+// We never return a bare option ID. If nothing resolves we return ''.
 function deriveCourseName(c: OntraportContactFields): string {
-  if (c.f1428 && c.f1428 !== '0') return c.f1428;
-  const qual = ONTRAPORT_QUALIFICATION_LABELS[c.f2290 || ''];
+  const qual = c.f2290 && c.f2290 !== '0' ? ONTRAPORT_QUALIFICATION_LABELS[c.f2290] : undefined;
   if (qual) return qual;
+  const course = c.f1834 && c.f1834 !== '0' ? ONTRAPORT_COURSE_LABELS[c.f1834] : undefined;
+  if (course) return course;
+  const pkg = c.f1428 && c.f1428 !== '0' ? ONTRAPORT_PACKAGE_LABELS[c.f1428] : undefined;
+  if (pkg) return pkg;
   return '';
 }
 
@@ -409,6 +466,7 @@ export async function notifySaleFromOntraportContact(
     termLabel ? `Term: ${termLabel}` : '',
     startDate ? `Start date: ${startDate}` : '',
     `Payment: ${planLine}`,
+    `Payment Method: ${c.f2537 === '577' ? 'Stripe' : (c.f2537 || 'Stripe')}`,
     totalPaid ? `Paid so far: ${totalPaid}` : '',
     `Marketing Campaign: ${c.f2168 || 'N/A'}`,
     `Ad Set: ${c.f2169 || 'N/A'}`,

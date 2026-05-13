@@ -135,7 +135,7 @@ export function OnboardingContent({ contact }: OnboardingContentProps) {
       {/* Header */}
       <div className="pt-8 pb-4 px-4">
         <div className="max-w-2xl mx-auto flex items-center justify-center gap-3">
-          <Image src="/images/logo.png" alt="IFT" width={40} height={40} className="rounded" />
+          <Image src="/logo-global.png" alt="Image Fitness Training" width={40} height={40} className="rounded" />
           <span className="text-white/60 text-sm">Image Fitness Training Global</span>
         </div>
       </div>

@@ -1,10 +1,15 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import { MetaPixel } from '@/components/meta-pixel'
 import './globals.css'
 
-export const dynamic = 'force-dynamic'
+export const viewport: Viewport = {
+  themeColor: '#0A0A0A',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://imageft.ie'),
@@ -45,14 +50,20 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Image Fitness Training | Ireland\'s #1 Personal Trainer Course',
     description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates.',
-    images: ['/og-image.png'],
-    site: '@imagefitnesstrainingofficial',
+    images: [{ url: '/og-image.png', alt: 'Image Fitness Training — Ireland\'s #1 Fitness Educator' }],
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
     shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+  manifest: '/site.webmanifest',
+  alternates: { canonical: 'https://imageft.ie' },
   robots: {
     index: true,
     follow: true,
@@ -77,7 +88,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js" />
+        {/* Preconnect + prefetch OnceHub CDN so the calendar modal opens instantly */}
+        <link rel="preconnect" href="https://cdn.oncehub.com" crossOrigin="" />
+        <link rel="preconnect" href="https://go.oncehub.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://cdn.oncehub.com" />
+        <script src="https://cdn.oncehub.com/cal/embed.js" async defer />
+        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js" async defer />
         <LocalBusinessJsonLd />
       </head>
       <body className="bg-charcoal-950 text-white antialiased" suppressHydrationWarning>

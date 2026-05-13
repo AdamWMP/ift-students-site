@@ -76,5 +76,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly',
       priority: 0.55,
     },
+    {
+      url: `${BASE_URL}/ai-for-coaches`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/course-pathway-quiz`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.60,
+    },
+    {
+      url: `${BASE_URL}/ptcall-imageft`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.65,
+    },
   ]
 }

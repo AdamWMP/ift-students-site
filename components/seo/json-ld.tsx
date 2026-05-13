@@ -9,7 +9,7 @@ export function LocalBusinessJsonLd() {
     name: 'Image Fitness Training',
     alternateName: ['ImageFT', 'IFT', 'Image Fitness Training Global'],
     url: 'https://imageft.ie',
-    logo: 'https://imageft.ie/logo.png',
+    logo: 'https://imageft.ie/logo-global.png',
     image: 'https://imageft.ie/og-image.png',
     description: "Ireland's #1 fitness educator. REPs Ireland accredited Personal Trainer, Pilates, Strength & Conditioning, Nutrition and Pre & Post Natal courses. 15+ years experience, 5,000+ graduates.",
     foundingDate: '2008',

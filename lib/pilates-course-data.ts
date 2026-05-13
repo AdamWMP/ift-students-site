@@ -167,6 +167,7 @@ export const locations: Location[] = [
   { id: 'dublin-tallaght', name: 'Dublin (Tallaght)', address: 'Belgard Square W, Tallaght, Dublin 24' },
   { id: 'galway', name: 'Galway (Tuam)', address: 'N17 Business Park, Galway Rd, Tuam, Co. Galway' },
   { id: 'cork', name: 'Cork City', address: 'Stapleton House, 10 Oliver Plunkett St, Cork City' },
+  { id: 'derry', name: 'Co. Derry', address: 'Gateway Studio, Co. Derry' },
   { id: 'online', name: 'Online', address: 'Tuesdays & Thursdays evenings' },
 ];
 
@@ -213,6 +214,30 @@ export const courseStartDates: CourseStartDate[] = [
   { date: '2026-06-06', label: '6 June 2026', locations: ['cork'], timetable: 'every-second-saturday' },
   // Autumn intake — Dublin Swords & Tallaght + Cork (every 2nd Saturday)
   { date: '2026-09-19', label: '19 September 2026', locations: ['dublin-swords', 'dublin-tallaght', 'cork'], timetable: 'every-second-saturday' },
+  // Dublin (Swords) — 3 Weekend Intensive (Summer 2026)
+  {
+    date: '2026-07-25',
+    label: '25 July 2026 — IFT Swords Academy (Practical Exam Weekend: 29–30 August)',
+    locations: ['dublin-swords'],
+    timetable: '3-weekend-intensive',
+    sessions: [
+      'Weekend 1: Sat 25 & Sun 26 July',
+      'Weekend 2: Sat 15 & Sun 16 August',
+      'Weekend 3: Sat 29 & Sun 30 August — Practical Exam',
+    ],
+  },
+  // Derry (Gateway Studio) — 3 Weekend Intensive (Autumn 2026)
+  {
+    date: '2026-09-05',
+    label: '5 September 2026 — Gateway Studio, Co. Derry',
+    locations: ['derry'],
+    timetable: '3-weekend-intensive',
+    sessions: [
+      'Weekend 1: Sat 5 & Sun 6 September',
+      'Weekend 2: Sat 19 & Sun 20 September',
+      'Weekend 3: Sat 3 & Sun 4 October',
+    ],
+  },
 ];
 
 // ─── Welcome Videos (per timetable type) ────────────────────────────
@@ -293,8 +318,19 @@ export const reformerStartDates: CourseStartDate[] = [
       'Weekend 4: Sat 4 & Sun 5 July',
     ],
   },
-  // Derry — Gateway Studio — dates TBC
-  { date: '2026-12-31', label: 'Dates coming soon', locations: ['derry'], timetable: 'reformer-3-weekend', comingSoon: true },
+  // Derry — Gateway Studio — 4 Weekends Oct–Nov 2026 (final weekend = exam)
+  {
+    date: '2026-10-24',
+    label: '24 October 2026 — Gateway Studio, Co. Derry (Final Exam Weekend: 28–29 November)',
+    locations: ['derry'],
+    timetable: 'reformer-3-weekend',
+    sessions: [
+      'Weekend 1: Sat 24 & Sun 25 October',
+      'Weekend 2: Sat 7 & Sun 8 November',
+      'Weekend 3: Sat 14 & Sun 15 November',
+      'Weekend 4: Sat 28 & Sun 29 November — Final Exam',
+    ],
+  },
 ];
 
 // Packages that include reformer (show reformer fields in details step)
@@ -308,7 +344,10 @@ export const REFORMER_ONLY_PACKAGES = new Set(['reformer-only']);
 /** Get available timetables for a location */
 export function getTimetablesForLocation(locationId: string): Timetable[] {
   if (locationId === 'online') return timetables.filter(t => t.id === 'online-evenings');
-  if (locationId === 'galway') return timetables.filter(t => t.id === '3-weekend-intensive');
+  if (locationId === 'galway' || locationId === 'derry') return timetables.filter(t => t.id === '3-weekend-intensive');
+  if (locationId === 'dublin-swords') {
+    return timetables.filter(t => t.id === 'every-second-saturday' || t.id === '3-weekend-intensive');
+  }
   return timetables.filter(t => t.id === 'every-second-saturday');
 }
 

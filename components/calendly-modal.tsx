@@ -1,34 +1,57 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X, Calendar } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface CalendlyModalProps {
   isOpen: boolean
   onClose: () => void
+  /**
+   * Where to redirect after the booking is completed. Defaults to /thank-you.
+   * OnceHub's own dashboard redirect setting remains the authoritative path —
+   * this is a client-side fallback for the in-modal embed.
+   */
+  successUrl?: string
 }
 
-export default function CalendlyModal({ isOpen, onClose }: CalendlyModalProps) {
-  const [isLoading, setIsLoading] = useState(true)
+export default function CalendlyModal({
+  isOpen,
+  onClose,
+  successUrl = '/thank-you',
+}: CalendlyModalProps) {
+  const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
 
+  // Only render on the client (OnceHub embed relies on window)
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Listen for OnceHub booking-completed events and redirect to the thank-you page
   useEffect(() => {
     if (!isOpen) return
 
-    setIsLoading(true)
-    const existingScript = document.querySelector(
-      'script[src="https://cdn.oncehub.com/cal/embed.js"]'
-    )
-    if (!existingScript) {
-      const script = document.createElement('script')
-      script.src = 'https://cdn.oncehub.com/cal/embed.js'
-      script.async = true
-      script.onload = () => setTimeout(() => setIsLoading(false), 500)
-      document.body.appendChild(script)
-    } else {
-      setTimeout(() => setIsLoading(false), 500)
+    function handleMessage(event: MessageEvent) {
+      const origin = event.origin || ''
+      if (!origin.includes('oncehub.com')) return
+
+      const data = event.data
+      const payload = typeof data === 'string' ? data.toLowerCase() : JSON.stringify(data ?? '').toLowerCase()
+
+      // OnceHub emits a variety of lifecycle events; we only care about completion
+      if (payload.includes('booking') && (payload.includes('complete') || payload.includes('confirmed') || payload.includes('success'))) {
+        onClose()
+        router.push(successUrl)
+      }
     }
-  }, [isOpen])
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [isOpen, onClose, router, successUrl])
+
+  if (!isClient) return null
 
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose() }}>
@@ -61,13 +84,8 @@ export default function CalendlyModal({ isOpen, onClose }: CalendlyModalProps) {
             </DialogPrimitive.Close>
           </div>
 
-          {/* OnceHub Calendar */}
+          {/* OnceHub Calendar — script is pre-loaded in the root layout, so this renders instantly */}
           <div className="flex-1 overflow-auto bg-white relative">
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-8 h-8 border-4 border-gold/30 border-t-gold rounded-full animate-spin" />
-              </div>
-            )}
             <div
               data-oh-booking-calendar-id="BKC-PDJR9D0K6W"
               style={{ minWidth: '320px', minHeight: '700px' }}

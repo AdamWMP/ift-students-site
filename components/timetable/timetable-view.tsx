@@ -55,7 +55,7 @@ export function TimetablePageView({
       {/* Header */}
       <div className="pt-8 pb-4 px-4 print:pt-2 print:pb-2">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <Image src="/images/logo.png" alt="IFT" width={40} height={40} className="rounded" />
+          <Image src="/logo-global.png" alt="Image Fitness Training" width={40} height={40} className="rounded" />
           <span className="text-white/60 text-sm print:text-black">Image Fitness Training Global</span>
         </div>
       </div>

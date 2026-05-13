@@ -4,4 +4,43 @@ Disallow: /thank-you
 Disallow: /onboarding/
 Disallow: /api/
 
+# AI / LLM crawlers — explicitly allowed so Image Fitness Training is
+# visible to ChatGPT, Claude, Perplexity, Google AI Overviews and Apple
+# Intelligence. Remove any of these if you want to opt out.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
 Sitemap: https://imageft.ie/sitemap.xml

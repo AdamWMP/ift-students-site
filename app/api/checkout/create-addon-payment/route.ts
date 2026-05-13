@@ -6,10 +6,14 @@ import {
   ONTRAPORT_ENROLLED_ID,
   getCurrentTermId,
 } from '@/lib/addon-course-config';
+import { notifyAddonSale } from '@/lib/sale-notifications';
 
 const PAYMENT_METHOD_STRIPE = '577';
 const CUSTOMERS_TAG_ID = '50';
 const ONTRAPORT_GATEWAY_ID = '6';
+
+// Invoice receipt template — "IFT Global Receipt"
+const INVOICE_TEMPLATE_ID = 5;
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -19,6 +23,48 @@ function ontraportHeaders() {
     'Api-Appid': process.env.ONTRAPORT_APP_ID || '',
     'Content-Type': 'application/json',
   };
+}
+
+// ─── Fetch marketing attribution (f2168/f2169/f2170) ────────────────
+async function fetchMarketingAttribution(contactId: string | number): Promise<{
+  campaign: string;
+  adSet: string;
+  adName: string;
+}> {
+  try {
+    const res = await fetch(
+      `https://api.ontraport.com/1/Contact?id=${encodeURIComponent(String(contactId))}`,
+      { method: 'GET', headers: ontraportHeaders() },
+    );
+    const json = await res.json() as Record<string, unknown>;
+    const data = (json.data || {}) as Record<string, unknown>;
+    return {
+      campaign: (data.f2168 as string) || '',
+      adSet:    (data.f2169 as string) || '',
+      adName:   (data.f2170 as string) || '',
+    };
+  } catch (e) {
+    console.error('[AddonCheckout] Failed to fetch marketing attribution:', e);
+    return { campaign: '', adSet: '', adName: '' };
+  }
+}
+
+// ─── Send IFT Global Receipt for a successful invoice ────────────────
+async function sendInvoiceReceipt(invoiceId: string | number) {
+  try {
+    const res = await fetch('https://api.ontraport.com/1/transaction/sendInvoice', {
+      method: 'PUT',
+      headers: ontraportHeaders(),
+      body: JSON.stringify({
+        id: String(invoiceId),
+        invoice_template: INVOICE_TEMPLATE_ID,
+      }),
+    });
+    const text = await res.text();
+    console.log(`[AddonCheckout] sendInvoice for ${invoiceId}:`, text.slice(0, 200));
+  } catch (e) {
+    console.error(`[AddonCheckout] Failed to send invoice receipt for ${invoiceId}:`, e);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -196,7 +242,7 @@ export async function POST(request: NextRequest) {
       hasTaxes: false,
       hasShipping: false,
       delay: 0,
-      invoice_template: 2,
+      invoice_template: INVOICE_TEMPLATE_ID,
       send_recurring_invoice: true,
     };
 
@@ -290,6 +336,21 @@ export async function POST(request: NextRequest) {
       updateBody.f2607 = `${firstInstalment.getDate()} ${MONTHS[firstInstalment.getMonth()]} ${firstInstalment.getFullYear()}`;
     }
 
+    // ── Course-specific Ontraport fields (S&C / PPN / NutriCert) ──────
+    // Each course config in addon-course-config.ts declares which f-fields to
+    // populate. priceField is direct-sale only (this route IS direct sale, so
+    // we always include it when configured).
+    const courseFields = course.ontraport;
+    if (courseFields) {
+      if (courseFields.startDateField)     updateBody[courseFields.startDateField]     = startDateUnix;
+      if (courseFields.locationField)      updateBody[courseFields.locationField]      = locationOptionId;
+      if (courseFields.qualificationField && courseFields.qualificationOptionId) {
+        updateBody[courseFields.qualificationField] = courseFields.qualificationOptionId;
+      }
+      if (courseFields.courseField)        updateBody[courseFields.courseField]        = 'true';
+      if (courseFields.priceField)         updateBody[courseFields.priceField]         = String(effectivePrice);
+    }
+
     await fetch('https://api.ontraport.com/1/Contacts', {
       method: 'PUT',
       headers: ontraportHeaders(),
@@ -298,6 +359,42 @@ export async function POST(request: NextRequest) {
 
     const txnData = (txnResult.data || {}) as Record<string, unknown>;
     const invoiceId = txnData.invoice_id || txnData.id || txnResult.invoice_id;
+
+    // ── Send IFT Global Receipt to customer ─────────────────────────────
+    if (invoiceId) {
+      await sendInvoiceReceipt(invoiceId as string | number);
+    }
+
+    // ── Slack sales bot ─────────────────────────────────────────────────
+    // Resolve location/timetable labels from intake config so the notification
+    // shows human-readable details (not slugs).
+    const matchedIntake = course.intakes?.find((i: { location: string }) => i.location === location);
+    const locationLabel  = matchedIntake?.locationLabel  || location || '';
+    const timetableLabel = matchedIntake?.timetableLabel || '';
+
+    const attribution = await fetchMarketingAttribution(contactId);
+
+    notifyAddonSale({
+      firstName,
+      lastName,
+      email,
+      phone,
+      courseName: course.fullName,
+      effectivePrice,
+      depositAmount,
+      monthlyPayment: monthlyPayment || 0,
+      months: months || 0,
+      isFullPayment,
+      locationLabel,
+      timetableLabel,
+      couponCode: couponCode || undefined,
+      discount: couponCode && discountedPrice ? course.price - discountedPrice : undefined,
+      contactId: String(contactId),
+      invoiceId: invoiceId ? String(invoiceId) : undefined,
+      marketingCampaign: attribution.campaign,
+      adSet: attribution.adSet,
+      adName: attribution.adName,
+    }).catch(err => console.error('[AddonCheckout] Notification error (non-blocking):', err));
 
     return NextResponse.json({ success: true, invoiceId, contactId });
   } catch (error) {

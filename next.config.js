@@ -230,13 +230,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/enrol',
-        destination: 'https://ptcheckout.imageft.ie',
-        permanent: true,
-      },
-      {
         source: '/enroll',
-        destination: 'https://ptcheckout.imageft.ie',
+        destination: '/enrol',
         permanent: true,
       },
       {

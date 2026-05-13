@@ -233,6 +233,55 @@ async function sendInvoiceReceipt(invoiceId: string | number) {
   }
 }
 
+// ─── Failsafe pre-flight booking log ─────────────────────────────────
+// Posts the full booking payload to Slack the moment a booking starts,
+// BEFORE any Ontraport call. Card details stripped (PCI). Even if every
+// downstream step fails, we have the customer's choices captured here.
+async function logRawBookingAttempt(payload: Record<string, unknown>): Promise<void> {
+  const safe: Record<string, unknown> = { ...payload };
+  delete safe.cardNumber;
+  delete safe.cardExpMonth;
+  delete safe.cardExpYear;
+  delete safe.cardCvc;
+
+  const stamp = new Date().toISOString();
+  const line =
+    `🗂 RAW PILATES BOOKING ATTEMPT (failsafe log)\n` +
+    `Time: ${stamp}\n` +
+    `Name: ${(safe.firstName as string) || ''} ${(safe.lastName as string) || ''}\n` +
+    `Email: ${(safe.email as string) || ''}\n` +
+    `Phone: ${(safe.phone as string) || ''}\n` +
+    `Course: ${(safe.packageName as string) || (safe.packageId as string) || ''}\n` +
+    `Mat Location: ${(safe.location as string) || '—'}\n` +
+    `Mat Timetable: ${(safe.timetable as string) || '—'}\n` +
+    `Mat Start Date: ${(safe.startDate as string) || '—'}\n` +
+    `Reformer Location: ${(safe.reformerLocation as string) || '—'}\n` +
+    `Reformer Timetable: ${(safe.reformerTimetable as string) || '—'}\n` +
+    `Reformer Start Date: ${(safe.reformerStartDate as string) || '—'}\n` +
+    `Total Price: €${(safe.totalPrice as number) ?? (safe.packagePrice as number) ?? '?'}\n` +
+    `Deposit: €${(safe.depositAmount as number) ?? '?'}\n` +
+    `Months: ${(safe.months as number) ?? '?'}\n` +
+    `Monthly: €${(safe.monthlyPayment as number) ?? '?'}\n` +
+    `Coupon: ${safe.coupon ? JSON.stringify(safe.coupon) : 'none'}\n` +
+    `Add-ons: ${Array.isArray(safe.addOns) && (safe.addOns as unknown[]).length ? (safe.addOns as unknown[]).join(', ') : 'none'}\n` +
+    `\nFull payload (cards stripped):\n` +
+    '```\n' + JSON.stringify(safe, null, 2) + '\n```';
+
+  console.log('[Checkout][RAW]', line);
+
+  const url = (process.env.SLACK_BOOKING_LOG_WEBHOOK_URL || process.env.SLACK_SALES_WEBHOOK_URL || '').trim();
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: line, username: 'IFT Booking Failsafe', icon_emoji: ':floppy_disk:' }),
+    });
+  } catch (e) {
+    console.error('[Checkout] failsafe Slack log failed:', e);
+  }
+}
+
 // ─── Void a failed invoice to keep Ontraport clean ───────────────────
 async function voidInvoice(invoiceId: string | number) {
   try {
@@ -261,6 +310,11 @@ async function voidInvoice(invoiceId: string | number) {
 export async function POST(request: NextRequest) {
   try {
     const body: CheckoutRequest = await request.json();
+
+    // FAILSAFE: log the raw booking payload immediately to Slack +
+    // server logs, before any Ontraport call. Survives Ontraport
+    // outages and silent field drops.
+    await logRawBookingAttempt(body as unknown as Record<string, unknown>);
 
     const {
       packageId,
@@ -325,14 +379,25 @@ export async function POST(request: NextRequest) {
 
     const isFullPayment = effectiveDeposit >= effectiveTotal;
 
-    // Determine current term — Spring (Feb-Jul) or Autumn (Aug-Jan)
-    // Same S/A logic as PT checkout
-    const currentMonth = new Date().getMonth() + 1;
-    const yearShort = String(new Date().getFullYear()).slice(-2);
-    const termPrefix = (currentMonth >= 2 && currentMonth <= 7) ? 'S' : 'A';
+    // ── Term classification (Spring vs Autumn) ───────────────────────────
+    // Aug → end of Jan (following year) = Autumn, anything else = Spring.
+    // Term tracks COURSE START date, not booking date. Jan edge case:
+    // a course starting in January belongs to the prior year's Autumn.
+    const termSourceDateStr = isReformerOnly ? reformerStartDate : startDate;
+    const termSource = termSourceDateStr ? new Date(termSourceDateStr) : new Date();
+    const termMonth = termSource.getMonth() + 1;
+    const termCalendarYear = termSource.getFullYear();
+    const isSpring = termMonth >= 2 && termMonth <= 7;
+    const termAnchorYear = isSpring
+      ? termCalendarYear
+      : (termMonth === 1 ? termCalendarYear - 1 : termCalendarYear);
+    const yearShort = String(termAnchorYear).slice(-2);
+    const termPrefix = isSpring ? 'S' : 'A';
     const termCode = `${termPrefix}${yearShort}`;
     // Pilates f2301: 511 = Spring, 509 = Autumn
-    const termOptionId = (currentMonth >= 2 && currentMonth <= 7) ? '511' : '509';
+    const termOptionId = isSpring ? '511' : '509';
+    // Reformer term: 618 = Spring, 617 = Autumn
+    const reformerTermOptionId = isSpring ? '618' : '617';
 
     // Map frontend values to Ontraport option IDs
     const locationOptionId          = LOCATION_TO_ONTRAPORT[location] || '';
@@ -342,22 +407,45 @@ export async function POST(request: NextRequest) {
     const courseOptionId            = PACKAGE_TO_ONTRAPORT_COURSE[packageId] || '';
     const qualificationsOptionId    = PACKAGE_TO_ONTRAPORT_QUALIFICATIONS[packageId] || '';
 
-    // Reformer term: 618 = Spring (Feb-Jul), 617 = Autumn (Aug-Jan)
-    const reformerTermOptionId = (currentMonth >= 2 && currentMonth <= 7) ? '618' : '617';
-
     const paymentPlanText = isFullPayment
       ? `Paid in Full — €${effectiveTotal}`
       : `€${effectiveDeposit} deposit + €${monthlyPayment.toFixed(2)}/mo x ${months} months (billed 30th)`;
 
-    // ── Step 1: Create/update Ontraport contact (MINIMAL info only) ─────
-    // Only set name, email, phone — NO payment fields yet
-    // Payment fields are set ONLY after successful charge (Step 3)
+    // Resolve add-on IDs → names early so Step 1 can write packageNameWithAddOns
+    const selectedAddOnRecords = ALL_PILATES_ADDONS.filter((a) =>
+      (selectedAddOns || []).includes(a.id),
+    );
+    const selectedAddOnNames = selectedAddOnRecords.map((a) => a.name);
+    const packageNameWithAddOns = selectedAddOnNames.length
+      ? `${packageName} + ${selectedAddOnNames.join(' + ')}`
+      : packageName;
+
+    // ── Step 1: Create/update Ontraport contact ─────────────────────────
+    // CRITICAL: course / location / timetable / start-date go in here so
+    // they survive even if Step 4 (post-success update) silently fails.
+    // Root cause of the 7 May 2026 lost-data incident on the PT side.
+    const matStartDateUnix = startDate ? String(Math.floor(new Date(startDate).getTime() / 1000)) : '';
+    const reformerStartDateUnix = reformerStartDate ? String(Math.floor(new Date(reformerStartDate).getTime() / 1000)) : '';
     const contactBody: Record<string, string> = {
       firstname: firstName,
       lastname: lastName,
       email,
       sms_number: phone,
+      f1834: courseOptionId,
+      f1428: packageNameWithAddOns,
     };
+    // Mat fields — populated for Cert / Career / Studio (anything that's not reformer-only)
+    if (!isReformerOnly) {
+      contactBody.f2303 = locationOptionId;
+      contactBody.f2304 = timetableOptionId;
+      contactBody.f2305 = matStartDateUnix;
+    }
+    // Reformer fields — populated for Career / Studio (combo) and reformer-only
+    if (isReformerOnly || REFORMER_PACKAGES.has(packageId)) {
+      contactBody.f2593 = reformerLocationOptionId;
+      contactBody.f2594 = reformerTimetableOptionId;
+      contactBody.f2595 = reformerStartDateUnix;
+    }
 
     const contactRes = await fetch('https://api.ontraport.com/1/Contacts/saveorupdate', {
       method: 'POST',
@@ -701,51 +789,35 @@ export async function POST(request: NextRequest) {
     });
     console.log(`[Checkout] Tags added: ${tagIds.join(', ')}`);
 
-    // ── Step 4: Update contact with ALL course + payment details ─────────
-    // PILATES FIELDS — f2300-f2309 series for mat, f2590-f2599 for reformer
-    // Resolve add-on IDs → records → names (server-side source of truth) so
-    // the Ontraport contact + Slack ding both reflect what was actually
-    // bought. Frontend sends just IDs.
-    const selectedAddOnRecords = ALL_PILATES_ADDONS.filter((a) =>
-      (selectedAddOns || []).includes(a.id),
-    );
-    const selectedAddOnNames = selectedAddOnRecords.map((a) => a.name);
-    const packageNameWithAddOns = selectedAddOnNames.length
-      ? `${packageName} + ${selectedAddOnNames.join(' + ')}`
-      : packageName;
-
+    // ── Step 4: Update contact with payment-plan + qualification details ───
+    // f1834, f1428, f2303-f2305, f2593-f2595 already written by Step 1's
+    // saveorupdate (they're enrolment data, not payment data — survive
+    // even if this step fails). This step adds fields that depend on
+    // the charge actually clearing.
     const updateBody: Record<string, string> = {
       id: contactId,
-      f1834: courseOptionId,                  // Shared course type dropdown
-      f1428: packageNameWithAddOns,           // Package label (with add-ons appended)
       f2537: PAYMENT_METHOD_STRIPE,           // Payment method: Stripe
       f1544: String(effectiveTotal),          // Total course cost (already includes addOnsTotal)
     };
 
     if (!isReformerOnly) {
-      // Mat Pilates fields (pilates-cert, pilates-career, pilates-studio)
-      updateBody.f2300 = '587';                                                                          // Pilates Course Year: 2026
-      updateBody.f2301 = termOptionId;                                                                   // Pilates Course Term
-      updateBody.f2302 = qualificationsOptionId;                                                         // Pilates Course Qualifications
-      updateBody.f2303 = locationOptionId;                                                               // Pilates Course Location
-      updateBody.f2304 = timetableOptionId;                                                              // Pilates Course Timetable
-      updateBody.f2305 = startDate ? String(Math.floor(new Date(startDate).getTime() / 1000)) : '';     // Pilates Course Start Date
-      updateBody.f2306 = String(effectiveTotal);                                                         // Pilates Course Price
-      updateBody.f2309 = paymentPlanText;                                                                // Pilates Course Payment Plan
+      // Mat Pilates payment + qualification fields
+      updateBody.f2300 = '587';                  // Pilates Course Year: 2026
+      updateBody.f2301 = termOptionId;            // Pilates Course Term
+      updateBody.f2302 = qualificationsOptionId;  // Pilates Course Qualifications
+      updateBody.f2306 = String(effectiveTotal);  // Pilates Course Price
+      updateBody.f2309 = paymentPlanText;         // Pilates Course Payment Plan
     }
 
     if (isReformerOnly || REFORMER_PACKAGES.has(packageId)) {
-      // Dedicated Reformer fields (f2590-f2599)
+      // Reformer payment + qualification fields
       const reformerPrice = isReformerOnly ? effectiveTotal : reformerTotal;
-      updateBody.f2590 = '616';                                                                                                    // Reformer Course Year: 2026
-      updateBody.f2591 = reformerTermOptionId;                                                                                     // Reformer Course Term
-      updateBody.f2592 = '619';                                                                                                    // Reformer Course Qualification (CPD)
-      updateBody.f2593 = reformerLocationOptionId;                                                                                 // Reformer Course Location
-      updateBody.f2594 = reformerTimetableOptionId;                                                                                // Reformer Course Timetable
-      updateBody.f2595 = reformerStartDate ? String(Math.floor(new Date(reformerStartDate).getTime() / 1000)) : '';               // Reformer Course Start Date
-      updateBody.f2596 = String(reformerPrice);                                                                                    // Reformer Course Price
-      updateBody.f2598 = paymentPlanText;                                                                                          // Reformer Payment Plan
-      updateBody.f2599 = String(reformerPrice);                                                                                    // Reformer Course Spent
+      updateBody.f2590 = '616';                    // Reformer Course Year: 2026
+      updateBody.f2591 = reformerTermOptionId;      // Reformer Course Term
+      updateBody.f2592 = '619';                    // Reformer Course Qualification (CPD)
+      updateBody.f2596 = String(reformerPrice);     // Reformer Course Price
+      updateBody.f2598 = paymentPlanText;           // Reformer Payment Plan
+      updateBody.f2599 = String(reformerPrice);     // Reformer Course Spent
     }
 
     // Payment plan specific fields
@@ -769,11 +841,37 @@ export async function POST(request: NextRequest) {
       updateBody.f2607 = String(Math.floor(firstInstalment.getTime() / 1000)); // First instalment date
     }
 
-    await fetch('https://api.ontraport.com/1/Contacts', {
-      method: 'PUT',
-      headers: ontraportHeaders(),
-      body: JSON.stringify(updateBody),
-    });
+    // CRITICAL: capture response — see PT route comment about the 7 May
+    // 2026 incident (Emily Doyle) where this PUT silently dropped data.
+    try {
+      const updRes = await fetch('https://api.ontraport.com/1/Contacts', {
+        method: 'PUT',
+        headers: ontraportHeaders(),
+        body: JSON.stringify(updateBody),
+      });
+      const updText = await updRes.text();
+      let updJson: Record<string, unknown> = {};
+      try { updJson = JSON.parse(updText); } catch { /* keep raw */ }
+      if (updJson.code !== undefined && updJson.code !== 0) {
+        console.error(`[Checkout] ⚠️ Step 4 contact update FAILED for ${email} (contact ${contactId}). Retrying once. Response:`, updText.slice(0, 600));
+        await new Promise((r) => setTimeout(r, 1000));
+        const retryRes = await fetch('https://api.ontraport.com/1/Contacts', {
+          method: 'PUT',
+          headers: ontraportHeaders(),
+          body: JSON.stringify(updateBody),
+        });
+        const retryText = await retryRes.text();
+        let retryJson: Record<string, unknown> = {};
+        try { retryJson = JSON.parse(retryText); } catch { /* keep raw */ }
+        if (retryJson.code !== undefined && retryJson.code !== 0) {
+          console.error(`[Checkout] 🚨 Step 4 contact update STILL FAILED after retry for ${email} (contact ${contactId}). Manual fix required. Body:`, JSON.stringify(updateBody), 'Response:', retryText.slice(0, 600));
+        } else {
+          console.log(`[Checkout] Step 4 retry succeeded for ${email}`);
+        }
+      }
+    } catch (e) {
+      console.error(`[Checkout] 🚨 Step 4 contact update threw for ${email} (contact ${contactId}):`, e);
+    }
 
     console.log(`[Checkout] ✅ All contact fields updated for ${contactId}`);
 
