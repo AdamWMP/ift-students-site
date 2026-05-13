@@ -11,17 +11,34 @@ import {
 } from 'lucide-react'
 import { getUpcomingPtIntakes, placesLine, isUrgent, type IntakeCard } from '@/lib/upcoming-intakes'
 
-// Name + Irish-county pool for the live-booking toast.
+// First-name pool used by the live-booking toast. Irish-skewing.
 const TOAST_NAMES = [
   'Conor', 'Sean', 'Eoin', 'Cillian', 'Oisin', 'Liam', 'Patrick', 'Jack',
   'Daniel', 'Cian', 'Ruairi', 'Darragh', 'Aoife', 'Niamh', 'Sarah', 'Emma',
   'Ciara', 'Hannah', 'Caoimhe', 'Saoirse', 'Aine', 'Maeve',
 ]
-const TOAST_COUNTIES = [
-  'Dublin', 'Cork', 'Galway', 'Limerick', 'Waterford', 'Wexford', 'Kerry',
-  'Donegal', 'Mayo', 'Kildare', 'Wicklow', 'Sligo', 'Tipperary', 'Clare',
-  'Meath', 'Louth', 'Westmeath',
+// Fallback only for "Nationwide" PT intakes (8-Week Full Time runs in 6
+// regions). Real-region intakes get the county pulled from intake.location
+// so "from X" matches the course being booked.
+const TOAST_COUNTY_FALLBACK = [
+  'Dublin', 'Cork', 'Galway', 'Limerick', 'Wexford',
 ]
+
+// Extract a clean county label from the intake's display location.
+//   "Dublin (Swords & Tallaght)"             → "Dublin"
+//   "Cork · Galway · Limerick · Wexford"     → random one of those
+//   "Cork"                                   → "Cork"
+//   "Nationwide"                             → random fallback
+function countyFromLocation(location: string): string {
+  if (/^Nationwide\b/i.test(location)) {
+    return TOAST_COUNTY_FALLBACK[Math.floor(Math.random() * TOAST_COUNTY_FALLBACK.length)]
+  }
+  if (location.includes('·')) {
+    const parts = location.split('·').map(s => s.trim()).filter(Boolean)
+    return parts[Math.floor(Math.random() * parts.length)]
+  }
+  return location.split('(')[0].trim()
+}
 
 // ── What happens on the call ───────────────────────────────────────
 const callPoints = [
@@ -260,12 +277,14 @@ export default function PtCallContent() {
         if (candidates.length === 0) return prev
         const target = candidates[Math.floor(Math.random() * candidates.length)]
         const name = TOAST_NAMES[Math.floor(Math.random() * TOAST_NAMES.length)]
-        const county = TOAST_COUNTIES[Math.floor(Math.random() * TOAST_COUNTIES.length)]
+        // County matches the booked intake's location, so the toast reads
+        // "Conor from Galway just booked Personal Training · 2 July intake".
+        const county = countyFromLocation(target.location)
         setToast({
           id: Date.now(),
           name,
           county,
-          courseLine: `${target.format} · ${target.location}`,
+          courseLine: `Personal Training · ${target.date} intake`,
         })
         eventsFiredRef.current += 1
         return prev.map(i =>
