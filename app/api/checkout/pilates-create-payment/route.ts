@@ -104,7 +104,7 @@ const REFORMER_LOCATION_TO_LABEL: Record<string, string> = {
   'dublin-tallaght': 'Dublin (Tallaght)',
   'cork':            'Cork',
   'kerry':           'Co. Kerry',
-  'derry':           'Co. Derry',
+  'derry':           'Co. Derry / L\'Derry',
   'clare':           'Co. Clare',
 };
 

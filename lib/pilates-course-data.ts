@@ -167,7 +167,7 @@ export const locations: Location[] = [
   { id: 'dublin-tallaght', name: 'Dublin (Tallaght)', address: 'Belgard Square W, Tallaght, Dublin 24' },
   { id: 'galway', name: 'Galway (Tuam)', address: 'N17 Business Park, Galway Rd, Tuam, Co. Galway' },
   { id: 'cork', name: 'Cork City', address: 'Stapleton House, 10 Oliver Plunkett St, Cork City' },
-  { id: 'derry', name: 'Co. Derry', address: 'Gateway Studio, Co. Derry' },
+  { id: 'derry', name: 'Co. Derry / L\'Derry', address: 'Gateway Studio, Co. Derry / L\'Derry' },
   { id: 'online', name: 'Online', address: 'Tuesdays & Thursdays evenings' },
 ];
 
@@ -229,7 +229,7 @@ export const courseStartDates: CourseStartDate[] = [
   // Derry (Gateway Studio) — 3 Weekend Intensive (Autumn 2026)
   {
     date: '2026-09-05',
-    label: '5 September 2026 — Gateway Studio, Co. Derry',
+    label: '5 September 2026 — Gateway Studio, Co. Derry / L\'Derry',
     locations: ['derry'],
     timetable: '3-weekend-intensive',
     sessions: [
@@ -270,7 +270,7 @@ export const reformerLocations: Location[] = [
   { id: 'cork', name: 'Himalaya Yoga Valley (Cork City)', address: 'Himalaya Yoga Valley, Cork City' },
   { id: 'clare', name: 'The Pilates Playground (Co. Clare)', address: 'Unit 19, Ballycasey Craft & Design Centre, Shannon, Co. Clare, V14 EA30' },
   { id: 'kerry', name: 'Halo Reformer Pilates Studio (Co. Kerry)', address: 'Halo Reformer Pilates Studio, Co. Kerry' },
-  { id: 'derry', name: 'Gateway Studio (Co. Derry)', address: 'Gateway Studio, Co. Derry' },
+  { id: 'derry', name: 'Gateway Studio (Co. Derry / L\'Derry)', address: 'Gateway Studio, Co. Derry / L\'Derry' },
 ];
 
 export const reformerTimetables: Timetable[] = [
@@ -321,7 +321,7 @@ export const reformerStartDates: CourseStartDate[] = [
   // Derry — Gateway Studio — 4 Weekends Oct–Nov 2026 (final weekend = exam)
   {
     date: '2026-10-24',
-    label: '24 October 2026 — Gateway Studio, Co. Derry (Final Exam Weekend: 28–29 November)',
+    label: '24 October 2026 — Gateway Studio, Co. Derry / L\'Derry (Final Exam Weekend: 28–29 November)',
     locations: ['derry'],
     timetable: 'reformer-3-weekend',
     sessions: [
