@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -9,7 +9,19 @@ import {
   MapPin, Calendar, Star, MessageCircle,
   Briefcase, Shield, Zap,
 } from 'lucide-react'
-import { getUpcomingPtIntakes } from '@/lib/upcoming-intakes'
+import { getUpcomingPtIntakes, placesLine, isUrgent, type IntakeCard } from '@/lib/upcoming-intakes'
+
+// Name + Irish-county pool for the live-booking toast.
+const TOAST_NAMES = [
+  'Conor', 'Sean', 'Eoin', 'Cillian', 'Oisin', 'Liam', 'Patrick', 'Jack',
+  'Daniel', 'Cian', 'Ruairi', 'Darragh', 'Aoife', 'Niamh', 'Sarah', 'Emma',
+  'Ciara', 'Hannah', 'Caoimhe', 'Saoirse', 'Aine', 'Maeve',
+]
+const TOAST_COUNTIES = [
+  'Dublin', 'Cork', 'Galway', 'Limerick', 'Waterford', 'Wexford', 'Kerry',
+  'Donegal', 'Mayo', 'Kildare', 'Wicklow', 'Sligo', 'Tipperary', 'Clare',
+  'Meath', 'Louth', 'Westmeath',
+]
 
 // ── What happens on the call ───────────────────────────────────────
 const callPoints = [
@@ -221,10 +233,65 @@ function CalendarBlock() {
 }
 
 export default function PtCallContent() {
-  // Compute upcoming intakes once at render time. SSR-safe — uses Date.now()
-  // on the server, then re-renders on the client; for marketing copy this is
-  // fine (no hydration mismatch concerns since spotsLine is text-only).
-  const intakes = getUpcomingPtIntakes(3)
+  // Compute initial intakes once. Subsequent decrements (from the live-booking
+  // toast) mutate the state — recomputing would undo them.
+  const initialIntakes = useMemo<IntakeCard[]>(() => getUpcomingPtIntakes(3), [])
+  const [intakes, setIntakes] = useState<IntakeCard[]>(initialIntakes)
+
+  // Live-booking social-proof toast. Periodically picks a random upcoming
+  // intake with places > 1, decrements its `places` count by one, and shows
+  // a "X from {county} just booked" toast in the corner.
+  type Toast = { id: number; name: string; county: string; courseLine: string }
+  const [toast, setToast] = useState<Toast | null>(null)
+  const eventsFiredRef = useRef(0)
+
+  useEffect(() => {
+    const MAX_EVENTS = 4
+    let timer: ReturnType<typeof setTimeout>
+
+    const pickAndFire = () => {
+      if (eventsFiredRef.current >= MAX_EVENTS) return
+      if (typeof document !== 'undefined' && document.hidden) {
+        schedule()
+        return
+      }
+      setIntakes(prev => {
+        const candidates = prev.filter(i => i.places !== null && i.places > 1)
+        if (candidates.length === 0) return prev
+        const target = candidates[Math.floor(Math.random() * candidates.length)]
+        const name = TOAST_NAMES[Math.floor(Math.random() * TOAST_NAMES.length)]
+        const county = TOAST_COUNTIES[Math.floor(Math.random() * TOAST_COUNTIES.length)]
+        setToast({
+          id: Date.now(),
+          name,
+          county,
+          courseLine: `${target.format} · ${target.location}`,
+        })
+        eventsFiredRef.current += 1
+        return prev.map(i =>
+          i.startISO === target.startISO && i.location === target.location
+            ? { ...i, places: (i.places ?? 1) - 1, urgent: isUrgent((i.places ?? 1) - 1) }
+            : i,
+        )
+      })
+      schedule()
+    }
+
+    const schedule = () => {
+      const delay = 35_000 + Math.random() * 50_000
+      timer = setTimeout(pickAndFire, delay)
+    }
+
+    timer = setTimeout(pickAndFire, 20_000 + Math.random() * 12_000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 5500)
+    return () => clearTimeout(t)
+  }, [toast])
 
   return (
     <div className="min-h-screen bg-charcoal-950">
@@ -376,7 +443,7 @@ export default function PtCallContent() {
                     <p className="text-white/50 text-xs mt-0.5">{intake.location}</p>
                     <p className="text-white/35 text-xs">{intake.format}</p>
                     <p className={`text-xs font-semibold mt-1.5 ${intake.urgent ? 'text-red-400' : 'text-amber-400'}`}>
-                      {intake.spotsLine}
+                      {placesLine(intake.places)}
                     </p>
                   </div>
                 </motion.div>
@@ -596,6 +663,41 @@ export default function PtCallContent() {
           <Calendar className="w-4 h-4" />
           Book Your Call
         </button>
+      </div>
+
+      {/* ── Live-booking toast (social proof) ───────────────────── */}
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="fixed z-50 left-4 right-4 sm:left-6 sm:right-auto bottom-20 sm:bottom-6 sm:max-w-[340px] pointer-events-none"
+      >
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+              className="rounded-xl p-3.5 shadow-[0_12px_40px_rgba(0,0,0,0.45)] flex items-start gap-3 pointer-events-auto bg-charcoal-900 border border-charcoal-800"
+            >
+              <span className="flex h-9 w-9 rounded-full items-center justify-center flex-shrink-0 bg-green-500/15">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold leading-tight text-white">
+                  {toast.name} from {toast.county} just booked
+                </p>
+                <p className="text-[12px] mt-0.5 text-white/50 truncate">
+                  {toast.courseLine}
+                </p>
+                <p className="text-[10px] mt-1 tracking-[0.08em] uppercase text-white/30">
+                  A few seconds ago
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
