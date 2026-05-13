@@ -353,14 +353,14 @@ export async function POST(request: NextRequest) {
     const effectiveDeposit = Math.min(depositAmount, effectiveTotal);
 
     // Validate required fields
-    const isReformerOnlyValidation = packageId === 'reformer-only';
+    const isReformerOnly = packageId === 'reformer-only';
     if (!packageId || !firstName || !lastName || !email || !phone) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    if (!isReformerOnlyValidation && (!location || !timetable)) {
+    if (!isReformerOnly && (!location || !timetable)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    if (isReformerOnlyValidation && (!reformerLocation || !reformerTimetable)) {
+    if (isReformerOnly && (!reformerLocation || !reformerTimetable)) {
       return NextResponse.json({ error: 'Missing required reformer fields' }, { status: 400 });
     }
     if (!cardNumber || !cardExpMonth || !cardExpYear || !cardCvc) {
@@ -493,7 +493,6 @@ export async function POST(request: NextRequest) {
     // Proportional to handle discounts: keep the same ratio as base prices.
 
     const includesReformer = REFORMER_PACKAGES.has(packageId);
-    const isReformerOnly   = packageId === 'reformer-only';
 
     // Calculate per-product totals for career/studio (split proportionally)
     const certTotal     = includesReformer && !isReformerOnly
