@@ -285,11 +285,10 @@ export const reformerStartDates: CourseStartDate[] = [
   // Intake 3: Follows 25th April Mat Start — 4 + 5 Jul, 18 + 19 Jul, 1 + 2 Aug · Exam 8 + 9 Aug
   {
     date: '2026-07-04',
-    label: '4 July 2026 — follows 25th April Mat start (Final Exam Weekend: 8–9 August)',
+    label: '4 July 2026 — follows 25th April Mat start (Final Exam Weekend: 8–9 August) — SOLD OUT',
     locations: ['dublin-swords'],
     timetable: 'reformer-3-weekend',
-    highDemand: true,
-    spotsLeft: 3,
+    soldOut: true,
     sessions: [
       'Weekend 1: Sat 4 & Sun 5 July',
       'Weekend 2: Sat 18 & Sun 19 July',
