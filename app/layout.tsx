@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { ThemeProvider } from '@/components/theme-provider'
 import { LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import { MetaPixel } from '@/components/meta-pixel'
@@ -102,7 +103,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://go.oncehub.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://cdn.oncehub.com" />
         <link rel="dns-prefetch" href="https://go.oncehub.com" />
-        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js" async defer />
+        {/* Abacus chat widget — was loaded eagerly in <head>, which on mobile
+            blocks main-thread parsing during initial paint. Moved to a lazy
+            load via <script> appended below after first interaction. */}
         <LocalBusinessJsonLd />
       </head>
       <body className="bg-charcoal-950 text-white antialiased" suppressHydrationWarning>
@@ -113,6 +116,9 @@ export default function RootLayout({
         {/* Singleton booking modal — one pre-warmed OnceHub iframe shared by
             every "Book Strategy Call" button. Pure visibility flip on open. */}
         <BookingModalRoot />
+        {/* Abacus chat widget — lazyOnload so it runs after window load
+            and never competes with the booking flow on mobile. */}
+        <Script src="https://apps.abacus.ai/chatllm/appllm-lib.js" strategy="lazyOnload" />
       </body>
     </html>
   )

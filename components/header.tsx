@@ -169,7 +169,7 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-4">
             <button
               onClick={() => setIsCalendlyOpen(true)}
-              className="btn-gold text-sm flex items-center gap-2"
+              className="btn-gold btn-press text-sm flex items-center gap-2"
             >
               <Calendar className="w-4 h-4" />
               BOOK STRATEGY CALL
@@ -180,7 +180,7 @@ export default function Header() {
           <div className="lg:hidden flex items-center gap-2">
             <button
               onClick={() => setIsCalendlyOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gold hover:bg-gold-600 text-charcoal-950 text-xs font-semibold rounded-full transition-colors"
+              className="btn-press flex items-center gap-1.5 px-3 py-1.5 bg-gold hover:bg-gold-600 active:bg-gold-600 text-charcoal-950 text-xs font-semibold rounded-full shadow-md shadow-gold/30"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>BOOK STRATEGY CALL</span>
@@ -266,7 +266,7 @@ export default function Header() {
                     setMobileMenuOpen(false)
                     setIsCalendlyOpen(true)
                   }}
-                  className="block w-full btn-gold text-center"
+                  className="block w-full btn-gold btn-press text-center"
                 >
                   <Calendar className="w-4 h-4 inline mr-2" />
                   BOOK STRATEGY CALL
