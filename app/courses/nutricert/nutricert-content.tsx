@@ -867,10 +867,12 @@ function VideoPreviewSection({ scrollToCheckout }: { scrollToCheckout: () => voi
               <div className="relative aspect-video bg-charcoal-800 overflow-hidden">
                 {preview.videoId ? (
                   <>
-                    <img
+                    <Image
                       src={`https://img.youtube.com/vi/${preview.videoId}/hqdefault.jpg`}
                       alt={preview.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
                     {/* Play button */}

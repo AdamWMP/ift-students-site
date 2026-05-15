@@ -13,7 +13,20 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: { unoptimized: true },
+  // Re-enabled Vercel image optimization (May 2026 audit). Lighthouse
+  // had flagged "Serve images in next-gen formats" at −610 ms on
+  // mobile. With this on, Next.js auto-converts JPG/PNG → WebP/AVIF
+  // at request time and serves responsive sizes — no need to
+  // pre-generate every variant by hand. Vercel Pro plan covers
+  // ~5,000 transformations/month for free, comfortably above
+  // current traffic.
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'img.youtube.com' },
+      { protocol: 'https', hostname: 'i.ytimg.com' },
+    ],
+  },
   async redirects() {
     return [
       // ── Pilates → imagepilates.ie ────────────────────────────────────────

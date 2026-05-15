@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 
 export type Tweaks = {
   days: string
@@ -52,10 +53,11 @@ const GoldGrad = ({ id, hi, mid, deep }: { id: string; hi: string; mid: string; 
 )
 
 const IFTLogo = ({ size = 36 }: { size?: number; color?: string }) => (
-  // eslint-disable-next-line @next/next/no-img-element
-  <img
+  <Image
     src="/marketing/3-days-to-go/logo-ift.png"
     alt="Image Fitness Training"
+    width={187}
+    height={Math.round(size * 2.2)}
     style={{ height: size * 2.2, display: 'block', objectFit: 'contain', width: '187px' }}
   />
 )

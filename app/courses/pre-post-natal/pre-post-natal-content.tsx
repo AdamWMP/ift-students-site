@@ -638,8 +638,7 @@ export default function PrePostNatalContent() {
                     />
                   ) : (
                     <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={video.poster} alt={video.title} className="w-full h-full object-cover opacity-80" />
+                      <Image src={video.poster} alt={video.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover opacity-80" />
                       <div className="absolute inset-0 bg-black/30" />
                       {/* Play button */}
                       <button
