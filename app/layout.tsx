@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { LocalBusinessJsonLd } from '@/components/seo/json-ld'
 import { MetaPixel } from '@/components/meta-pixel'
+import BookingModalRoot from '@/components/booking-modal-root'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -93,11 +94,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        {/* Preconnect + prefetch OnceHub CDN so the calendar modal opens instantly */}
+        {/* Preconnect + prefetch OnceHub CDN so the calendar modal opens instantly.
+            embed.js itself is injected by BookingModalRoot on idle / first user
+            interaction — loading it eagerly here wasted bandwidth for visitors
+            who never open the booking modal. */}
         <link rel="preconnect" href="https://cdn.oncehub.com" crossOrigin="" />
         <link rel="preconnect" href="https://go.oncehub.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://cdn.oncehub.com" />
-        <script src="https://cdn.oncehub.com/cal/embed.js" async defer />
+        <link rel="dns-prefetch" href="https://go.oncehub.com" />
         <script src="https://apps.abacus.ai/chatllm/appllm-lib.js" async defer />
         <LocalBusinessJsonLd />
       </head>
@@ -106,6 +110,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           {children}
         </ThemeProvider>
+        {/* Singleton booking modal — one pre-warmed OnceHub iframe shared by
+            every "Book Strategy Call" button. Pure visibility flip on open. */}
+        <BookingModalRoot />
       </body>
     </html>
   )
