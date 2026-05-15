@@ -103,6 +103,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://go.oncehub.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://cdn.oncehub.com" />
         <link rel="dns-prefetch" href="https://go.oncehub.com" />
+        {/* LCP — preload the hero JPG. It's painted as a CSS background
+            before any sections render, so the browser otherwise doesn't
+            discover it until the stylesheet parses. fetchpriority=high
+            jumps it ahead of non-critical CSS/JS. */}
+        <link rel="preload" as="image" href="/pt-hero.jpg" fetchPriority="high" />
         {/* Abacus chat widget — was loaded eagerly in <head>, which on mobile
             blocks main-thread parsing during initial paint. Moved to a lazy
             load via <script> appended below after first interaction. */}

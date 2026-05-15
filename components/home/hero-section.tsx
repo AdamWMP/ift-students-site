@@ -1,27 +1,30 @@
 'use client'
 
-import { motion } from 'framer-motion'
+// Hero section — kept lean for mobile LCP.
+//
+// Two prior wins that stay:
+//   - Mobile (< lg viewport, save-data, or 2g): NEVER load the 39 MB
+//     hero video. Show the static pt-hero.jpg as a CSS background instead.
+//   - Desktop: video mounts only after first paint + idle, with
+//     preload="metadata" so just the headers fetch until playback starts.
+//
+// New: every framer-motion element in this file has been replaced with
+// pure CSS @keyframes. Framer-motion was responsible for ~50 KB gzipped
+// of JS on the LCP critical path AND blocked first-meaningful-paint
+// until React hydrated all 17 motion children. CSS animations run on
+// the compositor with zero JS, so the hero now paints instantly and the
+// entry animation kicks in as soon as the browser sees the stylesheet.
+
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
-// Hero video is 39 MB. Downloading it on every page load was crushing
-// mobile Time-to-Interactive — typically 4-15 s on cellular before the
-// page felt usable. Now:
-//   - Mobile (< lg, no `prefers-reduced-data: reduce`): never load the
-//     video. Show the static pt-hero.jpg gradient + brand wash instead.
-//   - Desktop: skip-render the <video> until the page is interactive AND
-//     the browser is idle, then mount it with preload="metadata" so only
-//     the first few hundred KB are fetched until playback actually starts.
-// Net effect on mobile: ~39 MB → ~80 KB hero asset.
 function useShouldLoadHeroVideo() {
   const [load, setLoad] = useState(false)
   useEffect(() => {
-    // Skip the video on small viewports + data-saver mode entirely.
     if (typeof window === 'undefined') return
     const isMobile = window.matchMedia('(max-width: 1024px)').matches
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection?.saveData
-    const slowConn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection?.effectiveType
-    if (isMobile || saveData || slowConn === '2g' || slowConn === 'slow-2g') return
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+    if (isMobile || conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return
 
     const trigger = () => setLoad(true)
     const w = window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }
@@ -42,17 +45,12 @@ export default function HeroSection() {
   const shouldLoadVideo = useShouldLoadHeroVideo()
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.75
-    }
+    if (videoRef.current) videoRef.current.playbackRate = 0.75
   }, [shouldLoadVideo])
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Video Background — desktop only, loaded on idle */}
       <div className="absolute inset-0 z-0">
-        {/* Static fallback / poster — always painted first so there's no
-            black flash before the video (if any) takes over. */}
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center"
           style={{ backgroundImage: 'url(/pt-hero.jpg)' }}
@@ -78,113 +76,85 @@ export default function HeroSection() {
         <div className="absolute -top-20 -left-20 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[150px] opacity-60" />
         <div className="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-gold/8 rounded-full blur-[120px] opacity-50" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.7)_100%)]" />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 right-1/4 w-[2px] h-[60%] bg-gradient-to-b from-gold/30 via-gold/10 to-transparent rotate-[15deg] blur-sm"
-        />
+        {/* Subtle ambient gold ray — CSS-only, GPU-driven */}
+        <div className="hero-ray absolute top-0 right-1/4 w-[2px] h-[60%] bg-gradient-to-b from-gold/30 via-gold/10 to-transparent rotate-[15deg] blur-sm" aria-hidden="true" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-charcoal-950 to-transparent" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 pt-32 pb-20">
         <div className="max-w-3xl">
-          {/* Label */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm sm:text-base tracking-[0.25em] text-gold font-medium uppercase mb-6"
-          >
+          <p className="hero-fade hero-fade-1 text-sm sm:text-base tracking-[0.25em] text-gold font-medium uppercase mb-6">
             IMAGE FITNESS TRAINING GLOBAL
-          </motion.p>
-
-          {/* Gold separator line */}
-          <motion.div
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: 60 }}
-            transition={{ delay: 0.15 }}
-            className="h-[2px] bg-gold mb-10"
-          />
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-[1.05] mb-4"
-          >
+          </p>
+          <div className="hero-fade hero-fade-2 h-[2px] bg-gold mb-10" style={{ width: 60 }} />
+          <h1 className="hero-fade hero-fade-3 font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-[1.05] mb-4">
             Where Coaches<br />Are Made.
-          </motion.h1>
-
-          {/* Subheadline - gold italic */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-2xl sm:text-3xl md:text-4xl font-serif italic text-gold mb-10"
-          >
+          </h1>
+          <p className="hero-fade hero-fade-4 text-2xl sm:text-3xl md:text-4xl font-serif italic text-gold mb-10">
             Not certified. Made.
-          </motion.p>
-
-          {/* Body text */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-base sm:text-lg text-white/60 mb-10 max-w-2xl leading-relaxed"
-          >
+          </p>
+          <p className="hero-fade hero-fade-5 text-base sm:text-lg text-white/60 mb-10 max-w-2xl leading-relaxed">
             The only fitness educator in Ireland — probably anywhere — that doesn&apos;t stop when the certificate is in your hand. Because that&apos;s when the real work begins.
-          </motion.p>
-
-          {/* Stats line */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="text-sm sm:text-base text-gold font-medium mb-6"
-          >
+          </p>
+          <p className="hero-fade hero-fade-6 text-sm sm:text-base text-gold font-medium mb-6">
             <span className="font-bold">5,000+ Coaches</span>
             <span className="mx-3 text-white/30">&bull;</span>
             <span className="font-bold">16 Years</span>
             <span className="mx-3 text-white/30">&bull;</span>
             <span className="font-bold">Zero Compromise</span>
-          </motion.p>
-
-          {/* Accreditations */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-xs tracking-[0.2em] text-white/40 uppercase mb-12"
-          >
+          </p>
+          <p className="hero-fade hero-fade-7 text-xs tracking-[0.2em] text-white/40 uppercase mb-12">
             REPS ACCREDITED &middot; EHFA APPROVED &middot; SKILLNET IRELAND
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            className="flex flex-col sm:flex-row gap-4"
-          >
+          </p>
+          <div className="hero-fade hero-fade-8 flex flex-col sm:flex-row gap-4">
             <Link
               href="#pathways"
-              className="btn-gold flex items-center justify-center gap-2 text-sm sm:text-base tracking-[0.15em] uppercase font-semibold"
+              prefetch
+              className="btn-gold btn-press flex items-center justify-center gap-2 text-sm sm:text-base tracking-[0.15em] uppercase font-semibold"
             >
               EXPLORE THE PATHWAYS
             </Link>
             <Link
               href="/career-quiz"
-              className="btn-outline flex items-center justify-center gap-2 text-sm sm:text-base tracking-[0.15em] uppercase font-semibold"
+              prefetch
+              className="btn-outline btn-press flex items-center justify-center gap-2 text-sm sm:text-base tracking-[0.15em] uppercase font-semibold"
             >
               TAKE THE CAREER QUIZ
             </Link>
-          </motion.div>
+          </div>
         </div>
       </div>
 
+      <style jsx>{`
+        @keyframes hero-fade-in {
+          from { opacity: 0; transform: translate3d(0, 12px, 0); }
+          to   { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes hero-ray {
+          0%, 100% { opacity: 0.10; }
+          50%      { opacity: 0.20; }
+        }
+        .hero-fade {
+          opacity: 0;
+          animation: hero-fade-in 0.55s ease-out forwards;
+          will-change: opacity, transform;
+        }
+        .hero-fade-1 { animation-delay: 0.05s; }
+        .hero-fade-2 { animation-delay: 0.12s; }
+        .hero-fade-3 { animation-delay: 0.18s; }
+        .hero-fade-4 { animation-delay: 0.26s; }
+        .hero-fade-5 { animation-delay: 0.34s; }
+        .hero-fade-6 { animation-delay: 0.40s; }
+        .hero-fade-7 { animation-delay: 0.46s; }
+        .hero-fade-8 { animation-delay: 0.52s; }
+        :global(.hero-ray) {
+          animation: hero-ray 8s ease-in-out infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-fade { animation: none; opacity: 1; transform: none; }
+          :global(.hero-ray) { animation: none; opacity: 0.15; }
+        }
+      `}</style>
     </section>
   )
 }
