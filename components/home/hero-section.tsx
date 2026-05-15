@@ -1,73 +1,58 @@
 'use client'
 
-// Hero section — kept lean for mobile LCP.
+// Hero section — Apple-style background video on every device.
 //
-// Two prior wins that stay:
-//   - Mobile (< lg viewport, save-data, or 2g): NEVER load the 39 MB
-//     hero video. Show the static pt-hero.jpg as a CSS background instead.
-//   - Desktop: video mounts only after first paint + idle, with
-//     preload="metadata" so just the headers fetch until playback starts.
+// Hero video was re-encoded ffmpeg-side from 37.6 MB → 4.9 MB (libx264,
+// CRF 28, no audio track, +faststart so playback starts before the file
+// finishes downloading). At that size it's now safe to autoplay on
+// phones too — bandwidth cost is comparable to a few hero images.
 //
-// New: every framer-motion element in this file has been replaced with
-// pure CSS @keyframes. Framer-motion was responsible for ~50 KB gzipped
-// of JS on the LCP critical path AND blocked first-meaningful-paint
-// until React hydrated all 17 motion children. CSS animations run on
-// the compositor with zero JS, so the hero now paints instantly and the
-// entry animation kicks in as soon as the browser sees the stylesheet.
+// First paint sequence:
+//   1. /hero-poster.jpg (40 KB) renders as the <video poster>, painting
+//      instantly. The browser also has a fetchPriority="high" preload
+//      hint for this image in the root <head>.
+//   2. The video file streams in alongside the rest of the page. Because
+//      it has +faststart the first frames are playable as soon as the
+//      moov atom + first GOP land.
+//   3. <video> fades from poster → live video on `loadeddata`.
+//
+// Animations are still CSS @keyframes (no framer-motion on the LCP path).
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
-function useShouldLoadHeroVideo() {
-  const [load, setLoad] = useState(false)
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const isMobile = window.matchMedia('(max-width: 1024px)').matches
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
-    if (isMobile || conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return
-    // Desktop / wide-screen / fast connection: mount the video immediately.
-    // preload="metadata" already keeps the actual download lean (only the
-    // headers fetch until play begins), so there's no upside to waiting
-    // for requestIdleCallback — that just made the hero feel empty for
-    // 1–2 s on desktop. Loading inline keeps desktop perception snappy.
-    setLoad(true)
-  }, [])
-  return load
-}
-
 export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
-  const shouldLoadVideo = useShouldLoadHeroVideo()
 
   useEffect(() => {
     if (videoRef.current) videoRef.current.playbackRate = 0.75
-  }, [shouldLoadVideo])
+  }, [])
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0 z-0">
+        {/* Poster + video both reference the same JPG so even if the
+            video never loads (rare), the visual stays identical. */}
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center"
-          style={{ backgroundImage: 'url(/pt-hero.jpg)' }}
+          style={{ backgroundImage: 'url(/hero-poster.jpg)' }}
           aria-hidden="true"
         />
-        {shouldLoadVideo && (
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/pt-hero.jpg"
-            onLoadedData={() => setVideoLoaded(true)}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
-        )}
-        <div className={`absolute inset-0 bg-black transition-opacity duration-1000 ${shouldLoadVideo && videoLoaded ? 'opacity-0' : 'opacity-40'}`} />
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/hero-poster.jpg"
+          onLoadedData={() => setVideoLoaded(true)}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <source src="/hero-video.mp4" type="video/mp4" />
+        </video>
+        <div className={`absolute inset-0 bg-black transition-opacity duration-700 ${videoLoaded ? 'opacity-0' : 'opacity-40'}`} />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal-950/90 via-charcoal-950/75 to-charcoal-950" />
         <div className="absolute -top-20 -left-20 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[150px] opacity-60" />
         <div className="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-gold/8 rounded-full blur-[120px] opacity-50" />
