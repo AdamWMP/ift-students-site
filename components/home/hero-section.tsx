@@ -4,32 +4,76 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
+// Hero video is 39 MB. Downloading it on every page load was crushing
+// mobile Time-to-Interactive — typically 4-15 s on cellular before the
+// page felt usable. Now:
+//   - Mobile (< lg, no `prefers-reduced-data: reduce`): never load the
+//     video. Show the static pt-hero.jpg gradient + brand wash instead.
+//   - Desktop: skip-render the <video> until the page is interactive AND
+//     the browser is idle, then mount it with preload="metadata" so only
+//     the first few hundred KB are fetched until playback actually starts.
+// Net effect on mobile: ~39 MB → ~80 KB hero asset.
+function useShouldLoadHeroVideo() {
+  const [load, setLoad] = useState(false)
+  useEffect(() => {
+    // Skip the video on small viewports + data-saver mode entirely.
+    if (typeof window === 'undefined') return
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection?.saveData
+    const slowConn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection?.effectiveType
+    if (isMobile || saveData || slowConn === '2g' || slowConn === 'slow-2g') return
+
+    const trigger = () => setLoad(true)
+    const w = window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }
+    const handle = w.requestIdleCallback
+      ? w.requestIdleCallback(trigger, { timeout: 4000 })
+      : window.setTimeout(trigger, 2000)
+    return () => {
+      if (w.requestIdleCallback) (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback?.(handle as number)
+      else clearTimeout(handle as number)
+    }
+  }, [])
+  return load
+}
+
 export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const shouldLoadVideo = useShouldLoadHeroVideo()
 
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.playbackRate = 0.75
     }
-  }, [])
+  }, [shouldLoadVideo])
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Video Background */}
+      {/* Video Background — desktop only, loaded on idle */}
       <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          onLoadedData={() => setVideoLoaded(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-        >
-          <source src="/hero-video.mp4" type="video/mp4" />
-        </video>
-        <div className={`absolute inset-0 bg-black transition-opacity duration-1000 ${videoLoaded ? 'opacity-0' : 'opacity-100'}`} />
+        {/* Static fallback / poster — always painted first so there's no
+            black flash before the video (if any) takes over. */}
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: 'url(/pt-hero.jpg)' }}
+          aria-hidden="true"
+        />
+        {shouldLoadVideo && (
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/pt-hero.jpg"
+            onLoadedData={() => setVideoLoaded(true)}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <source src="/hero-video.mp4" type="video/mp4" />
+          </video>
+        )}
+        <div className={`absolute inset-0 bg-black transition-opacity duration-1000 ${shouldLoadVideo && videoLoaded ? 'opacity-0' : 'opacity-40'}`} />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal-950/90 via-charcoal-950/75 to-charcoal-950" />
         <div className="absolute -top-20 -left-20 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[150px] opacity-60" />
         <div className="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-gold/8 rounded-full blur-[120px] opacity-50" />

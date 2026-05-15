@@ -31,6 +31,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Reserve space at the bottom of every page on mobile so the sticky
+   MobileCta bar (Book Strategy Call + WhatsApp) doesn't cover real
+   content. pb-safe accounts for iPhone home-indicator inset. */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* Universal press-feedback for any element that opts in via the
    .btn-press utility — instant visual when tapped, even on mobile
    where :hover doesn't fire. Combine with existing button classes. */

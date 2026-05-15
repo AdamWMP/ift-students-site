@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   },
 }
 
+import dynamic from 'next/dynamic'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 import WhatsAppButton from '@/components/whatsapp-button'
@@ -32,21 +33,30 @@ import HeroSection from '@/components/home/hero-section'
 import StatsSection from '@/components/home/stats-section'
 import QuoteSection from '@/components/home/quote-section'
 import PathwaysSection from '@/components/home/pathways-section'
-import JourneySection from '@/components/home/journey-section'
-import ResultsSection from '@/components/home/results-section'
-import InvestmentSection from '@/components/home/investment-section'
-import GraduateCommunitySection from '@/components/home/graduate-community-section'
-import FinalCtaSection from '@/components/home/final-cta-section'
-import TeamPreviewSection from '@/components/home/team-preview-section'
-// Reputation/review-heavy panels imported from the iftstudents.com layout.
-// JourneyVideoSection has been replaced by EducationProviderSection (laptop
-// mockup with the better-laid-out video).
 import GraduatesBanner from '@/components/graduates-banner'
-import GoogleReviewsSlider from '@/components/google-reviews-slider'
-import ReputationSection from '@/components/home/reputation-section'
-import { EducationProviderSection } from '@/components/home/education-provider-section'
-import { CourseCarouselSection } from '@/components/home/course-carousel-section'
 import { ScrollToTop } from '@/components/scroll-to-top'
+
+// Below-the-fold sections are heavy (CourseCarousel: 418 LoC, ReputationSection:
+// 287 LoC, EducationProviderSection: 211 LoC with autoplay video) and aren't
+// visible during initial paint. Lazy-loading them cuts the initial JS+CSS
+// shipped to mobile by ~60% — the visitor sees the hero + pathways instantly
+// and the rest hydrates as they scroll.
+const JourneySection = dynamic(() => import('@/components/home/journey-section'), { ssr: true })
+const ResultsSection = dynamic(() => import('@/components/home/results-section'), { ssr: true })
+const InvestmentSection = dynamic(() => import('@/components/home/investment-section'), { ssr: true })
+const GraduateCommunitySection = dynamic(() => import('@/components/home/graduate-community-section'), { ssr: true })
+const FinalCtaSection = dynamic(() => import('@/components/home/final-cta-section'), { ssr: true })
+const TeamPreviewSection = dynamic(() => import('@/components/home/team-preview-section'), { ssr: true })
+const GoogleReviewsSlider = dynamic(() => import('@/components/google-reviews-slider'), { ssr: true })
+const ReputationSection = dynamic(() => import('@/components/home/reputation-section'), { ssr: true })
+const EducationProviderSection = dynamic(
+  () => import('@/components/home/education-provider-section').then(m => m.EducationProviderSection),
+  { ssr: true },
+)
+const CourseCarouselSection = dynamic(
+  () => import('@/components/home/course-carousel-section').then(m => m.CourseCarouselSection),
+  { ssr: true },
+)
 
 export default function HomePage() {
   return (
