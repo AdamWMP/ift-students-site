@@ -1,22 +1,20 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import Image from 'next/image'
-import { useInView } from 'react-intersection-observer'
+// "Join Ireland's largest, award-winning training provider" strip.
+//
+// Replaces the previous randomuser.me placeholder avatars with the real
+// IFT coaches row (public/graduates-banner.jpg — 10 actual graduates in
+// gold-ringed circles, baked into the image so no per-avatar CSS rings
+// needed).
+//
+// Animation: the row is too wide for any phone, so we run an infinite
+// horizontal marquee — the same image is rendered twice side-by-side
+// and translated -50% in a continuous loop so it feels alive without
+// the visitor needing to scroll the row themselves. The CSS uses pure
+// transform on the GPU (no JS frame loop), so it's cheap on mobile.
 
-// Graduate avatar data - using diverse images
-const graduates = [
-  { id: 1, image: 'https://randomuser.me/api/portraits/men/32.jpg', name: 'Graduate 1' },
-  { id: 2, image: 'https://randomuser.me/api/portraits/women/44.jpg', name: 'Graduate 2' },
-  { id: 3, image: 'https://randomuser.me/api/portraits/men/67.jpg', name: 'Graduate 3' },
-  { id: 4, image: 'https://randomuser.me/api/portraits/women/68.jpg', name: 'Graduate 4' },
-  { id: 5, image: 'https://randomuser.me/api/portraits/men/75.jpg', name: 'Graduate 5' },
-  { id: 6, image: 'https://randomuser.me/api/portraits/women/65.jpg', name: 'Graduate 6' },
-  { id: 7, image: 'https://randomuser.me/api/portraits/men/22.jpg', name: 'Graduate 7' },
-  { id: 8, image: 'https://randomuser.me/api/portraits/women/29.jpg', name: 'Graduate 8' },
-  { id: 9, image: 'https://randomuser.me/api/portraits/men/45.jpg', name: 'Graduate 9' },
-  { id: 10, image: 'https://randomuser.me/api/portraits/women/52.jpg', name: 'Graduate 10' },
-]
+import { motion } from 'framer-motion'
+import { useInView } from 'react-intersection-observer'
 
 interface GraduatesBannerProps {
   variant?: 'default' | 'compact'
@@ -24,68 +22,74 @@ interface GraduatesBannerProps {
 }
 
 export default function GraduatesBanner({ variant = 'default', className = '' }: GraduatesBannerProps) {
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 })
-
-  const isCompact = variant === 'compact'
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.15 })
+  const heightClass = variant === 'compact'
+    ? 'h-12 sm:h-14'
+    : 'h-14 sm:h-16'
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6 }}
-      className={`flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 ${className}`}
+      transition={{ duration: 0.5 }}
+      className={`flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 ${className}`}
     >
-      {/* Avatars Container */}
-      <div className="flex items-center justify-center">
-        <div className="flex items-center -space-x-3 sm:-space-x-4">
-          {graduates.map((graduate, index) => (
-            <motion.div
-              key={graduate.id}
-              initial={{ opacity: 0, scale: 0.5, x: -20 }}
-              animate={inView ? { opacity: 1, scale: 1, x: 0 } : {}}
-              transition={{ 
-                duration: 0.4, 
-                delay: index * 0.05,
-                type: 'spring',
-                stiffness: 200
-              }}
-              className="relative group"
-              style={{ zIndex: graduates.length - index }}
-            >
-              {/* Gold ring */}
-              <div className={`absolute inset-0 rounded-full bg-gradient-to-br from-gold via-gold-400 to-gold-600 p-[2px] ${isCompact ? 'w-8 h-8 sm:w-10 sm:h-10' : 'w-9 h-9 sm:w-11 sm:h-11'}`}>
-                <div className="w-full h-full rounded-full bg-charcoal-950 p-[2px]">
-                  <div className="w-full h-full rounded-full overflow-hidden">
-                  </div>
-                </div>
-              </div>
-              
-              {/* Avatar image with gold border */}
-              <div className={`relative rounded-full overflow-hidden ring-2 ring-gold shadow-lg shadow-gold/20 transition-transform duration-300 group-hover:scale-110 group-hover:z-50 ${isCompact ? 'w-8 h-8 sm:w-10 sm:h-10' : 'w-9 h-9 sm:w-11 sm:h-11'}`}>
-                <Image
-                  src={graduate.image}
-                  alt={graduate.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </motion.div>
-          ))}
+      {/* Marquee — only animates once the section is in view */}
+      <div
+        className={`relative overflow-hidden w-full md:max-w-[640px] ${heightClass}`}
+        style={{
+          maskImage: 'linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%)',
+        }}
+        aria-label="Image Fitness Training graduates"
+      >
+        <div
+          className="flex items-center gap-0 absolute inset-y-0 left-0"
+          style={{
+            animation: inView ? 'graduates-marquee 28s linear infinite' : 'none',
+            willChange: 'transform',
+          }}
+        >
+          {/* Two copies so the loop is seamless */}
+          <img
+            src="/graduates-banner.jpg"
+            alt="IFT graduates"
+            className="h-full w-auto select-none"
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            src="/graduates-banner.jpg"
+            alt=""
+            aria-hidden="true"
+            className="h-full w-auto select-none"
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
 
-      {/* Text */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
+      <motion.p
+        initial={{ opacity: 0, x: 16 }}
         animate={inView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="text-center md:text-left"
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className={`text-white/90 font-medium text-center md:text-left ${variant === 'compact' ? 'text-sm sm:text-base' : 'text-base sm:text-lg'}`}
       >
-        <p className={`text-white/90 font-medium ${isCompact ? 'text-sm sm:text-base' : 'text-base sm:text-lg'}`}>
-          Join Ireland&apos;s largest, award winning training provider
-        </p>
-      </motion.div>
+        Join Ireland&apos;s largest, award winning training provider
+      </motion.p>
+
+      <style jsx>{`
+        @keyframes graduates-marquee {
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-50%, 0, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          div[style*="graduates-marquee"] { animation: none !important; }
+        }
+      `}</style>
     </motion.div>
   )
 }
