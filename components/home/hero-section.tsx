@@ -25,16 +25,12 @@ function useShouldLoadHeroVideo() {
     const isMobile = window.matchMedia('(max-width: 1024px)').matches
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
     if (isMobile || conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return
-
-    const trigger = () => setLoad(true)
-    const w = window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }
-    const handle = w.requestIdleCallback
-      ? w.requestIdleCallback(trigger, { timeout: 4000 })
-      : window.setTimeout(trigger, 2000)
-    return () => {
-      if (w.requestIdleCallback) (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback?.(handle as number)
-      else clearTimeout(handle as number)
-    }
+    // Desktop / wide-screen / fast connection: mount the video immediately.
+    // preload="metadata" already keeps the actual download lean (only the
+    // headers fetch until play begins), so there's no upside to waiting
+    // for requestIdleCallback — that just made the hero feel empty for
+    // 1–2 s on desktop. Loading inline keeps desktop perception snappy.
+    setLoad(true)
   }, [])
   return load
 }
