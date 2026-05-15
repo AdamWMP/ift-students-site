@@ -14,7 +14,7 @@ const tutors = [
     location: 'Dublin',
     shortBio: 'Leading Image Fitness Training with a vision to develop the next generation of fitness professionals.',
     fullBio: '',
-    image: '/tutors/aaron.png'
+    image: '/tutors/aaron.jpg'
   },
   {
     name: 'Simon Creedon',
@@ -22,7 +22,7 @@ const tutors = [
     location: 'Dublin',
     shortBio: 'Former professional athlete, specialist in Olympic lifting.',
     fullBio: '',
-    image: '/tutors/simon.png'
+    image: '/tutors/simon.jpg'
   },
   {
     name: 'Conor Whyte',
@@ -30,7 +30,7 @@ const tutors = [
     location: 'Limerick',
     shortBio: 'Passionate about community fitness and group training.',
     fullBio: '',
-    image: '/tutors/conor.png'
+    image: '/tutors/conor.jpg'
   },
   // — Head / Lead Tutors —
   {
@@ -43,7 +43,7 @@ const tutors = [
 Johnny is committed to ensuring every student who comes through the doors of IFT leaves not just qualified, but genuinely ready to coach — confident in the science, the practical, and the business of personal training.
 
 His infectious energy and real-world coaching style make him one of the most sought-after tutors in the country. Whether you're on the gym floor, in the classroom, or working through your practical exams, Johnny is there to make sure you hit your stride.`,
-    image: '/tutors/johnny.png'
+    image: '/tutors/johnny.jpg'
   },
   {
     name: 'Shane Roche',
@@ -57,7 +57,7 @@ Shane specialises in rehabilitation, corrective exercise, strength training, and
 When it comes to learning, students can expect a fun, easygoing environment full of laughter, less stress, and plenty of practical, hands-on learning. Shane focuses on preparing students for the real-world fitness industry with a balanced approach that prioritises practical skills and confidence over stress.
 
 On a personal note, he believes that it's better to fail and learn than never try. He encourages students to embrace challenges, knowing that every step forward is progress.`,
-    image: '/tutors/shane.png'
+    image: '/tutors/shane.jpg'
   },
   {
     name: 'Pilar Lokko',
@@ -73,7 +73,7 @@ Through Strength and Conditioning sessions, Post-pregnancy sessions for Mamas wi
 As a tutor with Image Fitness working on both the Combination Course and the Mat Pilates Course, I believe that real ability isn't just doing it yourself — it's helping others realise that they can too. I am passionate about creating a learning environment that not only delivers the correct information, providing students with the fundamentals needed to complete the course, but also builds confidence, as instructors need to present their authentic self in the fitness industry.
 
 I want the students to feel on their learning journey exactly how I want my clients to feel: safe and capable. I want them to leave their course with belief in their knowledge and competency, to stay grounded and to keep learning and growing — always remembering that client care is number one, and to go out there and be that coach, PT, or instructor that they know their clients are in the right hands with.`,
-    image: '/tutors/pilar.png'
+    image: '/tutors/pilar.jpg'
   },
   // — Dublin Tutors —
   {
@@ -132,7 +132,7 @@ I have been a bodybuilding national champion and represented Ireland in many Wor
 I specialise in body transformation and photoshoot preps, but mostly now I enjoy training people of any age who want to transform their bodies and their lives. I enjoy helping the more mature population, male and female, who want to be healthier and experience a more active and more fun life.
 
 I co-own a fitness studio where I run semi-private personal training classes.`,
-    image: '/tutors/stef.png'
+    image: '/tutors/stef.jpg'
   },
   {
     name: 'Mark White',
@@ -148,7 +148,7 @@ I'm deeply passionate about long-term athlete development (LTAD) and advocate st
 As a former competitor in athletics, soccer, GAA, basketball, and triathlon, I draw on firsthand experience across multiple disciplines to inform my coaching. I hold a particular passion for advancing women's sport, delivering specialised guidance on female-specific physiology, hormonal influences, and developmental stages to ensure equitable opportunities and optimal outcomes.
 
 Students on the course I tutor can expect a hands-on, practical experience packed with real-world problem-solving, effective communication strategies, and insights into addressing individual athlete needs. Coaching, to me, is a refined skill — one that evolves through continuous education, reflection, and empathy. I'm committed to equipping athletes, coaches, and enthusiasts with the knowledge and tools for sustainable progress.`,
-    image: '/tutors/mark.png'
+    image: '/tutors/mark.jpg'
   },
   {
     name: 'Darragh Hannaphy',
@@ -160,7 +160,7 @@ Students on the course I tutor can expect a hands-on, practical experience packe
 My love for fitness comes from playing professional football in the League of Ireland from 19 years of age. From then, I was lucky enough to own my own studio for group classes and personal training. In 2016, I ventured into the coffee business and opened a coffee shop called The Grind in Howth.
 
 Seeing the students gain so much confidence throughout the courses is what drives me every day. My mission is simple: to inspire, educate, and empower people to become the strongest version of themselves.`,
-    image: '/tutors/darragh.png'
+    image: '/tutors/darragh.jpg'
   },
   {
     name: 'Nina Plazanin',
@@ -178,7 +178,7 @@ I aim to help my students not only gain knowledge but also build confidence and 
 Alongside tutoring, I work as a Fitness and Pilates Instructor, run my own coaching business, and work in corporate performance and wellbeing — delivering classes, programmes and events that focus on long-term results. My approach is realistic, combining everything I know, and empowering. I don't believe in quick fixes — I believe in building strong foundations that last.
 
 I am passionate about creating a positive and supportive environment where people feel motivated, capable and inspired to push beyond their limits and become the strongest version of themselves. Because once, I was that person sitting at the back hoping nobody would ask me a question — and now I get to help and inspire others to step out of their comfort zone.`,
-    image: '/tutors/nina.png'
+    image: '/tutors/nina.jpg'
   },
   {
     name: 'Aisling Duignan',
@@ -186,7 +186,7 @@ I am passionate about creating a positive and supportive environment where peopl
     location: 'Dublin',
     shortBio: 'Specialist in pre and post natal fitness, helping women safely exercise through every stage of motherhood.',
     fullBio: '',
-    image: '/tutors/aisling.png'
+    image: '/tutors/aisling.jpg'
   },
   {
     name: 'Diarmuid Cavanagh',
@@ -194,7 +194,7 @@ I am passionate about creating a positive and supportive environment where peopl
     location: 'Dublin',
     shortBio: 'Nutrition specialist delivering the NutriCert Global qualification with a practical, science-backed approach.',
     fullBio: '',
-    image: '/tutors/diarmuid.png'
+    image: '/tutors/diarmuid.jpg'
   },
   // — Cork —
   {
@@ -221,7 +221,7 @@ Aside from fitness I love my Xbox and Switch. I read a lot of Fantasy and I'm th
 I'm a first time Dad as of this year and wow. What a feeling. Less Xbox now days but I get to read Tolkien to him so happy days.
 
 See you in class!`,
-    image: '/tutors/thomas.png'
+    image: '/tutors/thomas.jpg'
   },
   {
     name: 'Greg Magner',
@@ -229,7 +229,7 @@ See you in class!`,
     location: 'Cork',
     shortBio: 'Focuses on client transformation and sustainable fitness habits.',
     fullBio: '',
-    image: '/tutors/greg.png'
+    image: '/tutors/greg.jpg'
   },
   {
     name: 'Eoin Cremin',
@@ -241,7 +241,7 @@ See you in class!`,
 My love of sports led me to begin working in the fitness industry in 2012.
 
 My coaching philosophy is all about sustainability. I have a sweet tooth myself and love chocolate, so it's only fair my clients can enjoy some as well!`,
-    image: '/tutors/eoin.png'
+    image: '/tutors/eoin.jpg'
   },
   // — Galway —
   {
@@ -249,7 +249,7 @@ My coaching philosophy is all about sustainability. I have a sweet tooth myself 
     role: 'Tutor & Gym Manager',
     location: 'Galway',
     shortBio: '9 years in the fitness industry, Gym Manager at HQ Gym Tuam, passionate about teaching and empowering future coaches.',
-    image: '/tutors/sharon.png',
+    image: '/tutors/sharon.jpg',
     fullBio: `I've been in the fitness industry for the past nine years, starting out as a group fitness instructor in a small fitness studio. Two years later, I started in the same gym I still work in today. I later completed my Personal Training qualification with Image Fitness (after a little push from my boss who saw potential in me!), and that experience gives me a real understanding of what our students go through.
 
 My time coaching on the gym floor saw me working closely with members who wanted to improve their lifting technique, including Olympic lifting, as well as coaching women who wanted to build strength and tone up in a supportive, empowering way.
@@ -277,7 +277,7 @@ I love the whole approach to training — building programmes that cater to the 
 I have been working with Image Fitness Training for almost 5 years now. I am always learning and extremely humbled to be part of students' journeys in becoming coaches. I love to stay in touch with past students — it's inspiring to see them do well and gain work they enjoy. I began tutoring on the Cork courses initially and two years ago we added the courses to a new location in Limerick, where I am currently based.
 
 My work schedule is a mix between being a mum, 1-1 hours with my own clients, coaching strength & conditioning classes, caring for patients in a GP Clinic, and tutoring students. The variety day to day is something I love. The focus is all centred around care and community, which I'm so grateful for. My son will always be the main focus and drive for everything I do.`,
-    image: '/tutors/may.png'
+    image: '/tutors/may.jpg'
   },
   {
     name: 'Lisa McCaffrey',
@@ -285,7 +285,7 @@ My work schedule is a mix between being a mum, 1-1 hours with my own clients, co
     location: 'Limerick',
     shortBio: 'Tutor based in Limerick, dedicated to developing the next generation of fitness professionals.',
     fullBio: '',
-    image: '/tutors/lisa.png'
+    image: '/tutors/lisa.jpg'
   },
   // — Manchester —
   {
@@ -294,7 +294,7 @@ My work schedule is a mix between being a mum, 1-1 hours with my own clients, co
     location: 'Manchester',
     shortBio: 'Fitness professional bringing expert coaching and real-world experience to students in Manchester.',
     fullBio: '',
-    image: '/tutors/dan.png'
+    image: '/tutors/dan.jpg'
   },
   {
     name: "Rebecca O'Rourke",
@@ -302,7 +302,7 @@ My work schedule is a mix between being a mum, 1-1 hours with my own clients, co
     location: 'Manchester',
     shortBio: 'Passionate fitness tutor dedicated to developing confident, skilled personal trainers in Manchester.',
     fullBio: '',
-    image: '/tutors/rebecca.png'
+    image: '/tutors/rebecca.jpg'
   },
   // — International / Specialists —
   {
@@ -320,7 +320,7 @@ My work schedule is a mix between being a mum, 1-1 hours with my own clients, co
     location: 'Dublin',
     shortBio: 'Expert in business development for fitness professionals.',
     fullBio: '',
-    image: '/tutors/adam.png'
+    image: '/tutors/adam.jpg'
   },
   {
     name: "Shauna O'Mahoney",
@@ -338,7 +338,7 @@ I strongly believe that fitness goes far beyond appearance. The mental benefits,
 Interestingly, I wasn't naturally sporty growing up and didn't enjoy PE at school. It wasn't until completing my Personal Training qualification that I fully understood the impact of strength training and proper nutrition on overall health. Now, I'm passionate about helping women prioritise their wellbeing not just for today, but for their future selves.
 
 A mindset I always share with clients is: If you were 30 failures away from your goal, how quickly would you want to fail? Progress requires action, patience, and persistence — and you never know what's possible until you try!`,
-    image: '/tutors/shauna.png'
+    image: '/tutors/shauna.jpg'
   },
   {
     name: 'Shannon Seier',
@@ -346,7 +346,7 @@ A mindset I always share with clients is: If you were 30 failures away from your
     location: 'Galway',
     shortBio: 'Marketing and social media team member at Image Fitness Training.',
     fullBio: '',
-    image: '/tutors/shanon.png'
+    image: '/tutors/shanon.jpg'
   },
   {
     name: 'Fabiana Creedon',
@@ -354,7 +354,7 @@ A mindset I always share with clients is: If you were 30 failures away from your
     location: 'Dublin',
     shortBio: 'Expert in functional training and injury prevention.',
     fullBio: '',
-    image: '/tutors/fabiana.png'
+    image: '/tutors/fabiana.jpg'
   },
   {
     name: 'Katie Doolan',
@@ -371,7 +371,7 @@ const pilatsTutors = [
   { name: 'Holly Ring',      role: 'Pilates Instructor',           image: '/tutors/holly.jpg',           initials: 'HR', bio: 'Image Pilates graduate turned tutor — bringing the student perspective and reformer expertise to every session.' },
   { name: 'Rachel Edwards',  role: 'Pilates Instructor',           image: '/tutors/rachel-edwards.jpg',  initials: 'RE', bio: 'Reformer specialist dedicated to empowering students through hands-on, energetic instruction.' },
   { name: 'Aoife McIntyre',  role: 'Pilates Instructor',           image: '/tutors/aoife-mcintyre.jpg',  initials: 'AM', bio: 'Bringing warmth and expertise to every session, with a focus on inclusive, accessible Pilates.' },
-  { name: 'Amy Halligan',    role: 'Pilates Instructor',           image: '/tutors/amy.png',             initials: 'AH', bio: 'Dedicated to creating a welcoming space where every student feels supported and confident.' },
+  { name: 'Amy Halligan',    role: 'Pilates Instructor',           image: '/tutors/amy.jpg',             initials: 'AH', bio: 'Dedicated to creating a welcoming space where every student feels supported and confident.' },
 ]
 
 export default function TeamContent() {
