@@ -23,10 +23,11 @@ export const metadata = {
   ],
   alternates: { canonical: 'https://imageft.ie/courses/pre-post-natal' },
   openGraph: {
-    title: 'Pre & Post Natal Exercise Instructor Course Ireland | Image Fitness Training',
-    description: 'REPs Ireland & PD:Approval dual accredited. 11 modules, 16 CPD points. Online, self-paced. €697.',
+    // Title rewrite per high-intent formula: [Keyword + Location] | [Qualifier] | [Benefit + Offer]
+    title: 'Pre & Post Natal Exercise Instructor Course | REPs + PD:Approval | Online, €697',
+    description: 'REPs Ireland & PD:Approval dual-accredited. 11 modules, 16 CPD points, 200+ page manual. Online, self-paced. €697 or 3 payments of €299.',
     url: 'https://imageft.ie/courses/pre-post-natal',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/logo-dark.jpg', width: 1600, height: 1066, alt: 'Pre & Post Natal Exercise Instructor Course Ireland (REPs + PD:Approval Accredited)' }],
     type: 'website',
   },
 }

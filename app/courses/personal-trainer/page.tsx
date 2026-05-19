@@ -7,8 +7,9 @@ import MetaViewContent from '@/components/meta-view-content'
 import { CourseJsonLd, BreadcrumbJsonLd, FAQJsonLd } from '@/components/seo/json-ld'
 
 export const metadata = {
-  title: 'Personal Trainer Course Ireland | REPs Accredited | Get Qualified in 8 Weeks',
-  description: 'Become a certified Personal Trainer in 8–16 weeks with Image Fitness Training. REPs Ireland & EQF Level 3 & 4 accredited. The Cert from €2,800. Locations in Dublin, Cork, Galway, Limerick, Wexford & Belfast.',
+  // Title rewrite per high-intent formula: [Keyword + Location] | [Qualifier] | [Specific Benefit + Offer]
+  title: 'Personal Trainer Course Ireland | REPs Accredited | 8 Weeks, From €2,800, Pay Monthly',
+  description: 'Become a certified Personal Trainer in 8–16 weeks with Image Fitness Training. REPs Ireland & EQF Level 3 & 4 accredited. From €2,800, pay monthly. Courses in Swords, Tallaght, Cork, Galway, Tuam, Limerick, Wexford. Derry launching September 2026.',
   keywords: [
     'personal trainer course ireland',
     'personal trainer course dublin',
@@ -21,13 +22,19 @@ export const metadata = {
     'become a personal trainer ireland',
     'pt course dublin',
     'personal trainer course cork',
+    'personal trainer course galway',
+    'personal trainer course tuam',
+    'personal trainer course limerick',
+    'personal trainer course wexford',
+    'personal trainer course swords',
+    'personal trainer course tallaght',
   ],
   alternates: { canonical: 'https://imageft.ie/courses/personal-trainer' },
   openGraph: {
-    title: 'Personal Trainer Course Ireland | REPs Accredited | Image Fitness Training',
-    description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. The Cert from €2,800.',
+    title: 'Personal Trainer Course Ireland | REPs Accredited | 8 Weeks, From €2,800',
+    description: 'Get qualified as a Personal Trainer in 8–16 weeks. REPs Ireland accredited. 5,000+ graduates. Pay monthly. Courses across Ireland.',
     url: 'https://imageft.ie/courses/personal-trainer',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/logo-dark.jpg', width: 1600, height: 1066, alt: 'Personal Trainer Course Ireland — Image Fitness Training (REPs Accredited)' }],
     type: 'website',
   },
 }

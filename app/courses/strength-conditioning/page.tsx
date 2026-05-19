@@ -8,8 +8,9 @@ import { CourseJsonLd, BreadcrumbJsonLd } from '@/components/seo/json-ld'
 import MetaViewContent from '@/components/meta-view-content'
 
 export const metadata = {
-  title: 'Strength & Conditioning Course Ireland | Active IQ Level 4 | REPs Accredited',
-  description: 'Become a certified Strength & Conditioning Coach in Ireland. Active IQ Level 4, REPs Ireland accredited. 12-week intensive programme. Live online theory + practical weekends in Dublin. €1,500.',
+  // Title rewrite per high-intent formula: [Keyword + Location] | [Qualifier] | [Benefit + Offer]
+  title: 'Strength & Conditioning Course Ireland | Active IQ Level 4 | 12 Weeks, €1,500',
+  description: 'Become a certified Strength & Conditioning Coach in Ireland. Active IQ Level 4 + REPs Ireland accredited. 12-week intensive: live online theory + practical weekends in Dublin. €1,500, pay monthly.',
   keywords: [
     'strength and conditioning course ireland',
     'strength conditioning certification ireland',
@@ -23,10 +24,10 @@ export const metadata = {
   ],
   alternates: { canonical: 'https://imageft.ie/courses/strength-conditioning' },
   openGraph: {
-    title: 'Strength & Conditioning Course Ireland | Active IQ Level 4 | Image Fitness Training',
-    description: 'REPs Ireland accredited S&C Coach certification. 12-week intensive. Live online theory + Dublin practicals. €1,500.',
+    title: 'Strength & Conditioning Course Ireland | Active IQ Level 4 | 12 Weeks, €1,500',
+    description: 'REPs Ireland accredited S&C Coach certification. 12-week intensive. Live online theory + Dublin practicals. €1,500, pay monthly.',
     url: 'https://imageft.ie/courses/strength-conditioning',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/logo-dark.jpg', width: 1600, height: 1066, alt: 'Strength & Conditioning Course Ireland — Active IQ Level 4 (REPs Accredited)' }],
     type: 'website',
   },
 }

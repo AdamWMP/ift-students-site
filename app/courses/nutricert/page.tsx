@@ -23,10 +23,11 @@ export const metadata = {
   ],
   alternates: { canonical: 'https://imageft.ie/courses/nutricert' },
   openGraph: {
-    title: 'NutriCert Global — Nutrition Coaching Certification Ireland | Image Fitness Training',
-    description: "Ireland's most complete nutrition certification. Science, coaching psychology & business in one. €750 or pay in 3.",
+    // Title kept verbatim from page title since it's already strong (keyword + qualifier + price)
+    title: 'NutriCert Global — Nutrition Coach Certification Ireland | REPs Aligned | €750',
+    description: "Ireland's most complete nutrition certification. Science, coaching psychology & business in one. 100+ lessons, lifetime access. €750 or pay in 3.",
     url: 'https://imageft.ie/courses/nutricert',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/logo-dark.jpg', width: 1600, height: 1066, alt: 'NutriCert Global — Nutrition Coach Certification Ireland (REPs Aligned)' }],
     type: 'website',
   },
 }
