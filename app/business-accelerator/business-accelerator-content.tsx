@@ -37,7 +37,7 @@ export default function BusinessAcceleratorContent() {
       <section ref={heroRef} className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/business-coaching.png"
+            src="/business-coaching.webp"
             alt="Fitness Business Accelerator"
             fill
             className="object-cover"

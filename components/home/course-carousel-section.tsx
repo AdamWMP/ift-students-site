@@ -123,7 +123,7 @@ const courses = [
     name: 'Pre & Post Natal',
     shortName: 'Pre/Post Natal',
     description: 'Specialist certification for training pregnant and postpartum clients safely.',
-    image: '/prenatal-fitness.png',
+    image: '/prenatal-fitness.webp',
     href: '/courses/pre-post-natal',
     duration: 'Fully Online',
     level: 'Specialist',

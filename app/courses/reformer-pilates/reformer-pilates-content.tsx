@@ -64,7 +64,7 @@ export default function ReformerPilatesCourseContent() {
       <section ref={heroRef} className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/reformer-pilates.png"
+            src="/reformer-pilates.webp"
             alt="Reformer Pilates Course"
             fill
             className="object-cover"
@@ -282,7 +282,7 @@ export default function ReformerPilatesCourseContent() {
             >
               <div className="aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/reformer-pilates.png"
+                  src="/reformer-pilates.webp"
                   alt="Reformer Pilates Training"
                   fill
                   className="object-cover"

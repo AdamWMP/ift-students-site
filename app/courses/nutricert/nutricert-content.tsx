@@ -339,7 +339,7 @@ export default function NutriCertContent() {
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section ref={heroRef} className="relative pt-24 pb-16 sm:pt-32 sm:pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image src="/nutrition-coaching.png" alt="NutriCert Global — Advanced Nutrition Coaching" fill className="object-cover" priority />
+          <Image src="/nutrition-coaching.webp" alt="NutriCert Global — Advanced Nutrition Coaching" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-charcoal-950/90 via-charcoal-950/80 to-charcoal-950" />
         </div>
         <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6">
