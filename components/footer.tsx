@@ -118,7 +118,7 @@ export default function Footer() {
 
           {/* Pathways */}
           <div>
-            <h4 className="text-white font-semibold text-xs uppercase tracking-wider mb-4">Pathways</h4>
+            <h4 className="text-white font-semibold text-xs uppercase tracking-wider mb-4">Personal Trainer Course Pathways</h4>
             <ul className="space-y-2.5">
               {pathwayLinks.map((link) => (
                 <li key={link.name}>

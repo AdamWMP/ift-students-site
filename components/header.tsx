@@ -23,7 +23,11 @@ const navItems = [
     ],
   },
   {
-    label: 'Pathways',
+    label: 'Personal Trainer Course Pathways',
+    // Parent is now a clickable link: tapping/clicking routes to the top
+    // of the personal-trainer course page; the children dropdown still
+    // works for jumping directly to The Cert / Career / Business anchors.
+    href: '/courses/personal-trainer',
     children: [
       { href: '/courses/personal-trainer#the-cert', label: '⭐ The Cert' },
       { href: '/courses/personal-trainer#the-career', label: '⭐ The Career' },
@@ -102,10 +106,25 @@ export default function Header() {
                     onMouseEnter={() => setOpenDropdown(item?.label ?? null)}
                     onMouseLeave={() => setOpenDropdown(null)}
                   >
-                    <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white/80 hover:text-gold transition-colors">
-                      {item?.label}
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
+                    {/* Parent label: if the item has its own href (e.g.
+                        "Personal Trainer Course Pathways" → /courses/personal-trainer)
+                        render as a Link so clicking the label navigates;
+                        otherwise keep it as a non-navigating button. The
+                        dropdown still opens on hover either way. */}
+                    {(item as { href?: string })?.href ? (
+                      <Link
+                        href={(item as { href: string }).href}
+                        className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white/80 hover:text-gold transition-colors"
+                      >
+                        {item?.label}
+                        <ChevronDown className="w-4 h-4" />
+                      </Link>
+                    ) : (
+                      <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white/80 hover:text-gold transition-colors">
+                        {item?.label}
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                    )}
                     <AnimatePresence>
                       {openDropdown === item?.label && (
                         <motion.div
@@ -215,9 +234,22 @@ export default function Header() {
                 <div key={index}>
                   {item?.children ? (
                     <div className="space-y-1">
-                      <p className="px-4 py-2 text-sm font-medium text-white/50">
-                        {item?.label}
-                      </p>
+                      {/* Mobile: parent label is a Link when the nav item has
+                          its own href (so tapping "Personal Trainer Course Pathways"
+                          routes to /courses/personal-trainer). Otherwise plain text. */}
+                      {(item as { href?: string })?.href ? (
+                        <Link
+                          href={(item as { href: string }).href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block px-4 py-2 text-sm font-semibold text-gold hover:text-white tap-target"
+                        >
+                          {item?.label}
+                        </Link>
+                      ) : (
+                        <p className="px-4 py-2 text-sm font-medium text-white/50">
+                          {item?.label}
+                        </p>
+                      )}
                       {item?.children?.map?.((child, childIndex) => (
                         (child as { external?: boolean })?.external ? (
                           <a
