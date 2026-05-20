@@ -789,7 +789,7 @@ export default function PTCourseContent() {
           {getActiveIntakes().length === 0 && (
             <div className="max-w-5xl mx-auto text-center py-12">
               <p className="text-white/50 mb-4">New intake dates coming soon.</p>
-              <a href="https://wa.me/353866000001?text=Hi!%20When%20is%20the%20next%20PT%20course%20intake?" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white transition-colors text-sm font-medium">
+              <a href="https://wa.me/353866003667?text=Hi!%20When%20is%20the%20next%20PT%20course%20intake?" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white transition-colors text-sm font-medium">
                 Get notified when dates are released →
               </a>
             </div>
@@ -965,7 +965,7 @@ export default function PTCourseContent() {
                 Book a Free Call <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="https://wa.me/353866000001?text=Hi!%20I%27d%20like%20to%20chat%20about%20the%20PT%20course%20options."
+                href="https://wa.me/353866003667?text=Hi!%20I%27d%20like%20to%20chat%20about%20the%20PT%20course%20options."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-outline flex items-center justify-center gap-2 text-sm whitespace-nowrap"
@@ -1214,7 +1214,7 @@ export default function PTCourseContent() {
               Book a Free Call
             </a>
             <a
-              href="https://wa.me/353866000001?text=Hi!%20I%27d%20love%20to%20know%20more%20about%20the%20PT%20course."
+              href="https://wa.me/353866003667?text=Hi!%20I%27d%20love%20to%20know%20more%20about%20the%20PT%20course."
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline inline-flex items-center justify-center gap-2"
@@ -1254,7 +1254,7 @@ function StickyMobileBar() {
           Book a Call
         </a>
         <a
-          href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20PT%20course."
+          href="https://wa.me/353866003667?text=Hi!%20I%27m%20interested%20in%20the%20PT%20course."
           target="_blank"
           rel="noopener noreferrer"
           className="w-12 btn-outline flex items-center justify-center shrink-0 text-sm py-2.5"

@@ -47,7 +47,7 @@ export function CheckoutReturn({ sessionId }: { sessionId?: string }) {
               Back to Home
             </Link>
             <a
-              href="https://wa.me/353866000001"
+              href="https://wa.me/353866003667"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 border border-zinc-700 text-white font-semibold rounded-xl hover:border-zinc-500 transition-colors"

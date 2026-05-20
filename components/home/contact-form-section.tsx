@@ -179,7 +179,7 @@ export default function ContactFormSection() {
                 <span className="text-white/40">or</span>
 
                 <a
-                  href="https://wa.me/353866000001"
+                  href="https://wa.me/353866003667"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-8 py-4 border border-green-500/30 hover:border-green-500 bg-green-500/10 hover:bg-green-500/20 text-white font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-3"

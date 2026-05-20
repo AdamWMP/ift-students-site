@@ -217,7 +217,7 @@ export default function PTTimetableWizard() {
     const schedule = scheduleData?.name ?? ''
     const date = dateData ? formatDate(dateData.date) : ''
     const message = `Hi! I'm interested in the ${pkg} (${schedule}) starting ${date} in ${loc}. Can you tell me more?`
-    return `https://wa.me/353866000001?text=${encodeURIComponent(message)}`
+    return `https://wa.me/353866003667?text=${encodeURIComponent(message)}`
   }
 
   if (!isClient) {

@@ -41,7 +41,7 @@ export default function CTASection() {
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <a
-                  href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20your%20fitness%20courses."
+                  href="https://wa.me/353866003667?text=Hi!%20I%27m%20interested%20in%20your%20fitness%20courses."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-outline flex items-center justify-center gap-2 text-base sm:text-lg"

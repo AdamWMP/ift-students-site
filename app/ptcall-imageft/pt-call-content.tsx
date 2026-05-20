@@ -332,7 +332,7 @@ export default function PtCallContent() {
             />
           </Link>
           <a
-            href="https://wa.me/353866000001?text=Hi%2C%20I%27d%20like%20to%20book%20a%20PT%20strategy%20call."
+            href="https://wa.me/353866003667?text=Hi%2C%20I%27d%20like%20to%20book%20a%20PT%20strategy%20call."
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
@@ -631,12 +631,12 @@ export default function PtCallContent() {
             <p className="text-white/25 text-xs mt-5">
               Or WhatsApp us directly at{' '}
               <a
-                href="https://wa.me/353866000001"
+                href="https://wa.me/353866003667"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gold hover:text-gold/80 transition-colors"
               >
-                +353 86 600 0001
+                +353 86 600 3667
               </a>
             </p>
           </motion.div>

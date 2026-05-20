@@ -24,11 +24,10 @@ import { usePathname } from 'next/navigation'
 import { openBookingModal } from '@/components/booking-modal-root'
 import { track } from '@/lib/meta/events'
 
-// TODO Adam: verify this number. The pilates contact page uses
-// 353866003667; this currently uses 353866000001 (ends in 000001 which
-// looks placeholder-y). Update WHATSAPP_NUMBER below if a different
-// number should answer these messages.
-const WHATSAPP_NUMBER = '353866000001'
+// Canonical IFT WhatsApp number (matches pilates.imageft.ie + all other
+// IFT-group contact properties). Decided 2026-05-20 — Adam consolidated
+// inbound WhatsApp routing to this number.
+const WHATSAPP_NUMBER = '353866003667'
 
 // Pathname → pre-written WhatsApp message. First matching regex wins,
 // so order specific routes before broad ones (e.g. /courses/pilates

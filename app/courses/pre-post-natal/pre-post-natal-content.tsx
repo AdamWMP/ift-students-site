@@ -390,7 +390,7 @@ export default function PrePostNatalContent() {
   const [playingVideo, setPlayingVideo] = useState<number | null>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
 
-  const waLink = "https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20Pre%20%26%20Post%20Natal%20Exercise%20Coaching%20course."
+  const waLink = "https://wa.me/353866003667?text=Hi!%20I%27m%20interested%20in%20the%20Pre%20%26%20Post%20Natal%20Exercise%20Coaching%20course."
 
   return (
     <>

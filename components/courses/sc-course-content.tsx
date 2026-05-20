@@ -125,7 +125,7 @@ export default function SCCourseContent() {
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <a
-                  href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20S%26C%20Course."
+                  href="https://wa.me/353866003667?text=Hi!%20I%27m%20interested%20in%20the%20S%26C%20Course."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-outline flex items-center justify-center gap-2 px-8 py-4"
@@ -419,7 +419,7 @@ export default function SCCourseContent() {
                 Schedule a Call
               </button>
               <a
-                href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20S%26C%20Course."
+                href="https://wa.me/353866003667?text=Hi!%20I%27m%20interested%20in%20the%20S%26C%20Course."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-outline flex items-center gap-2 px-10 py-4"

@@ -47,7 +47,7 @@ export default function FinalCtaSection() {
             BOOK YOUR STRATEGY CALL
           </button>
           <Link
-            href="https://wa.me/353866000001?text=Hi!%20I%27m%20interested%20in%20the%20Personal%20Trainer%20course."
+            href="https://wa.me/353866003667?text=Hi!%20I%27m%20interested%20in%20the%20Personal%20Trainer%20course."
             target="_blank"
             className="w-full btn-outline text-sm tracking-[0.15em] uppercase font-semibold py-4 text-center"
           >

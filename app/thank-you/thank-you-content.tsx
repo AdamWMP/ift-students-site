@@ -221,7 +221,7 @@ function ThankYouInner() {
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <a
-              href="https://wa.me/353866000001?text=Hi!%20I%20just%20submitted%20an%20enquiry%20and%20wanted%20to%20introduce%20myself."
+              href="https://wa.me/353866003667?text=Hi!%20I%20just%20submitted%20an%20enquiry%20and%20wanted%20to%20introduce%20myself."
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline inline-flex items-center justify-center gap-2"
@@ -472,7 +472,7 @@ function ThankYouInner() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://wa.me/353866000001?text=Hi!%20I%20have%20a%20quick%20question%20before%20my%20call."
+                href="https://wa.me/353866003667?text=Hi!%20I%20have%20a%20quick%20question%20before%20my%20call."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-gold inline-flex items-center justify-center gap-2 text-sm tracking-[0.1em] uppercase font-semibold py-4"

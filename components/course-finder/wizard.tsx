@@ -123,7 +123,7 @@ export default function CourseFinderWizard({ data }: { data: WizardData }) {
     const loc = selectedLocationData?.name ?? 'location'
     const date = selectedStartDateData ? new Date(selectedStartDateData?.date ?? Date.now())?.toLocaleDateString?.('en-IE', { month: 'long', day: 'numeric' }) : 'TBD'
     const message = `Hi! I'm interested in the ${pkg} starting ${date} at ${loc}.`
-    return `https://wa.me/353866000001?text=${encodeURIComponent(message)}`
+    return `https://wa.me/353866003667?text=${encodeURIComponent(message)}`
   }
 
   return (
