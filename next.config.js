@@ -271,18 +271,27 @@ const nextConfig = {
         permanent: true,
       },
       {
+        // Phase 9: was permanent:false (307 temp). Google doesn't consolidate
+        // ranking signals through 307. Now 308 perm so stale SERPs drop out.
         source: '/image-x',
         destination: '/',
-        permanent: false,
+        permanent: true,
       },
       {
+        // Phase 9: same fix.
         source: '/comp',
         destination: '/',
-        permanent: false,
+        permanent: true,
       },
       {
         source: '/image-fitness-training-courses/workshops',
         destination: '/courses/personal-trainer',
+        permanent: true,
+      },
+      {
+        // Phase 9: /courses was 404. Redirect to / until hub page in Phase 11.
+        source: '/courses',
+        destination: '/',
         permanent: true,
       },
     ];
