@@ -176,7 +176,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2.5 text-white/50 text-sm">
                 <MapPin className="w-4 h-4 mt-0.5 text-gold/60 flex-shrink-0" />
-                <span className="leading-relaxed">Dublin · Cork · Galway<br />Limerick · Wexford · Belfast</span>
+                <span className="leading-relaxed">Swords · Tallaght · Cork · Galway<br />Tuam · Limerick · Wexford · Derry (Sep 2026)</span>
               </li>
               <li>
                 <a
