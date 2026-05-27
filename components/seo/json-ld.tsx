@@ -10,7 +10,9 @@ export function LocalBusinessJsonLd() {
     alternateName: ['ImageFT', 'IFT', 'Image Fitness Training Global'],
     url: 'https://imageft.ie',
     logo: 'https://imageft.ie/logo-global.png',
-    image: 'https://imageft.ie/og-image.png',
+    // Phase 13 (2026-05-27): updated to canonical share image (per Phase 2
+    // standardisation). Was /og-image.png which was migrated to /logo-dark.jpg.
+    image: 'https://imageft.ie/logo-dark.jpg',
     description: "Ireland's #1 fitness educator. REPs Ireland accredited Personal Trainer, Pilates, Strength & Conditioning, Nutrition and Pre & Post Natal courses. 15+ years experience, 5,000+ graduates.",
     foundingDate: '2008',
     telephone: '+353-1-902-3377',
@@ -25,13 +27,19 @@ export function LocalBusinessJsonLd() {
       addressCountry: 'IE',
       addressRegion: 'Dublin',
     },
+    // Phase 13 (2026-05-27): real operational locations. Was claiming Belfast
+    // (never operational); was missing Swords, Tallaght, Tuam, Derry. Per Phase
+    // 22 verification gate — all cities below appear on the live /locations page.
     areaServed: [
+      { '@type': 'City', name: 'Swords' },
+      { '@type': 'City', name: 'Tallaght' },
       { '@type': 'City', name: 'Dublin' },
       { '@type': 'City', name: 'Cork' },
       { '@type': 'City', name: 'Galway' },
+      { '@type': 'City', name: 'Tuam' },
       { '@type': 'City', name: 'Limerick' },
       { '@type': 'City', name: 'Wexford' },
-      { '@type': 'City', name: 'Belfast' },
+      { '@type': 'City', name: 'Derry' },
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
