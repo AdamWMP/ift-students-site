@@ -202,15 +202,15 @@
   footer a{color:var(--gold);text-decoration:none}
 
   /* accreditation badge logos */
-  .trustbadges{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .blogo{background:#fff;border-radius:10px;padding:7px 12px;height:46px;display:flex;align-items:center;justify-content:center}
-  .blogo img{max-height:30px;width:auto;display:block}
+  .trustbadges{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:360px;margin:0 auto;padding:18px 20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .blogo{background:#fff;border-radius:10px;height:62px;padding:8px 10px;display:flex;align-items:center;justify-content:center}
+  .blogo img{max-height:38px;max-width:100%;width:auto;object-fit:contain;display:block}
   .blogo.eqf{background:rgba(212,168,54,.12);border:1px solid var(--gold);color:var(--gold-bright);font-size:11px;font-weight:700;line-height:1.05;text-align:center;letter-spacing:.5px}
   .blogo.eqf b{display:block;font-size:13px;color:var(--gold-bright)}
   .blogo.gov{background:rgba(212,168,54,.12);border:1px solid var(--gold);color:var(--gold-bright);font-size:9px;font-weight:700;line-height:1.2;text-align:center;letter-spacing:.4px;text-transform:uppercase}
   .blogo.gov b{display:block;font-size:10.5px;color:var(--ink)}
-  .govchip{padding:6px 12px;height:auto}
-  .govchip img{max-height:42px;width:auto;display:block}
+  .govchip{padding:8px 10px}
+  .govchip img{max-height:38px;max-width:100%;width:auto;object-fit:contain;display:block}
   .govchip .govtxt{display:none;flex-direction:column;align-items:center;gap:2px;font-size:9px;font-weight:700;line-height:1.2;letter-spacing:.4px;text-transform:uppercase;color:var(--gold-bright)}
   .govchip .govtxt b{color:var(--ink);font-size:10.5px}
   .govchip.nologo{background:rgba(212,168,54,.12);border:1px solid var(--gold)}
@@ -285,14 +285,14 @@
   <div class="blogo"><img src="/ehfa-logo.webp" alt="EHFA / Ireland Active approved" loading="lazy" decoding="async"></div>
   <div class="blogo"><img src="/skillnet-logo.png" alt="Skillnet Ireland" loading="lazy" decoding="async"></div>
   <div class="blogo govchip" id="govBadge">
-    <img src="/gov-of-ireland.png" alt="Funded by the Government of Ireland" loading="lazy" decoding="async" onerror="document.getElementById('govBadge').classList.add('nologo')">
+    <img src="/gov-of-ireland.svg" alt="Funded by the Government of Ireland" loading="lazy" decoding="async" onerror="document.getElementById('govBadge').classList.add('nologo')">
     <span class="govtxt">Government of Ireland<b>Funded</b></span>
   </div>
 </div>
 
 <!-- ============ IDENTITY STATEMENT ============ -->
 <section class="wrap statement">
-  <p>Stop taking the class.<br><span class="g">Become the one running it.</span></p>
+  <p>Stop getting coached.<br><span class="g">Become the coach.</span></p>
 </section>
 
 <!-- ============ TUTOR AUTHORITY ============ -->
