@@ -296,6 +296,12 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Ad landing page served from public/pt-course-2026.html at a clean URL
+      { source: '/pt-course-2026', destination: '/pt-course-2026.html' },
+    ];
+  },
 };
 
 module.exports = nextConfig;

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Become a Personal Trainer in Ireland | Image Fitness Training</title>
+<meta name="description" content="REPs Ireland accredited, EQF Level 4 PT course. 16 years, 5,000+ graduates. Book a free 15-min strategy call.">
+<meta name="robots" content="index, follow">
+
+<!--
+  IFT INSTANT-LOAD AD LANDING PAGE  (Flow B — direct-click PT course page)
+  Built to IFT_PT_LandingPage_Spec_May2026.md + verified against imageft.ie (May 2026).
+  ----------------------------------------------------------------------------------
+  REAL DATA WIRED IN:
+    • Brand tokens from the live IFT site (#0a0a0a / gold #D4A836 / Inter, dark luxury)
+    • OnceHub PT calendar: data-oh-booking-calendar-id="BKC-PDJR9D0K6W" (cal/embed.js)
+    • WhatsApp business number: 353866003667
+    • Phone: +353 1 902 3377   ·   Accreditation: REPs Ireland · EHFA · Skillnet · EQF L4
+    • Trust: 16 years · 5,000+ graduates   ·   Pathways: The Cert / The Career / The Business
+
+  CTA hierarchy (per your instruction — calendar friction-free, form NOT a gate):
+    1. PRIMARY   — Book a 15-min call  -> OnceHub   -> Pixel `Schedule`
+    2. SECONDARY — WhatsApp (sticky)   -> wa.me      -> Pixel `ContactWhatsapp`
+    3. TERTIARY  — small opt-in form   -> your CRM   -> Pixel `Lead` + CAPI (fallback only)
+
+  HERO MESSAGE-MATCH: ?utm_content=<key> swaps the H1/subhead to match the ad (A-G).
+  ASAI: no income figures, no "guaranteed job", pricing stays vague (set on the call).
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.oncehub.com" crossorigin>
+<link rel="dns-prefetch" href="https://connect.facebook.net">
+<link rel="stylesheet" media="print" onload="this.media='all'"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+
+<style>
+  :root{
+    --bg:#0a0a0a; --card:#161616; --card-2:#1f1f1f;
+    --ink:#f5f5f5; --ink-dim:#9a9a9a; --line:#2a2a2a;
+    --gold:#D4A836; --gold-bright:#E8BC4A;
+    --green:#1f7a3d;
+    --body:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+    --maxw:580px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);
+    line-height:1.5;font-size:17px;padding-bottom:86px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+  h1{font-size:clamp(32px,8.6vw,44px);line-height:1.04;font-weight:800;letter-spacing:-.5px;margin:0 0 14px}
+  h2{font-size:clamp(22px,5.6vw,28px);line-height:1.1;font-weight:800;letter-spacing:-.3px;margin:0 0 18px}
+  h3{font-weight:700}
+  .gold{color:var(--gold)}
+  .dim{color:var(--ink-dim)}
+  a{color:inherit}
+  .ambient{position:fixed;inset:0;pointer-events:none;z-index:-1;
+    background:radial-gradient(ellipse 70% 45% at 50% 0%,rgba(212,168,54,.09),transparent 60%)}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:24px 0 30px;text-align:center}
+  .logo{height:30px;width:auto;margin:0 auto 16px;display:block}
+  .accred{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold);
+    font-weight:600;margin-bottom:18px}
+  .hero-sub{font-size:17px;color:var(--ink-dim);max-width:460px;margin:0 auto 8px}
+  .trustline{font-size:12.5px;color:var(--ink-dim);letter-spacing:.4px;margin:14px auto 22px}
+  .hero-photo{width:100%;max-width:480px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;
+    margin:6px auto 0;display:block;background:#15140f}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+    padding:17px 20px;border-radius:12px;border:none;cursor:pointer;
+    font-family:var(--body);font-weight:700;font-size:18px;text-decoration:none;
+    transition:transform .08s ease,filter .15s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn-gold{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#1a1200;
+    box-shadow:0 6px 20px rgba(212,168,54,.22)}
+  .btn-gold:hover{filter:brightness(1.05)}
+  .btn-wa{background:var(--green);color:#fff}
+  .btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn-row{display:flex;gap:10px;max-width:460px;margin:0 auto}
+  .btn-row .btn{font-size:16px}
+  .cta-note{font-size:13px;color:var(--ink-dim);margin-top:10px;text-align:center}
+
+  section{padding:34px 0;border-top:1px solid var(--line)}
+  .eyebrow{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
+
+  /* trust bar */
+  .trust{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;justify-content:center;padding:20px 0}
+  .trust span{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-dim);font-weight:600}
+
+  /* pathway */
+  .steps{display:grid;gap:12px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+  .step .num{flex:0 0 30px;height:30px;border-radius:8px;background:rgba(212,168,54,.12);color:var(--gold);
+    display:grid;place-items:center;font-weight:800;font-size:15px}
+  .step b{display:block;margin-bottom:2px}
+  .step p{font-size:14.5px;color:var(--ink-dim)}
+
+  /* tutors + grads */
+  .people{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .person{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .person .ph{width:56px;height:56px;border-radius:50%;background:#222 center/cover;margin-bottom:10px;border:1px solid var(--line)}
+  .person .q{font-size:14.5px;font-style:italic;margin-bottom:10px}
+  .person .n{font-size:12.5px;color:var(--gold);font-weight:600}
+  .stars{color:var(--gold);font-size:12px;letter-spacing:2px;margin-top:4px}
+
+  /* graduate video rail (lazy facade — posters only until tapped) */
+  .grad-rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+    padding:2px 20px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .grad-rail::-webkit-scrollbar{display:none}
+  .gv{flex:0 0 62%;max-width:270px;scroll-snap-align:center;position:relative;
+    border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:9/16;cursor:pointer}
+  .gv .poster{width:100%;height:100%;object-fit:cover;opacity:.82;display:block}
+  .gv .play{position:absolute;inset:0;display:grid;place-items:center;transition:background .15s}
+  .gv:hover .play{background:rgba(0,0,0,.15)}
+  .gv .circle{width:54px;height:54px;border-radius:50%;background:var(--gold);display:grid;place-items:center;box-shadow:0 4px 18px rgba(0,0,0,.5)}
+  .gv .circle::after{content:"";border-style:solid;border-width:10px 0 10px 17px;border-color:transparent transparent transparent #1a1200;margin-left:4px}
+  .gv .meta{position:absolute;left:12px;bottom:10px;text-shadow:0 2px 8px #000;pointer-events:none}
+  .gv .meta b{font-size:14px;display:block}
+  .gv .meta span{font-size:11.5px;color:var(--gold-bright)}
+  .gv video{width:100%;height:100%;object-fit:cover;background:#000;display:block}
+  .rail-hint{font-size:12.5px;color:var(--ink-dim);padding:0 20px 4px}
+
+  /* 3-package compare */
+  .pkgs{display:grid;gap:12px}
+  .pkg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .pkg.feat{border-color:var(--gold);box-shadow:0 0 0 1px rgba(212,168,54,.25)}
+  .pkg .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .pkg .name{font-weight:800;font-size:18px}
+  .pkg .len{font-size:12px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .pkg p{font-size:14.5px;color:var(--ink-dim)}
+  .pkg .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:#1a1200;background:var(--gold);border-radius:6px;padding:2px 8px;margin-bottom:8px}
+
+  /* comparison video (click-to-play, no heavy autoload) */
+  .video-card{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:#000 center/cover;aspect-ratio:16/9;cursor:pointer;margin-top:6px}
+  .video-card .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
+  .video-card .play{position:absolute;inset:0;display:grid;place-items:center}
+  .video-card .play .circle{width:64px;height:64px;border-radius:50%;background:var(--gold);
+    display:grid;place-items:center;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+  .video-card .play .circle::after{content:"";border-style:solid;border-width:12px 0 12px 20px;
+    border-color:transparent transparent transparent #1a1200;margin-left:5px}
+  .video-card .label{position:absolute;left:14px;bottom:12px;font-weight:700;font-size:15px;text-shadow:0 2px 8px #000}
+
+  /* booking */
+  #book{scroll-margin-top:10px}
+  .cal-shell{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:640px}
+  .cal-head{background:var(--card);border:1px solid var(--line);border-bottom:none;border-radius:12px 12px 0 0;
+    padding:14px 18px;display:flex;align-items:center;gap:12px}
+  .cal-head .ic{width:34px;height:34px;border-radius:9px;background:rgba(212,168,54,.15);border:1px solid rgba(212,168,54,.25);
+    display:grid;place-items:center;color:var(--gold);font-size:16px}
+  .cal-placeholder{display:grid;place-items:center;min-height:640px;text-align:center;padding:30px;cursor:pointer;color:#1a1200;background:#fafafa}
+  .cal-placeholder .big{font-weight:800;font-size:20px;margin-bottom:6px}
+  .cal-placeholder .sub{font-size:13px;color:#555}
+  #calMount{min-height:1px}
+  .cal-hint{display:none;align-items:center;justify-content:center;gap:8px;margin-top:12px;
+    background:rgba(212,168,54,.12);border:1px solid rgba(212,168,54,.35);color:var(--gold-bright);
+    border-radius:999px;padding:11px 16px;font-size:14px;font-weight:600;text-align:center}
+  .cal-hint.show{display:flex;animation:hintIn .35s ease both}
+  .cal-hint i{font-style:normal;display:inline-block;animation:arrowBob 1.3s ease-in-out infinite}
+  @keyframes hintIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes arrowBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+  /* opt-in form (tertiary) */
+  .formbox{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:18px}
+  .formbox h3{font-size:16px;margin-bottom:4px}
+  .formbox p.s{font-size:13px;color:var(--ink-dim);margin-bottom:14px}
+  .field{margin-bottom:10px}
+  .field-row{display:flex;gap:10px}
+  .field-row .field{flex:1;margin-bottom:10px}
+  .field input{width:100%;padding:13px;border-radius:10px;border:1px solid var(--line);
+    background:#0a0a0a;color:var(--ink);font-size:16px;font-family:var(--body)}
+  .field input:focus{outline:none;border-color:var(--gold)}
+  .consent{font-size:11.5px;color:var(--ink-dim);display:flex;gap:8px;align-items:flex-start;margin:4px 0 12px}
+  .formbox .ok{display:none;color:var(--gold);font-weight:600;font-size:15px;text-align:center;padding:8px 0}
+
+  /* FAQ */
+  details{border-bottom:1px solid var(--line);padding:15px 0}
+  summary{cursor:pointer;font-weight:600;font-size:16px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--gold);font-size:22px;line-height:1}
+  details[open] summary::after{content:"–"}
+  details p{padding-top:10px;color:var(--ink-dim);font-size:15px}
+
+  /* whatsapp inline */
+  .wa-inline{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center}
+  .wa-inline p{margin-bottom:12px;color:var(--ink-dim);font-size:15px}
+
+  /* sticky bar */
+  .stickybar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(10,10,10,.94);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+  .stickybar .btn{font-size:16px;padding:14px}
+  .stickybar .btn-wa{flex:0 0 56px;gap:0;padding:14px 0}
+
+  footer{padding:28px 0 22px;text-align:center;color:var(--ink-dim);font-size:13px}
+  footer .locs{margin:12px 0;line-height:1.8;font-size:12.5px}
+  footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <img class="logo" id="brandLogo" alt="Image Fitness Training" src="/pt-course-2026-logo.png" onerror="this.style.display='none'">
+    <div class="accred">REPs Ireland Accredited · EQF Level 4</div>
+    <h1 id="heroH1">Become a qualified Personal Trainer in Ireland.</h1>
+    <p class="hero-sub" id="heroSub">Hands-on, accredited, and built around your schedule. Book a free 15-minute call and we'll map your fastest route to qualified.</p>
+    <div class="trustline">16 years · 5,000+ graduates · locations nationwide</div>
+    <a href="#book" class="btn btn-gold" data-cta="hero-book">Book my free 15-min call →</a>
+    <p class="cta-note">No pressure — we walk you through your options and you decide what fits.</p>
+    <img class="hero-photo" id="heroPhoto" alt="" loading="eager" decoding="async" src="" onerror="this.style.display='none'">
+  </div>
+</header>
+
+<!-- ============ TRUST BAR ============ -->
+<div class="trust wrap" role="img" aria-label="Accreditations">
+  <span>REPs Ireland</span><span>EHFA Approved</span><span>Skillnet Ireland</span><span>EQF Level 4</span>
+</div>
+
+<!-- ============ 3-STEP PATHWAY ============ -->
+<section class="wrap">
+  <div class="eyebrow">How it works</div>
+  <h2>Three steps to a real career</h2>
+  <div class="steps">
+    <div class="step"><span class="num">1</span><div><b>Enrol</b><p>8-week Cert, or the longer Career &amp; Business pathways. Online + in-person options.</p></div></div>
+    <div class="step"><span class="num">2</span><div><b>Train</b><p>Real coaching hours, real tutors, real curriculum — to the EQF Level 4 standard.</p></div></div>
+    <div class="step"><span class="num">3</span><div><b>Career</b><p>Qualify job-ready. Work in any gym — or build your own business.</p></div></div>
+  </div>
+</section>
+
+<!-- ============ TUTOR AUTHORITY ============ -->
+<section class="wrap">
+  <div class="eyebrow">Who teaches you</div>
+  <h2>Tutors who've done it themselves</h2>
+  <div class="people">
+    <div class="person"><div class="ph" id="tutorGary"></div><p class="q">"I sat in this exact chair 16 years ago. It's the best decision I've ever made."</p><p class="n">Gary — IFT Tutor, 16 years</p></div>
+    <div class="person"><div class="ph" id="tutorShane"></div><p class="q">"What separates this course from the others? The people behind it."</p><p class="n">Shane — IFT Tutor</p></div>
+  </div>
+</section>
+
+<!-- ============ GRADUATE PROOF (real video testimonials, lazy) ============ -->
+<section class="wrap" style="padding-bottom:14px">
+  <div class="eyebrow">Real graduates</div>
+  <h2>Hear it from people who did it</h2>
+</section>
+<p class="rail-hint">Real graduates, real stories — tap any video to play. ›</p>
+<div class="grad-rail" id="gradRail" aria-label="Graduate video testimonials"></div>
+
+<!-- ============ 3-PACKAGE COMPARISON + VIDEO ============ -->
+<section class="wrap">
+  <div class="eyebrow">Compare the pathways</div>
+  <h2>Pick the path that fits your goal</h2>
+
+  <!-- Comparison video: click-to-play. The raw file is ~440MB, far too heavy to
+       inline. Host it (YouTube/Vimeo or a compressed MP4) and set CFG.comparisonVideoUrl. -->
+  <div class="video-card" id="videoCard" role="button" tabindex="0" aria-label="Play the package comparison video">
+    <img class="poster" id="videoPoster" alt="" src="" onerror="this.style.display='none'">
+    <div class="play"><div class="circle"></div></div>
+    <div class="label">Watch: which package is right for you?</div>
+  </div>
+
+  <div class="pkgs" style="margin-top:14px">
+    <div class="pkg"><div class="top"><span class="name">The Cert</span><span class="len">8 weeks</span></div>
+      <p>Qualify as a personal trainer to the EQF Level 4 standard. The fastest route to qualified.</p></div>
+    <div class="pkg feat"><span class="tag">Most popular</span><div class="top"><span class="name">The Career</span><span class="len">Qual + placement</span></div>
+      <p>Everything in The Cert — and finish with a merit or distinction to unlock placement opportunities across our network of gym partners. Many get offers before they graduate.</p></div>
+    <div class="pkg"><div class="top"><span class="name">The Business</span><span class="len">24 weeks</span></div>
+      <p>Our most comprehensive pathway — qualify, then learn to build and run your own fitness business.</p></div>
+  </div>
+  <p class="cta-note">Not sure which one? That's exactly what the free call is for.</p>
+</section>
+
+<!-- ============ PRIMARY CTA — ONCEHUB (deferred) ============ -->
+<section class="wrap" id="book">
+  <div class="eyebrow">The next step</div>
+  <h2>Book your free 15-min strategy call</h2>
+  <p class="dim" style="font-size:15px;margin:-6px 0 16px">We'll walk you through every course and package coming up — then put the ball in your court. No pressure to commit: you decide what suits you best, with the full picture in front of you.</p>
+  <div class="cal-head"><span class="ic">📅</span><div><b>Available today</b><div class="dim" style="font-size:12.5px">15-minute call · no obligation</div></div></div>
+  <div class="cal-shell" style="border-radius:0 0 16px 16px">
+    <div class="cal-placeholder" id="calPlaceholder">
+      <div>
+        <div class="big">Tap to load the calendar</div>
+        <div class="sub">We'll talk you through the upcoming courses and packages — you decide what fits.</div>
+      </div>
+    </div>
+    <div id="calMount"></div>
+  </div>
+  <div class="cal-hint" id="calHint" aria-hidden="true"><span>Picked a date? Scroll down to choose your time</span><i>↓</i></div>
+</section>
+
+<!-- ============ TERTIARY — SMALL OPT-IN FORM (tracking backstop) ============ -->
+<section class="wrap">
+  <div class="formbox">
+    <h3>Prefer we call you?</h3>
+    <p class="s">Leave your details and the team will be in touch — no need to pick a slot now.</p>
+    <form id="leadForm" novalidate>
+      <div class="field-row">
+        <div class="field"><input type="text" id="lf_first" name="first_name" placeholder="First name" autocomplete="given-name" required></div>
+        <div class="field"><input type="text" id="lf_last" name="last_name" placeholder="Last name" autocomplete="family-name" required></div>
+      </div>
+      <div class="field"><input type="tel" id="lf_phone" name="phone" placeholder="Mobile number" autocomplete="tel" inputmode="tel" required></div>
+      <div class="field"><input type="email" id="lf_email" name="email" placeholder="Email" autocomplete="email" required></div>
+      <label class="consent"><input type="checkbox" id="lf_consent" required><span>I'm happy for Image Fitness Training to contact me about the course.</span></label>
+      <button type="submit" class="btn btn-outline" data-cta="lead-submit">Request a callback</button>
+    </form>
+    <div class="ok" id="leadOk">✓ Got it — the team will be in touch shortly.</div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="wrap">
+  <div class="eyebrow">Questions</div>
+  <h2>Straight answers</h2>
+  <details><summary>How long does the course take?</summary><p>The Cert is an 8-week qualification. The Career and Business pathways run longer, but all qualify you to the same EQF Level 4 standard.</p></details>
+  <details><summary>Do I need to be fit or experienced already?</summary><p>No. Every cohort includes complete beginners. The course teaches anatomy, programming and coaching from the ground up.</p></details>
+  <details><summary>What does it cost — and can I pay in instalments?</summary><p>Payment plans are available. We'll walk you through the options and find what works for you on the call.</p></details>
+  <details><summary>Will I actually get clients after I qualify?</summary><p>IFT has 200+ active hiring partners across Ireland. Graduate with a merit or distinction and you unlock placement opportunities with our network of gym partners — many students receive offers during placement, before they've even graduated.</p></details>
+  <details><summary>Is the qualification recognised?</summary><p>Yes — a REPs Ireland approved PT qualification at EQF Level 4, also EHFA approved and Skillnet Ireland supported.</p></details>
+</section>
+
+<!-- ============ WHATSAPP INLINE ============ -->
+<section class="wrap">
+  <div class="wa-inline">
+    <p>Faster than a call? Message us directly.</p>
+    <a href="#" class="btn btn-wa" id="waInline" data-cta="inline-whatsapp" target="_blank" rel="noopener">Message us on WhatsApp</a>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA + FOOTER ============ -->
+<section class="wrap" style="text-align:center">
+  <h2>Ready to find out if it's for you?</h2>
+  <p class="dim" style="margin-bottom:18px">16 years · 5,000+ graduates · locations nationwide</p>
+  <a href="#book" class="btn btn-gold" data-cta="final-book">Book my free 15-min call →</a>
+</section>
+
+<footer class="wrap">
+  <div>Image Fitness Training · REPs Ireland Accredited · 16 years</div>
+  <div class="locs">Swords · Tallaght · Cork · Galway · Limerick · Wexford · Derry (Sep 2026)</div>
+  <div><a href="tel:+35319023377">+353 1 902 3377</a></div>
+</footer>
+
+<!-- ============ STICKY MOBILE BAR ============ -->
+<div class="stickybar">
+  <a href="#book" class="btn btn-gold" data-cta="sticky-book">Book a call</a>
+  <a href="#" class="btn btn-wa" id="waSticky" data-cta="sticky-whatsapp" aria-label="Message us on WhatsApp" target="_blank" rel="noopener">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.715zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>
+  </a>
+</div>
+
+<script>
+/* =========================================================================
+   CONFIG — verified IFT values pre-filled. Set pixelId + (optionally) the
+   comparison video URL and CRM endpoint before launch.
+   ========================================================================= */
+var CFG = {
+  // Primary CTA — OnceHub PT strategy-call calendar (from the live imageft.ie page)
+  onceHubCalendarId: "BKC-PDJR9D0K6W",
+
+  // Secondary CTA — WhatsApp business number (verified)
+  whatsappNumber: "353866003667",
+  whatsappText:   "Hi, I'd like to know more about the PT course. I saw your ad on {src}.",
+
+  // Comparison video — self-hosted, web-compressed MP4. Click-to-play only:
+  // nothing downloads until the user taps the thumbnail (preload="none").
+  comparisonVideoUrl: "/videos/pt-course-2026-comparison.mp4",
+  comparisonPoster:   "/videos/pt-course-2026-comparison-poster.jpg",
+
+  // Tracking
+  pixelId:       "REPLACE_WITH_PIXEL_ID",
+  ga4Id:         "",
+  leadEndpoint:  ""                  // your CRM/CAPI receiver (fires server-side Lead w/ same event_id)
+};
+
+/* Real graduate video testimonials — sources from the live site (results-wall).
+   Hosted on Shopify CDN. Posters load lazily; the MP4 streams ONLY on tap.
+   TODO: replace generic name/role with real first name + location (stronger proof
+   + ASAI requires identifiable, consented graduates). */
+var GRAD_VIDEOS = [
+  {src:"https://cdn.shopify.com/videos/c/vp/bbce677bd33c4c79b88f33a890df9fda/bbce677bd33c4c79b88f33a890df9fda.HD-720p-4.5Mbps-72028946.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/bbce677bd33c4c79b88f33a890df9fda.thumbnail.0000000000.jpg?v=1770650570&width=608&height=1080", name:"Graduate Story", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/e26ef2f596d3457e9dfb9cc9c7591bb3/e26ef2f596d3457e9dfb9cc9c7591bb3.HD-720p-1.6Mbps-72029079.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/e26ef2f596d3457e9dfb9cc9c7591bb3.thumbnail.0000000000.jpg?v=1770650532&width=608&height=1080", name:"Success Story", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/b50cb1d575fe452d8f52b52bfce01f60/b50cb1d575fe452d8f52b52bfce01f60.HD-720p-1.6Mbps-72029338.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/b50cb1d575fe452d8f52b52bfce01f60.thumbnail.0000000000.jpg?v=1770650611&width=608&height=1080", name:"Career Change", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/a61c35b3b0dc46a090dba0ab11449050/a61c35b3b0dc46a090dba0ab11449050.HD-720p-1.6Mbps-72029306.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/a61c35b3b0dc46a090dba0ab11449050.thumbnail.0000000000.jpg?v=1770650624&width=608&height=1080", name:"Transformation", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/743d958e9f5d4af2b72fa476dd6dd3fa/743d958e9f5d4af2b72fa476dd6dd3fa.HD-720p-1.6Mbps-72029278.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/743d958e9f5d4af2b72fa476dd6dd3fa.thumbnail.0000000000.jpg?v=1770650588&width=608&height=1080", name:"Dream Job", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/ed62a2c6bcbb4e78af243abdf00a9a75/ed62a2c6bcbb4e78af243abdf00a9a75.HD-720p-1.6Mbps-72028963.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/ed62a2c6bcbb4e78af243abdf00a9a75.thumbnail.0000000000.jpg?v=1770650509&width=608&height=1080", name:"New Career", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/1a10facb055a42d5b2fb4f4e9fd4457b/1a10facb055a42d5b2fb4f4e9fd4457b.HD-720p-1.6Mbps-72029063.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/1a10facb055a42d5b2fb4f4e9fd4457b.thumbnail.0000000000.jpg?v=1770650543&width=608&height=1080", name:"Life Changed", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/03aa338aaedb43f1ade5c1e75e811b7c/03aa338aaedb43f1ade5c1e75e811b7c.HD-720p-1.6Mbps-72029047.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/03aa338aaedb43f1ade5c1e75e811b7c.thumbnail.0000000000.jpg?v=1770650569&width=608&height=1080", name:"Success", role:"PT Graduate"}
+];
+
+/* Hero message-match: utm_content -> variant. Copy is from the PT LP spec §6. */
+var HERO = {
+  A:{h1:"Become a qualified Personal Trainer in Ireland.", sub:"Hands-on, accredited, and built around your schedule. Book a free 15-minute call and we'll map your fastest route to qualified."},
+  B:{h1:"Career in fitness? Pick up the phone.", sub:"A 15-minute call. No pressure. Find out if it fits you."},
+  C:{h1:"Behind this door is a 16-year career.", sub:"The course Gary did. The course Gary now teaches. Next intake starting soon."},
+  D:{h1:"Why I started — and why I'm still here.", sub:"16 years in the industry. Same course. Same conviction."},
+  E:{h1:"Your 9-to-5 isn't the only option.", sub:"A real career, not a side hustle. Next PT intake starting soon."},
+  F:{h1:"Who is this PT course really for?", sub:"Spoiler: probably you. 8–16 weeks to qualified."},
+  G:{h1:"What separates Image from the other courses?", sub:"A tutor with 16 years in the room. Hear it from people who've done both."}
+};
+var UTM_TO_VARIANT = {
+  "gary-dont-become-pt":"A","gary-pick-up-phone":"B","gary-behind-door":"C","gary-sat-in-chair":"C",
+  "gary-crohns":"D","career-switch-male":"E","shane-who-its-for":"F","shane-need-fit":"F","shane-vs-others":"G"
+};
+
+function qs(k){return new URLSearchParams(location.search).get(k);}
+function genId(){return 'lead_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);}
+function fbq_(){ if(window.fbq) try{fbq.apply(null,arguments);}catch(e){} }
+function ga_(n,p){ if(window.gtag) try{gtag('event',n,p||{});}catch(e){} }
+
+/* hero variant select */
+var variant = UTM_TO_VARIANT[(qs('utm_content')||'').toLowerCase()] || 'A';
+document.getElementById('heroH1').textContent = HERO[variant].h1;
+document.getElementById('heroSub').textContent = HERO[variant].sub;
+
+/* ---------- META PIXEL (async, doesn't block paint) ---------- */
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+if(CFG.pixelId && CFG.pixelId.indexOf('REPLACE')<0){
+  fbq_('init', CFG.pixelId);
+  fbq_('track','PageView');
+  fbq_('track','ViewContent',{content_name:'pt-course-LP', content_category:'PT'});
+}
+
+/* ---------- GA4 (optional) ---------- */
+if(CFG.ga4Id){
+  var g=document.createElement('script');g.async=true;g.src='https://www.googletagmanager.com/gtag/js?id='+CFG.ga4Id;
+  document.head.appendChild(g);window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};
+  gtag('js',new Date());gtag('config',CFG.ga4Id);
+}
+
+/* ---------- WhatsApp deep links + ContactWhatsapp event ---------- */
+(function(){
+  var src=qs('utm_source')||'social';
+  var text=CFG.whatsappText.replace('{src}',src);
+  var href='https://wa.me/'+CFG.whatsappNumber+'?text='+encodeURIComponent(text);
+  function wire(el){ if(!el) return; el.href=href; el.addEventListener('click',function(){
+    fbq_('trackCustom','ContactWhatsapp',{utm_source:src});
+    ga_('whatsapp_click',{utm_source:src});
+  });}
+  wire(document.getElementById('waSticky'));
+  wire(document.getElementById('waInline'));
+})();
+
+/* ---------- OnceHub: deferred load (idle / scroll / tap) ---------- */
+var calLoaded=false;
+function loadScheduler(){
+  if(calLoaded) return; calLoaded=true;
+  var ph=document.getElementById('calPlaceholder'); if(ph) ph.style.display='none';
+  var d=document.createElement('div');
+  d.setAttribute('data-oh-booking-calendar-id', CFG.onceHubCalendarId);
+  d.style.minWidth='320px'; d.style.height='640px';
+  document.getElementById('calMount').appendChild(d);
+  if(!document.querySelector('script[src="https://cdn.oncehub.com/cal/embed.js"]')){
+    var s=document.createElement('script');s.async=true;
+    s.src='https://cdn.oncehub.com/cal/embed.js';document.body.appendChild(s);
+  }
+  revealCalHint();
+}
+
+/* "Scroll down to pick your time" nudge. The OnceHub calendar is a cross-domain
+   iframe, so we can't see the in-iframe date click — instead we surface the hint
+   shortly after the calendar is live (when the user is choosing a date) and
+   auto-dismiss it once they scroll, so it never nags. */
+var calHintReady=false, calHintDismissed=false;
+function showCalHint(){
+  if(calHintDismissed || !calHintReady) return;
+  var h=document.getElementById('calHint'); if(h) h.classList.add('show');
+}
+function dismissCalHint(){
+  calHintDismissed=true;
+  var h=document.getElementById('calHint'); if(h) h.classList.remove('show');
+}
+function revealCalHint(){
+  var hint=document.getElementById('calHint'); if(!hint) return;
+  calHintReady=true;
+  // Timed fallback (in case OnceHub posts no interaction message)…
+  setTimeout(showCalHint, 2200);
+  // …but prefer to pop it the moment the user interacts with the calendar:
+  // any postMessage from the OnceHub iframe (e.g. content change after a date
+  // is picked) triggers it — see the OnceHub message listener below.
+  var startY=window.scrollY;
+  function onScroll(){ if(Math.abs(window.scrollY-startY)>120){ dismissCalHint(); window.removeEventListener('scroll',onScroll); } }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  hint.addEventListener('click',dismissCalHint);
+}
+document.getElementById('calPlaceholder').addEventListener('click',loadScheduler);
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){ if(e.isIntersecting){loadScheduler();io.disconnect();}});},{rootMargin:'250px'});
+  io.observe(document.getElementById('book'));
+}
+Array.prototype.forEach.call(document.querySelectorAll('[data-cta$="book"]'),function(b){ b.addEventListener('click',loadScheduler); });
+
+/* OnceHub booking -> Pixel `Schedule` (best-effort from iframe postMessage).
+   GUARANTEED signal: set the Meta Pixel inside OnceHub (account -> Integrations
+   -> Facebook Pixel, same Pixel ID) so Schedule fires on its confirmation step. */
+window.addEventListener('message',function(e){
+  if(typeof e.origin==='string' && /oncehub\.com|scheduleonce\.com/i.test(e.origin)){
+    // Any interaction inside the calendar surfaces the "scroll for times" hint.
+    showCalHint();
+    var blob = (typeof e.data==='string') ? e.data : JSON.stringify(e.data||'');
+    if(/booking|scheduled|confirm/i.test(blob)){
+      dismissCalHint();
+      fbq_('track','Schedule',{content_name:'pt-course-LP', content_category:'PT'});
+      ga_('oncehub_book',{});
+    }
+  }
+});
+
+/* ---------- Graduate video rail: posters now, MP4 only on tap ---------- */
+(function(){
+  var rail=document.getElementById('gradRail'); if(!rail) return;
+  GRAD_VIDEOS.forEach(function(v){
+    var card=document.createElement('div'); card.className='gv'; card.setAttribute('role','button'); card.tabIndex=0;
+    card.setAttribute('aria-label','Play '+v.name+' testimonial');
+    var img=new Image(); img.className='poster'; img.loading='lazy'; img.decoding='async'; img.alt=''; img.src=v.poster;
+    img.onerror=function(){ card.style.background='#161616'; };
+    var play=document.createElement('div'); play.className='play'; play.innerHTML='<div class="circle"></div>';
+    var meta=document.createElement('div'); meta.className='meta'; meta.innerHTML='<b>'+v.name+'</b><span>'+v.role+'</span>';
+    card.appendChild(img); card.appendChild(play); card.appendChild(meta);
+    function go(){
+      var vid=document.createElement('video');
+      vid.src=v.src; vid.controls=true; vid.autoplay=true; vid.playsInline=true; vid.setAttribute('playsinline','');
+      vid.preload='auto';
+      card.innerHTML=''; card.appendChild(vid); card.style.cursor='default';
+      var p=vid.play(); if(p&&p.catch) p.catch(function(){});
+      fbq_('trackCustom','VideoPlay',{name:'grad-testimonial'}); ga_('video_play',{name:'grad-testimonial'});
+    }
+    card.addEventListener('click',go);
+    card.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); }});
+    rail.appendChild(card);
+  });
+})();
+
+/* ---------- Comparison video: click-to-play (keeps first paint instant) ---------- */
+(function(){
+  var card=document.getElementById('videoCard');
+  if(!CFG.comparisonVideoUrl){ if(card) card.style.display='none'; return; }
+  if(CFG.comparisonPoster) document.getElementById('videoPoster').src=CFG.comparisonPoster;
+  var isMp4=/\.mp4($|\?)/i.test(CFG.comparisonVideoUrl);
+  function play(){
+    var el;
+    if(isMp4){
+      el=document.createElement('video');
+      el.src=CFG.comparisonVideoUrl; el.controls=true; el.autoplay=true; el.playsInline=true;
+      el.setAttribute('playsinline',''); el.preload='auto';
+      if(CFG.comparisonPoster) el.poster=CFG.comparisonPoster;
+      el.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000';
+      card.innerHTML=''; card.appendChild(el);
+      var p=el.play(); if(p&&p.catch) p.catch(function(){});
+    } else {
+      el=document.createElement('iframe');
+      el.src=CFG.comparisonVideoUrl; el.allow='autoplay; fullscreen'; el.setAttribute('allowfullscreen','');
+      el.style.cssText='position:absolute;inset:0;border:0;width:100%;height:100%';
+      card.innerHTML=''; card.appendChild(el);
+    }
+    fbq_('trackCustom','VideoPlay',{name:'package-comparison'}); ga_('video_play',{name:'package-comparison'});
+  }
+  card.addEventListener('click',play);
+  card.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); play(); }});
+})();
+
+/* ---------- Opt-in form: Pixel `Lead` (client) + CAPI (server) shared event_id ---------- */
+document.getElementById('leadForm').addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var first=document.getElementById('lf_first').value.trim();
+  var last=document.getElementById('lf_last').value.trim();
+  var phone=document.getElementById('lf_phone').value.trim();
+  var email=document.getElementById('lf_email').value.trim();
+  if(!first || !last){ alert('Please add your first and last name.'); return; }
+  if(phone.replace(/\D/g,'').length<7){ alert('Please add a valid mobile number.'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Please add a valid email address.'); return; }
+  if(!document.getElementById('lf_consent').checked){ alert('Please tick the consent box so we can contact you.'); return; }
+
+  var eventId=genId();
+  fbq_('track','Lead',{content_name:'pt-course-LP', content_category:'PT'}, {eventID:eventId});
+  ga_('generate_lead',{});
+
+  if(CFG.leadEndpoint){
+    fetch(CFG.leadEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({first_name:first,last_name:last,name:first+' '+last,phone:phone,email:email,event_id:eventId,
+        hero_variant:variant,
+        utm_source:qs('utm_source'),utm_medium:qs('utm_medium'),utm_campaign:qs('utm_campaign'),
+        utm_content:qs('utm_content'),utm_term:qs('utm_term'),
+        fbclid:qs('fbclid'),gclid:qs('gclid'),landing_url:location.href,referrer:document.referrer})
+    }).catch(function(){});
+  }
+  this.style.display='none';
+  document.getElementById('leadOk').style.display='block';
+});
+</script>
+</body>
+</html>
