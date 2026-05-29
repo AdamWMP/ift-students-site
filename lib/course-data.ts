@@ -391,13 +391,13 @@ export interface SpecialOffer {
 export const specialOffers: SpecialOffer[] = [
   // ── June Bank Holiday Offer ──
   // €300 off The Cert / The Career / The Business, deposit dropped to €199.
-  // Expires at end of Bank Holiday Monday 1 June 2026 (i.e. Tue 2 June 00:00 IST).
+  // Expires 23:59 IST on Bank Holiday Monday 1 June 2026.
   {
     packageId: 'pro-coach',
     price: 2500,
     originalPrice: 2800,
     minDeposit: 199,
-    expires: '2026-06-02T00:00:00+01:00',
+    expires: '2026-06-01T23:59:00+01:00',
     label: 'Bank Holiday Offer',
   },
   {
@@ -405,7 +405,7 @@ export const specialOffers: SpecialOffer[] = [
     price: 3200,
     originalPrice: 3500,
     minDeposit: 199,
-    expires: '2026-06-02T00:00:00+01:00',
+    expires: '2026-06-01T23:59:00+01:00',
     label: 'Bank Holiday Offer',
   },
   {
@@ -413,7 +413,7 @@ export const specialOffers: SpecialOffer[] = [
     price: 4500,
     originalPrice: 4800,
     minDeposit: 199,
-    expires: '2026-06-02T00:00:00+01:00',
+    expires: '2026-06-01T23:59:00+01:00',
     label: 'Bank Holiday Offer',
   },
 ];
