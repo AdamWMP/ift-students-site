@@ -101,7 +101,7 @@
   /* tutors + grads */
   .people{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .person{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
-  .person .ph{width:56px;height:56px;border-radius:50%;background:#222 center/cover;margin-bottom:10px;border:1px solid var(--line)}
+  .person .ph{width:64px;height:64px;border-radius:50%;background:#222 center top/135%;background-repeat:no-repeat;margin-bottom:10px;border:1px solid var(--line)}
   .person .q{font-size:14.5px;font-style:italic;margin-bottom:10px}
   .person .n{font-size:12.5px;color:var(--gold);font-weight:600}
   .stars{color:var(--gold);font-size:12px;letter-spacing:2px;margin-top:4px}
@@ -264,7 +264,7 @@
   <div class="eyebrow">How it works</div>
   <h2>Three steps to a real career</h2>
   <div class="steps">
-    <div class="step"><span class="num">1</span><div><b>Enrol</b><p>8-week Cert, or the longer Career &amp; Business pathways. Online + in-person options.</p></div></div>
+    <div class="step"><span class="num">1</span><div><b>Enrol</b><p>8–16 weeks depending on the pathway and schedule you choose. Online + in-person options.</p></div></div>
     <div class="step"><span class="num">2</span><div><b>Train</b><p>Real coaching hours, real tutors, real curriculum — to the EQF Level 4 standard.</p></div></div>
     <div class="step"><span class="num">3</span><div><b>Career</b><p>Qualify job-ready. Work in any gym — or build your own business.</p></div></div>
   </div>
@@ -274,6 +274,7 @@
 <section class="wrap">
   <div class="eyebrow">Who teaches you</div>
   <h2>Tutors who've done it themselves</h2>
+  <p class="dim" style="font-size:14.5px;margin:-8px 0 14px">Both started as Image students — now they teach the course they once took.</p>
   <div class="people">
     <div class="person"><div class="ph" id="tutorGary" style="background-image:url('/tutors/gary.jpg')"></div><p class="q">"I sat in this exact chair 16 years ago. It's the best decision I've ever made."</p><p class="n">Gary — IFT Tutor, 16 years</p></div>
     <div class="person"><div class="ph" id="tutorShane" style="background-image:url('/tutors/shane.jpg')"></div><p class="q">"What separates this course from the others? The people behind it."</p><p class="n">Shane — IFT Tutor</p></div>
@@ -381,7 +382,7 @@
 <section class="wrap">
   <div class="eyebrow">Questions</div>
   <h2>Straight answers</h2>
-  <details><summary>How long does the course take?</summary><p>The Cert is an 8-week qualification. The Career and Business pathways run longer, but all qualify you to the same EQF Level 4 standard.</p></details>
+  <details><summary>How long does the course take?</summary><p>Between 8 and 16 weeks, depending on the pathway and schedule you choose — all to the same EQF Level 4 standard. (The Business pathway runs longer, as it adds dedicated business training.)</p></details>
   <details><summary>Do I need to be fit or experienced already?</summary><p>No. Every cohort includes complete beginners. The course teaches anatomy, programming and coaching from the ground up.</p></details>
   <details><summary>What does it cost — and can I pay in instalments?</summary><p>Payment plans are available. We'll walk you through the options and find what works for you on the call.</p></details>
   <details><summary>Will I actually get clients after I qualify?</summary><p>IFT has 200+ active hiring partners across Ireland. Graduate with a merit or distinction and you unlock placement opportunities with our network of gym partners — many students receive offers during placement, before they've even graduated.</p></details>
@@ -452,14 +453,14 @@ var CFG = {
    TODO: replace generic name/role with real first name + location (stronger proof
    + ASAI requires identifiable, consented graduates). */
 var GRAD_VIDEOS = [
-  {src:"https://cdn.shopify.com/videos/c/vp/bbce677bd33c4c79b88f33a890df9fda/bbce677bd33c4c79b88f33a890df9fda.HD-720p-4.5Mbps-72028946.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/bbce677bd33c4c79b88f33a890df9fda.thumbnail.0000000000.jpg?v=1770650570&width=608&height=1080", name:"Graduate Story", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/e26ef2f596d3457e9dfb9cc9c7591bb3/e26ef2f596d3457e9dfb9cc9c7591bb3.HD-720p-1.6Mbps-72029079.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/e26ef2f596d3457e9dfb9cc9c7591bb3.thumbnail.0000000000.jpg?v=1770650532&width=608&height=1080", name:"Success Story", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/b50cb1d575fe452d8f52b52bfce01f60/b50cb1d575fe452d8f52b52bfce01f60.HD-720p-1.6Mbps-72029338.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/b50cb1d575fe452d8f52b52bfce01f60.thumbnail.0000000000.jpg?v=1770650611&width=608&height=1080", name:"Career Change", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/a61c35b3b0dc46a090dba0ab11449050/a61c35b3b0dc46a090dba0ab11449050.HD-720p-1.6Mbps-72029306.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/a61c35b3b0dc46a090dba0ab11449050.thumbnail.0000000000.jpg?v=1770650624&width=608&height=1080", name:"Transformation", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/743d958e9f5d4af2b72fa476dd6dd3fa/743d958e9f5d4af2b72fa476dd6dd3fa.HD-720p-1.6Mbps-72029278.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/743d958e9f5d4af2b72fa476dd6dd3fa.thumbnail.0000000000.jpg?v=1770650588&width=608&height=1080", name:"Dream Job", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/ed62a2c6bcbb4e78af243abdf00a9a75/ed62a2c6bcbb4e78af243abdf00a9a75.HD-720p-1.6Mbps-72028963.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/ed62a2c6bcbb4e78af243abdf00a9a75.thumbnail.0000000000.jpg?v=1770650509&width=608&height=1080", name:"New Career", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/1a10facb055a42d5b2fb4f4e9fd4457b/1a10facb055a42d5b2fb4f4e9fd4457b.HD-720p-1.6Mbps-72029063.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/1a10facb055a42d5b2fb4f4e9fd4457b.thumbnail.0000000000.jpg?v=1770650543&width=608&height=1080", name:"Life Changed", role:"PT Graduate"},
-  {src:"https://cdn.shopify.com/videos/c/vp/03aa338aaedb43f1ade5c1e75e811b7c/03aa338aaedb43f1ade5c1e75e811b7c.HD-720p-1.6Mbps-72029047.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/03aa338aaedb43f1ade5c1e75e811b7c.thumbnail.0000000000.jpg?v=1770650569&width=608&height=1080", name:"Success", role:"PT Graduate"}
+  {src:"https://cdn.shopify.com/videos/c/vp/bbce677bd33c4c79b88f33a890df9fda/bbce677bd33c4c79b88f33a890df9fda.HD-720p-4.5Mbps-72028946.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/bbce677bd33c4c79b88f33a890df9fda.thumbnail.0000000000.jpg?v=1770650570&width=608&height=1080", name:"Martyna", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/e26ef2f596d3457e9dfb9cc9c7591bb3/e26ef2f596d3457e9dfb9cc9c7591bb3.HD-720p-1.6Mbps-72029079.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/e26ef2f596d3457e9dfb9cc9c7591bb3.thumbnail.0000000000.jpg?v=1770650532&width=608&height=1080", name:"Clodagh", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/b50cb1d575fe452d8f52b52bfce01f60/b50cb1d575fe452d8f52b52bfce01f60.HD-720p-1.6Mbps-72029338.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/b50cb1d575fe452d8f52b52bfce01f60.thumbnail.0000000000.jpg?v=1770650611&width=608&height=1080", name:"Conan", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/a61c35b3b0dc46a090dba0ab11449050/a61c35b3b0dc46a090dba0ab11449050.HD-720p-1.6Mbps-72029306.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/a61c35b3b0dc46a090dba0ab11449050.thumbnail.0000000000.jpg?v=1770650624&width=608&height=1080", name:"Jess", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/743d958e9f5d4af2b72fa476dd6dd3fa/743d958e9f5d4af2b72fa476dd6dd3fa.HD-720p-1.6Mbps-72029278.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/743d958e9f5d4af2b72fa476dd6dd3fa.thumbnail.0000000000.jpg?v=1770650588&width=608&height=1080", name:"Sean", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/ed62a2c6bcbb4e78af243abdf00a9a75/ed62a2c6bcbb4e78af243abdf00a9a75.HD-720p-1.6Mbps-72028963.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/ed62a2c6bcbb4e78af243abdf00a9a75.thumbnail.0000000000.jpg?v=1770650509&width=608&height=1080", name:"Nicole", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/1a10facb055a42d5b2fb4f4e9fd4457b/1a10facb055a42d5b2fb4f4e9fd4457b.HD-720p-1.6Mbps-72029063.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/1a10facb055a42d5b2fb4f4e9fd4457b.thumbnail.0000000000.jpg?v=1770650543&width=608&height=1080", name:"Jodie", role:"PT Graduate"},
+  {src:"https://cdn.shopify.com/videos/c/vp/03aa338aaedb43f1ade5c1e75e811b7c/03aa338aaedb43f1ade5c1e75e811b7c.HD-720p-1.6Mbps-72029047.mp4", poster:"https://cdn.shopify.com/s/files/1/0943/8170/3499/files/preview_images/03aa338aaedb43f1ade5c1e75e811b7c.thumbnail.0000000000.jpg?v=1770650569&width=608&height=1080", name:"Jordan", role:"PT Graduate"}
 ];
 
 /* Hero message-match: utm_content -> variant. Copy is from the PT LP spec §6. */
