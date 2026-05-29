@@ -29,14 +29,21 @@ import {
   addOns,
   getTimetablesForLocation,
   getStartDatesForSelection,
+  getEffectivePackage,
+  getNextOfferExpiry,
   type AddOn,
 } from '@/lib/course-data';
+import { AddOnWithCohort, type CohortSelection } from './addon-with-cohort';
 
 // ptcheckout.imageft.ie shows ONLY the three flagship packages.
 // The four standalone/bundle packages (PT-only, Group-only, Launch Pad,
 // Online Coaching) are unique to checkout.imageft.ie/enrol.
 const PTCHECKOUT_PACKAGE_IDS = new Set(['pro-coach', 'complete-coach', 'fitness-business-coach']);
-const packages = ALL_PACKAGES.filter((p) => PTCHECKOUT_PACKAGE_IDS.has(p.id));
+const RAW_PACKAGES = ALL_PACKAGES.filter((p) => PTCHECKOUT_PACKAGE_IDS.has(p.id));
+// Apply any currently-active special offer (price, originalPrice, minDeposit,
+// badge). Re-evaluated at module load; auto-reverts to base price once the
+// offer's `expires` timestamp passes.
+const packages = RAW_PACKAGES.map((p) => getEffectivePackage(p.id) ?? p);
 
 // ─── Types ─────────────────────────────────────────────────────────────
 type Step = 'package' | 'addons' | 'plan' | 'details' | 'payment';
@@ -51,6 +58,83 @@ interface FormData {
   startDate: string;
 }
 
+// ─── Bank Holiday Offer Countdown ────────────────────────────────────
+// Shows a live countdown banner until the soonest-expiring special offer
+// runs out. Renders nothing once all offers have expired — so leaving
+// this in the tree after Bank Holiday Monday is safe.
+function CountdownCell({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center bg-black/50 rounded px-2 py-1 min-w-[2.4rem] md:min-w-[2.75rem]">
+      <span className="text-base md:text-xl font-bold text-white tabular-nums leading-none">
+        {value.toString().padStart(2, '0')}
+      </span>
+      <span className="text-[9px] md:text-[10px] text-zinc-400 uppercase tracking-wider leading-none mt-0.5">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function BankHolidayCountdown({ compact = false }: { compact?: boolean }) {
+  const expiry = useMemo(() => getNextOfferExpiry(), []);
+  const [now, setNow] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    if (!expiry) return;
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, [expiry]);
+
+  if (!expiry) return null;
+  const diffMs = expiry.getTime() - now.getTime();
+  if (diffMs <= 0) return null;
+
+  const days = Math.floor(diffMs / 86_400_000);
+  const hours = Math.floor((diffMs / 3_600_000) % 24);
+  const minutes = Math.floor((diffMs / 60_000) % 60);
+  const seconds = Math.floor((diffMs / 1000) % 60);
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-white/90">
+        <Sparkles className="w-3 h-3 text-red-300" />
+        <span className="font-semibold">Offer ends in</span>
+        <span className="tabular-nums font-bold text-red-200">
+          {days}d {hours.toString().padStart(2, '0')}h{' '}
+          {minutes.toString().padStart(2, '0')}m {seconds.toString().padStart(2, '0')}s
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-5 rounded-xl border-2 border-red-500/50 bg-gradient-to-r from-red-600/20 via-amber-500/15 to-red-600/20 p-3 md:p-4 shadow-[0_0_24px_rgba(239,68,68,0.15)]">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
+          <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-red-300 flex-shrink-0 animate-pulse" />
+          <div>
+            <p className="text-sm md:text-base font-bold text-white leading-tight">
+              Bank Holiday Offer
+            </p>
+            <p className="text-[11px] md:text-xs text-zinc-300 leading-tight">
+              €300 off The Cert, The Career & The Business — secure your place with €199.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 md:gap-2 self-start md:self-auto">
+          <CountdownCell value={days} label="Days" />
+          <span className="text-red-300 font-bold text-lg md:text-xl pb-2">:</span>
+          <CountdownCell value={hours} label="Hrs" />
+          <span className="text-red-300 font-bold text-lg md:text-xl pb-2">:</span>
+          <CountdownCell value={minutes} label="Min" />
+          <span className="text-red-300 font-bold text-lg md:text-xl pb-2">:</span>
+          <CountdownCell value={seconds} label="Sec" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Export ─────────────────────────────────────────────────────
 export function PtCheckout() {
   return <CheckoutForm />;
@@ -59,6 +143,10 @@ export function PtCheckout() {
 function CheckoutForm() {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
+  // Cohort selections for add-ons that require one (Mat / Reformer Pilates).
+  // Keyed by addon id. Cleared automatically when the add-on is toggled off
+  // so a re-selection forces the student to re-pick (prevents stale data).
+  const [addonCohorts, setAddonCohorts] = useState<Record<string, CohortSelection>>({});
   const [depositAmount, setDepositAmount] = useState(500);
   const [months, setMonths] = useState(6);
   const [formData, setFormData] = useState<FormData>({
@@ -101,9 +189,21 @@ function CheckoutForm() {
     [selectedPackageId]
   );
 
-  // Add-on totals
+  // Add-on totals — addons may be dual-priced (e.g. Mat Pilates: €1,800
+  // upfront / €2,000 plan). The slider's max uses the UPFRONT total so a
+  // student dragging to the top pays the discounted price. The plan total
+  // is used to compute monthly instalments (so monthly × months sums to
+  // the higher plan total). The €200 delta is the cost of the plan.
   const addOnsTotal = useMemo(() => {
+    // Upfront total — sum of addon.price (lower / discounted)
     return addOns.filter((a) => selectedAddOns.has(a.id)).reduce((sum, a) => sum + a.price, 0);
+  }, [selectedAddOns]);
+
+  const addOnsTotalPlan = useMemo(() => {
+    // Plan total — uses paymentPlanPrice when present, else falls back to price
+    return addOns
+      .filter((a) => selectedAddOns.has(a.id))
+      .reduce((sum, a) => sum + (a.paymentPlanPrice ?? a.price), 0);
   }, [selectedAddOns]);
 
   const addOnsSavings = useMemo(() => {
@@ -118,7 +218,11 @@ function CheckoutForm() {
     return addOns.filter((a) => !a.excludeFromPackages?.includes(selectedPackageId));
   }, [selectedPackageId]);
 
+  // combinedPrice = upfront total (slider max). combinedPricePlan = what
+  // the customer pays across deposit + monthly instalments if they don't
+  // drag the slider to the top.
   const combinedPrice = (selectedPackage?.price ?? 0) + addOnsTotal;
+  const combinedPricePlan = (selectedPackage?.price ?? 0) + addOnsTotalPlan;
 
   // Coupon discount
   const discount = useMemo(() => {
@@ -129,10 +233,21 @@ function CheckoutForm() {
     return Math.min(appliedCoupon.discountValue, combinedPrice);
   }, [appliedCoupon, selectedPackage, combinedPrice]);
 
+  // Apply coupon to both totals — discount is whichever path the customer chooses
   const discountedPrice = combinedPrice - discount;
+  const discountedPricePlan = combinedPricePlan - discount;
+
   const effectiveDeposit = Math.min(depositAmount, discountedPrice);
-  const remaining = discountedPrice - effectiveDeposit;
-  const monthlyPayment = months > 0 ? Math.ceil((remaining / months) * 100) / 100 : 0;
+  // isFullPayment: deposit has been dragged to the slider's max → student
+  // pays the upfront price in full, gets the €200 (or whatever) discount.
+  const isFullPayment = effectiveDeposit >= discountedPrice;
+  // When on a plan, the total paid across deposit + instalments equals the
+  // plan price (higher). When in full, it equals the upfront price (lower).
+  const effectiveTotal = isFullPayment ? discountedPrice : discountedPricePlan;
+  const remaining = isFullPayment ? 0 : (discountedPricePlan - effectiveDeposit);
+  const monthlyPayment = months > 0 && !isFullPayment ? Math.ceil((remaining / months) * 100) / 100 : 0;
+  // Upfront savings — shown to the student as a "save €X by paying upfront" hint
+  const planVsUpfrontSavings = Math.max(0, combinedPricePlan - combinedPrice);
 
   // Reset deposit/months when package changes
   useEffect(() => {
@@ -196,7 +311,35 @@ function CheckoutForm() {
       else next.add(id);
       return next;
     });
+    // If toggling OFF a cohort-required add-on, drop its cohort data too
+    setAddonCohorts((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   }, []);
+
+  // ─── Cohort setter for Mat / Reformer add-ons ────────────────────────
+  const setAddonCohort = useCallback((id: string, cohort: CohortSelection | null) => {
+    setAddonCohorts((prev) => {
+      const next = { ...prev };
+      if (cohort) next[id] = cohort;
+      else delete next[id];
+      return next;
+    });
+  }, []);
+
+  // Continue-button gate: every selected cohort-required add-on must have
+  // location + timetable + start-date all filled before payment can proceed.
+  const cohortAddOnsResolved = useMemo(() => {
+    return addOns
+      .filter((a) => a.requiresCohort && selectedAddOns.has(a.id))
+      .every((a) => {
+        const c = addonCohorts[a.id];
+        return !!(c && c.locationId && c.timetableId && c.startDate);
+      });
+  }, [selectedAddOns, addonCohorts]);
 
   // ─── Step Navigation ──────────────────────────────────────────────
   const selectPackage = useCallback((id: string) => {
@@ -289,6 +432,9 @@ function CheckoutForm() {
             packagePrice: selectedPackage.price,
             addOns: Array.from(selectedAddOns),
             addOnsTotal,
+            addOnsTotalPlan,
+            addonCohorts,
+            isFullPayment,
             totalPrice: discountedPrice,
             depositAmount: effectiveDeposit,
             months,
@@ -542,7 +688,10 @@ function CheckoutForm() {
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <div className="space-y-3 pt-3">
+                  <div className="pt-3">
+                    <BankHolidayCountdown />
+                  </div>
+                  <div className="space-y-3 pt-1">
                     {packages.map((pkg) => (
                       <motion.button
                         key={pkg.id}
@@ -665,6 +814,21 @@ function CheckoutForm() {
                     <div className="space-y-2.5">
                       {filteredAddOns.map((addon: AddOn) => {
                         const isSelected = selectedAddOns.has(addon.id);
+                        // Mat Pilates + Reformer Pilates use the cohort-picker
+                        // variant so the student locks in location/timetable/
+                        // start-date before they can continue.
+                        if (addon.requiresCohort) {
+                          return (
+                            <AddOnWithCohort
+                              key={addon.id}
+                              addon={addon}
+                              selected={isSelected}
+                              cohort={addonCohorts[addon.id] ?? null}
+                              onToggle={() => toggleAddOn(addon.id)}
+                              onCohortChange={(c) => setAddonCohort(addon.id, c)}
+                            />
+                          );
+                        }
                         return (
                           <motion.button
                             key={addon.id}
@@ -786,11 +950,14 @@ function CheckoutForm() {
                       )}
                       <button
                         onClick={confirmAddOns}
-                        className="w-full py-3 md:py-4 rounded-xl bg-[#D4A836] text-black font-bold text-sm md:text-base hover:bg-[#c49830] transition-colors"
+                        disabled={!cohortAddOnsResolved}
+                        className="w-full py-3 md:py-4 rounded-xl bg-[#D4A836] text-black font-bold text-sm md:text-base hover:bg-[#c49830] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D4A836]"
                       >
-                        {selectedAddOns.size > 0
-                          ? `Continue with ${selectedAddOns.size} Add-On${selectedAddOns.size > 1 ? 's' : ''}`
-                          : 'No Thanks — Continue'}
+                        {!cohortAddOnsResolved
+                          ? 'Finish picking your Mat / Reformer cohort →'
+                          : selectedAddOns.size > 0
+                            ? `Continue with ${selectedAddOns.size} Add-On${selectedAddOns.size > 1 ? 's' : ''}`
+                            : 'No Thanks — Continue'}
                       </button>
                     </div>
                   </div>
@@ -828,7 +995,10 @@ function CheckoutForm() {
                   className="overflow-hidden"
                 >
                   <div className="pt-4 space-y-8 bg-zinc-900/30 rounded-xl border border-zinc-800 p-4 md:p-6 mt-3">
-                    {/* Package Summary */}
+                    {/* Package Summary — headline price reflects the CURRENT mode:
+                        plan mode shows the plan total (e.g. €4,800), full-payment
+                        mode shows the upfront total (e.g. €4,600). Pre-coupon
+                        strikethrough also uses the mode-correct base. */}
                     <div className="text-center">
                       <p className="text-zinc-400 text-sm mb-1">
                         {selectedPackage.name}
@@ -838,21 +1008,27 @@ function CheckoutForm() {
                       {discount > 0 ? (
                         <>
                           <p className="text-zinc-500 text-lg line-through">
-                            &euro;{combinedPrice.toLocaleString()}
+                            &euro;{(isFullPayment ? combinedPrice : combinedPricePlan).toLocaleString()}
                           </p>
                           <p className="text-3xl md:text-4xl font-bold text-white">
-                            &euro;{discountedPrice.toLocaleString()}
+                            &euro;{effectiveTotal.toLocaleString()}
                           </p>
                         </>
                       ) : (
                         <p className="text-3xl md:text-4xl font-bold text-white">
-                          &euro;{combinedPrice.toLocaleString()}
+                          &euro;{effectiveTotal.toLocaleString()}
                         </p>
                       )}
                     </div>
 
                     {/* Deposit Slider */}
                     <div>
+                      <div className="mb-2 px-3 py-1.5 rounded-md bg-[#D4A836]/10 border border-[#D4A836]/30 text-[#D4A836] text-xs md:text-sm font-medium flex items-center justify-center gap-2">
+                        <span>Pull slider to the top if you want to pay in full</span>
+                        <span className="relative inline-block w-10 h-1.5 bg-[#D4A836]/25 rounded-full overflow-hidden flex-shrink-0">
+                          <span className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-full bg-[#D4A836] shadow-[0_0_4px_rgba(212,168,54,0.7)] slider-hint-dot" />
+                        </span>
+                      </div>
                       <div className="flex items-center justify-between mb-3">
                         <label className="text-white font-semibold text-sm md:text-base">
                           Deposit Amount
@@ -1034,11 +1210,18 @@ function CheckoutForm() {
                         </>
                       )}
                       <div className="border-t border-zinc-700 pt-3 flex justify-between">
-                        <span className="text-white font-bold">Total</span>
+                        <span className="text-white font-bold">
+                          {isFullPayment ? 'Total (paid in full)' : 'Total (across plan)'}
+                        </span>
                         <span className="text-[#D4A836] font-bold text-lg">
-                          &euro;{discountedPrice.toLocaleString()}
+                          &euro;{effectiveTotal.toLocaleString()}
                         </span>
                       </div>
+                      {!isFullPayment && planVsUpfrontSavings > 0 && (
+                        <div className="mt-1 px-2 py-1.5 rounded-md bg-[#D4A836]/8 border border-[#D4A836]/25 text-[#D4A836] text-[11px] text-center">
+                          💡 Save &euro;{planVsUpfrontSavings.toLocaleString()} by dragging the slider to the top &amp; paying upfront
+                        </div>
+                      )}
                     </div>
 
                     {/* Confirm Plan Button */}
@@ -1580,6 +1763,16 @@ function CheckoutForm() {
           height: 8px;
           border-radius: 4px;
           background: #3f3f46;
+        }
+        @keyframes slider-hint-slide {
+          0%   { left: 0;                opacity: 0.4; }
+          15%  { opacity: 1; }
+          70%  { left: calc(100% - 8px); opacity: 1; }
+          85%  { left: calc(100% - 8px); opacity: 0; }
+          100% { left: 0;                opacity: 0; }
+        }
+        .slider-hint-dot {
+          animation: slider-hint-slide 1.8s ease-in-out infinite;
         }
       `}</style>
     </section>

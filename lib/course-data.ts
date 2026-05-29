@@ -46,8 +46,16 @@ export interface CourseStartDate {
 export interface AddOn {
   id: string;
   name: string;
+  // Upfront price — used when the customer pays the WHOLE booking in full
+  // (deposit slider at max).
   price: number;
+  // Inflated price applied when the WHOLE booking is on a payment plan.
+  // Mirrors the standalone Pilates checkout's pricing model: customers
+  // save the difference by paying upfront. If omitted, addon is single-priced.
+  paymentPlanPrice?: number;
   originalPrice?: number;
+  // Legacy: addon-specific standalone plan (e.g. NutriCert €750 upfront /
+  // €900 across 3 months as its own plan, independent of the main booking).
   paymentPlanTotal?: number;
   paymentPlanMonths?: number;
   description: string;
@@ -55,6 +63,15 @@ export interface AddOn {
   delivery: string;
   highlights: string[];
   excludeFromPackages?: string[];
+  // Add-ons that need a cohort picked before they can be confirmed
+  // (Mat Pilates, Reformer Pilates). When true, the checkout renders the
+  // cohort dropdowns (location → timetable → start date) and the Continue
+  // button is gated until all three are filled.
+  requiresCohort?: boolean;
+  // Which dropdown data set to pull from for the cohort picker:
+  //   'pilates'  → Pilates locations + Mat timetables + Mat start dates
+  //   'reformer' → Reformer locations + Reformer timetables + start dates
+  cohortFieldSet?: 'pilates' | 'reformer';
 }
 
 // ─── Add-On Courses (upsells during checkout) ──────────────────────
@@ -118,6 +135,39 @@ export const addOns: AddOn[] = [
     delivery: 'In-Person · Swords, Dublin',
     highlights: ['15 high-quality brand images (posts, profiles, ads)', '2 professionally edited reels (30–45 sec, vertical format)', 'Fully guided by Hourglass Studios · Limited to 15 places'],
     excludeFromPackages: ['fitness-business-coach'],
+  },
+  // ─── Pilates qualifications as PT-checkout add-ons ──────────────────
+  // These two need a cohort (location + timetable + start date) picked
+  // inside the card before they can be confirmed. The checkout writes
+  // the relevant Pilates / Reformer Ontraport fields per
+  // booking-confirmation-mockups → bundle tracking architecture, so
+  // every Mat / Reformer addon flows into the same Ontraport pipeline
+  // the standalone pilatescheckout.imageft.ie uses.
+  {
+    id: 'mat-pilates-cert',
+    name: 'Mat Pilates Instructor — The Cert',
+    // Dual-priced: €1,800 if the booking is paid in full upfront,
+    // €2,000 if it's on a payment plan. Mirrors the standalone Pilates
+    // checkout's pricing model — student saves €200 for paying up front.
+    price: 1800,
+    paymentPlanPrice: 2000,
+    description: 'Add a REPs-Ireland EQF Level 4 Mat Pilates qualification onto your PT. Different client, same instructor — two income streams under one banner.',
+    badge: 'New · Cohort Required',
+    delivery: 'In-Studio · 11 Weeks · Sat/Sun/Evenings',
+    highlights: ['REPs Ireland EQF Level 4', 'Body-Flow Method certification', 'Pregnancy Pilates workshop included'],
+    requiresCohort: true,
+    cohortFieldSet: 'pilates',
+  },
+  {
+    id: 'reformer-pilates-cpd',
+    name: 'Reformer Pilates Instructor — CPD',
+    price: 1000,
+    description: 'Equipment-based Pilates is where premium studios pay the most per hour. Bolt on a reformer qualification — Mat experience helps but isn\'t required if taken alongside The Cert.',
+    badge: 'New · Cohort Required',
+    delivery: 'In-Studio · 4 Weekends · Sat & Sun',
+    highlights: ['REPs Ireland CPD certified', 'Full studio reformer repertoire', 'Class programming + small group teaching'],
+    requiresCohort: true,
+    cohortFieldSet: 'reformer',
   },
 ];
 
@@ -339,13 +389,32 @@ export interface SpecialOffer {
 }
 
 export const specialOffers: SpecialOffer[] = [
+  // ── June Bank Holiday Offer ──
+  // €300 off The Cert / The Career / The Business, deposit dropped to €199.
+  // Expires at end of Bank Holiday Monday 1 June 2026 (i.e. Tue 2 June 00:00 IST).
   {
     packageId: 'pro-coach',
-    price: 2600,
+    price: 2500,
     originalPrice: 2800,
-    minDeposit: 350,
-    expires: '2026-04-01T00:00:00+01:00', // midnight IST March 31
-    label: 'Special Offer — Today Only',
+    minDeposit: 199,
+    expires: '2026-06-02T00:00:00+01:00',
+    label: 'Bank Holiday Offer',
+  },
+  {
+    packageId: 'complete-coach',
+    price: 3200,
+    originalPrice: 3500,
+    minDeposit: 199,
+    expires: '2026-06-02T00:00:00+01:00',
+    label: 'Bank Holiday Offer',
+  },
+  {
+    packageId: 'fitness-business-coach',
+    price: 4500,
+    originalPrice: 4800,
+    minDeposit: 199,
+    expires: '2026-06-02T00:00:00+01:00',
+    label: 'Bank Holiday Offer',
   },
 ];
 
@@ -357,6 +426,35 @@ export function getActiveOffer(packageId: string): SpecialOffer | null {
       (o) => o.packageId === packageId && new Date(o.expires) > now
     ) ?? null
   );
+}
+
+/**
+ * Return a package with any currently-active special offer applied
+ * (price, originalPrice, minDeposit, badge). Falls back to the raw
+ * package once the offer expires — so no manual revert is needed.
+ */
+export function getEffectivePackage(packageId: string): Package | undefined {
+  const pkg = packages.find((p) => p.id === packageId);
+  if (!pkg) return undefined;
+  const offer = getActiveOffer(packageId);
+  if (!offer) return pkg;
+  return {
+    ...pkg,
+    price: offer.price,
+    originalPrice: offer.originalPrice,
+    minDeposit: offer.minDeposit,
+    badge: offer.label,
+  };
+}
+
+/** Soonest-expiring active offer (for a single global countdown). */
+export function getNextOfferExpiry(): Date | null {
+  const now = new Date();
+  const upcoming = specialOffers
+    .map((o) => new Date(o.expires))
+    .filter((d) => d.getTime() > now.getTime())
+    .sort((a, b) => a.getTime() - b.getTime());
+  return upcoming[0] ?? null;
 }
 
 // ─── Helper Functions ───────────────────────────────────────────────
