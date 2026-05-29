@@ -199,6 +199,23 @@
   footer{padding:28px 0 22px;text-align:center;color:var(--ink-dim);font-size:13px}
   footer .locs{margin:12px 0;line-height:1.8;font-size:12.5px}
   footer a{color:var(--gold);text-decoration:none}
+
+  /* accreditation badge logos */
+  .trustbadges{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .blogo{background:#fff;border-radius:10px;padding:7px 12px;height:46px;display:flex;align-items:center;justify-content:center}
+  .blogo img{max-height:30px;width:auto;display:block}
+  .blogo.eqf{background:rgba(212,168,54,.12);border:1px solid var(--gold);color:var(--gold-bright);font-size:11px;font-weight:700;line-height:1.05;text-align:center;letter-spacing:.5px}
+  .blogo.eqf b{display:block;font-size:13px;color:var(--ink)}
+  /* package price */
+  .price{font-weight:800;font-size:18px;color:var(--gold-bright);margin:2px 0 6px}
+  /* upcoming intakes */
+  .intakes{display:grid;gap:8px}
+  .intake{display:flex;gap:14px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:11px 14px}
+  .intake .d{font-weight:800;color:var(--gold-bright);font-size:15px;flex:0 0 92px}
+  .intake .m{font-size:13.5px;color:var(--ink-dim)}
+  /* qualify / risk-reversal */
+  .qualify{font-size:14px;color:var(--ink-dim);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 14px}
+  .qualify b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -218,9 +235,12 @@
   </div>
 </header>
 
-<!-- ============ TRUST BAR ============ -->
-<div class="trust wrap" role="img" aria-label="Accreditations">
-  <span>REPs Ireland</span><span>EHFA Approved</span><span>Skillnet Ireland</span><span>EQF Level 4</span>
+<!-- ============ TRUST BAR (real accreditation logos) ============ -->
+<div class="trustbadges wrap" aria-label="Accreditations">
+  <div class="blogo"><img src="/reps-ireland-logo.png" alt="REPs Ireland accredited" loading="lazy" decoding="async"></div>
+  <div class="blogo"><img src="/ehfa-logo.webp" alt="EHFA approved" loading="lazy" decoding="async"></div>
+  <div class="blogo"><img src="/skillnet-logo.png" alt="Skillnet Ireland" loading="lazy" decoding="async"></div>
+  <div class="blogo eqf">EQF<b>Level 4</b></div>
 </div>
 
 <!-- ============ 3-STEP PATHWAY ============ -->
@@ -267,20 +287,39 @@
 
   <div class="pkgs" style="margin-top:14px">
     <div class="pkg"><div class="top"><span class="name">The Cert</span><span class="len">8 weeks</span></div>
+      <div class="price">from €2,800</div>
       <p>Qualify as a personal trainer to the EQF Level 4 standard. The fastest route to qualified.</p></div>
     <div class="pkg feat"><span class="tag">Most popular</span><div class="top"><span class="name">The Career</span><span class="len">Qual + placement</span></div>
+      <div class="price">from €3,500</div>
       <p>Everything in The Cert — and finish with a merit or distinction to unlock placement opportunities across our network of gym partners. Many get offers before they graduate.</p></div>
     <div class="pkg"><div class="top"><span class="name">The Business</span><span class="len">24 weeks</span></div>
+      <div class="price">€4,800</div>
       <p>Our most comprehensive pathway — qualify, then learn to build and run your own fitness business.</p></div>
   </div>
-  <p class="cta-note">Not sure which one? That's exactly what the free call is for.</p>
+  <p class="cta-note">Flexible payment plans — pay a deposit, then spread the balance over 12 months. We'll tailor it to you on the call.</p>
+</section>
+
+<!-- ============ UPCOMING INTAKES (real dates) ============ -->
+<section class="wrap">
+  <div class="eyebrow">Upcoming intakes</div>
+  <h2>Real dates. Limited places.</h2>
+  <div class="intakes">
+    <div class="intake"><span class="d">2 Jul 2026</span><span class="m">PT Summer · 8-week intensive · all six locations</span></div>
+    <div class="intake"><span class="d">31 Aug 2026</span><span class="m">Dublin (Swords &amp; Tallaght) · Evenings + Saturday</span></div>
+    <div class="intake"><span class="d">6 Sep 2026</span><span class="m">Dublin · Sundays (Sun16)</span></div>
+    <div class="intake"><span class="d">1 Oct 2026</span><span class="m">Cork &amp; Galway · 8-week intensive</span></div>
+    <div class="intake"><span class="d">24 Oct 2026</span><span class="m">Cork · Galway · Limerick · Wexford · 16-week Saturday</span></div>
+    <div class="intake"><span class="d">26 Oct 2026</span><span class="m">Dublin · Evenings + Saturday</span></div>
+  </div>
+  <p class="cta-note">Cohorts fill first-come — book your call to hold a place on the date that suits you.</p>
 </section>
 
 <!-- ============ PRIMARY CTA — ONCEHUB (deferred) ============ -->
 <section class="wrap" id="book">
   <div class="eyebrow">The next step</div>
   <h2>Book your free 15-min strategy call</h2>
-  <p class="dim" style="font-size:15px;margin:-6px 0 16px">We'll walk you through every course and package coming up — then put the ball in your court. No pressure to commit: you decide what suits you best, with the full picture in front of you.</p>
+  <p class="dim" style="font-size:15px;margin:-6px 0 12px">We'll walk you through every course and package coming up — then put the ball in your court. No pressure to commit: you decide what suits you best, with the full picture in front of you.</p>
+  <p class="qualify"><b>Is it for you?</b> This is a recognised EQF Level 4 qualification — a real career path, not a weekend certificate. If you're serious about coaching, the call is 15 honest minutes: we'll tell you straight whether it's the right fit for you, with no obligation.</p>
   <div class="cal-head"><span class="ic">📅</span><div><b>Available today</b><div class="dim" style="font-size:12.5px">15-minute call · no obligation</div></div></div>
   <div class="cal-shell" style="border-radius:0 0 16px 16px">
     <div class="cal-placeholder" id="calPlaceholder">
@@ -371,10 +410,16 @@ var CFG = {
   comparisonVideoUrl: "/videos/pt-course-2026-comparison.mp4",
   comparisonPoster:   "/videos/pt-course-2026-comparison-poster.jpg",
 
-  // Tracking
-  pixelId:       "REPLACE_WITH_PIXEL_ID",
+  // Tracking — "2026 Dataset / Pixel - imageft" (active, firing today, incl. CAPI)
+  pixelId:       "974569781798246",
   ga4Id:         "",
-  leadEndpoint:  ""                  // your CRM/CAPI receiver (fires server-side Lead w/ same event_id)
+
+  // Lead capture -> existing Ontraport pipeline. /api/contact upserts the contact
+  // (Contacts/saveorupdate) and tags "Website Lead". Relative path = same-origin on imageft.ie.
+  leadEndpoint:  "/api/contact",
+  // After submit, send the lead to the real thank-you page. Absolute so it also
+  // works from the standalone review deploy.
+  thankYouUrl:   "https://imageft.ie/thank-you"
 };
 
 /* Real graduate video testimonials — sources from the live site (results-wall).
@@ -498,17 +543,24 @@ if('IntersectionObserver' in window){
 }
 Array.prototype.forEach.call(document.querySelectorAll('[data-cta$="book"]'),function(b){ b.addEventListener('click',loadScheduler); });
 
-/* OnceHub booking -> Pixel `Schedule` (best-effort from iframe postMessage).
-   GUARANTEED signal: set the Meta Pixel inside OnceHub (account -> Integrations
-   -> Facebook Pixel, same Pixel ID) so Schedule fires on its confirmation step. */
+/* OnceHub booking -> Pixel `Schedule` (the booked-call conversion). [SC6 fix]
+   SINGLE SOURCE OF TRUTH: this page fires Schedule exactly once per page-load,
+   with a dedup event_id. The `scheduleFired` guard stops the OnceHub iframe's
+   repeated postMessages from firing it multiple times in one booking flow.
+   ⚠ Do NOT also enable a Schedule event inside OnceHub's Meta integration — the
+   two sources can't share an event_id, so Meta would double-count the booking.
+   Detection is best-effort from the OnceHub iframe's postMessage. */
+var scheduleFired=false;
 window.addEventListener('message',function(e){
   if(typeof e.origin==='string' && /oncehub\.com|scheduleonce\.com/i.test(e.origin)){
     // Any interaction inside the calendar surfaces the "scroll for times" hint.
     showCalHint();
     var blob = (typeof e.data==='string') ? e.data : JSON.stringify(e.data||'');
-    if(/booking|scheduled|confirm/i.test(blob)){
+    if(/booking|scheduled|confirm/i.test(blob) && !scheduleFired){
+      scheduleFired=true;
       dismissCalHint();
-      fbq_('track','Schedule',{content_name:'pt-course-LP', content_category:'PT'});
+      fbq_('track','Schedule',{content_name:'pt-course-LP', content_category:'PT'},
+           {eventID:'sched_'+Date.now()+'_'+Math.random().toString(36).slice(2,8)});
       ga_('oncehub_book',{});
     }
   }
@@ -583,17 +635,27 @@ document.getElementById('leadForm').addEventListener('submit',function(ev){
   fbq_('track','Lead',{content_name:'pt-course-LP', content_category:'PT'}, {eventID:eventId});
   ga_('generate_lead',{});
 
+  // /api/contact requires name + email + message; it upserts to Ontraport and
+  // tags "Website Lead". We pack attribution into subject + message.
+  var attribution='PT landing-page lead · interest: '+(qs('utm_content')||'general')
+    +' · source: '+(qs('utm_source')||'direct')+'/'+(qs('utm_campaign')||'-')
+    +' · phone: '+phone+' · page: '+location.href;
+  var payload={
+    name:(first+' '+last).trim(), first_name:first, last_name:last,
+    email:email, phone:phone,
+    subject:'PT Landing Page Lead', message:attribution,
+    event_id:eventId, hero_variant:variant,
+    utm_source:qs('utm_source'), utm_medium:qs('utm_medium'), utm_campaign:qs('utm_campaign'),
+    utm_content:qs('utm_content'), utm_term:qs('utm_term'), fbclid:qs('fbclid'), gclid:qs('gclid')
+  };
+
+  function go(){ if(CFG.thankYouUrl){ window.location.href=CFG.thankYouUrl; } else { var ok=document.getElementById('leadOk'); document.getElementById('leadForm').style.display='none'; if(ok) ok.style.display='block'; } }
+
+  var btn=this.querySelector('button[type=submit]'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
   if(CFG.leadEndpoint){
-    fetch(CFG.leadEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({first_name:first,last_name:last,name:first+' '+last,phone:phone,email:email,event_id:eventId,
-        hero_variant:variant,
-        utm_source:qs('utm_source'),utm_medium:qs('utm_medium'),utm_campaign:qs('utm_campaign'),
-        utm_content:qs('utm_content'),utm_term:qs('utm_term'),
-        fbclid:qs('fbclid'),gclid:qs('gclid'),landing_url:location.href,referrer:document.referrer})
-    }).catch(function(){});
-  }
-  this.style.display='none';
-  document.getElementById('leadOk').style.display='block';
+    fetch(CFG.leadEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(go).catch(go);
+  } else { go(); }
 });
 </script>
 </body>
