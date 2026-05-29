@@ -216,6 +216,17 @@
   /* qualify / risk-reversal */
   .qualify{font-size:14px;color:var(--ink-dim);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 14px}
   .qualify b{color:var(--ink)}
+  /* experience / where graduates end up */
+  .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center}
+  .stat b{display:block;font-size:26px;font-weight:800;color:var(--gold-bright);line-height:1}
+  .stat span{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:6px;line-height:1.25}
+  .wherenow{list-style:none;display:grid;gap:12px;margin-bottom:16px}
+  .wherenow li{display:flex;gap:11px;font-size:15px;color:var(--ink-dim)}
+  .wherenow li::before{content:"→";color:var(--gold);font-weight:800;flex:0 0 auto}
+  .wherenow b{color:var(--ink)}
+  .rep{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-dim)}
+  .rep .stars{color:var(--gold);letter-spacing:2px}
 </style>
 </head>
 <body>
@@ -231,7 +242,12 @@
     <div class="trustline">16 years · 5,000+ graduates · locations nationwide</div>
     <a href="#book" class="btn btn-gold" data-cta="hero-book">Book my free 15-min call →</a>
     <p class="cta-note">No pressure — we walk you through your options and you decide what fits.</p>
-    <img class="hero-photo" id="heroPhoto" alt="" loading="eager" decoding="async" src="" onerror="this.style.display='none'">
+    <!-- Hero VSL = the course-comparison video. Click-to-play (poster only on load). -->
+    <div class="video-card" id="videoCard" role="button" tabindex="0" aria-label="Play the course overview video" style="margin-top:18px">
+      <img class="poster" id="videoPoster" alt="" src="" onerror="this.style.display='none'">
+      <div class="play"><div class="circle"></div></div>
+      <div class="label">Watch: which Image pathway fits you?</div>
+    </div>
   </div>
 </header>
 
@@ -259,8 +275,8 @@
   <div class="eyebrow">Who teaches you</div>
   <h2>Tutors who've done it themselves</h2>
   <div class="people">
-    <div class="person"><div class="ph" id="tutorGary"></div><p class="q">"I sat in this exact chair 16 years ago. It's the best decision I've ever made."</p><p class="n">Gary — IFT Tutor, 16 years</p></div>
-    <div class="person"><div class="ph" id="tutorShane"></div><p class="q">"What separates this course from the others? The people behind it."</p><p class="n">Shane — IFT Tutor</p></div>
+    <div class="person"><div class="ph" id="tutorGary" style="background-image:url('/tutors/gary.jpg')"></div><p class="q">"I sat in this exact chair 16 years ago. It's the best decision I've ever made."</p><p class="n">Gary — IFT Tutor, 16 years</p></div>
+    <div class="person"><div class="ph" id="tutorShane" style="background-image:url('/tutors/shane.jpg')"></div><p class="q">"What separates this course from the others? The people behind it."</p><p class="n">Shane — IFT Tutor</p></div>
   </div>
 </section>
 
@@ -272,18 +288,27 @@
 <p class="rail-hint">Real graduates, real stories — tap any video to play. ›</p>
 <div class="grad-rail" id="gradRail" aria-label="Graduate video testimonials"></div>
 
-<!-- ============ 3-PACKAGE COMPARISON + VIDEO ============ -->
+<!-- ============ EXPERIENCE / WHERE GRADUATES END UP ============ -->
+<section class="wrap">
+  <div class="eyebrow">16 years in the industry</div>
+  <h2>Where Image graduates end up</h2>
+  <div class="stats3">
+    <div class="stat"><b>16</b><span>years training coaches</span></div>
+    <div class="stat"><b>5,000+</b><span>graduates</span></div>
+    <div class="stat"><b>200+</b><span>hiring partners</span></div>
+  </div>
+  <ul class="wherenow">
+    <li><span><b>Coaching online from abroad</b> — graduates run client businesses remotely from around the world.</span></li>
+    <li><span><b>Running their own gyms</b> — Image graduates now own and operate studios across Ireland, including ones our own team trains in.</span></li>
+    <li><span><b>First pick for employers</b> — gyms across our 200+ partner network actively ask for Image-qualified trainers.</span></li>
+  </ul>
+  <div class="rep"><span class="stars">★★★★★</span> Trusted by 5,000+ graduates over 16 years</div>
+</section>
+
+<!-- ============ 3-PACKAGE COMPARISON ============ -->
 <section class="wrap">
   <div class="eyebrow">Compare the pathways</div>
   <h2>Pick the path that fits your goal</h2>
-
-  <!-- Comparison video: click-to-play. The raw file is ~440MB, far too heavy to
-       inline. Host it (YouTube/Vimeo or a compressed MP4) and set CFG.comparisonVideoUrl. -->
-  <div class="video-card" id="videoCard" role="button" tabindex="0" aria-label="Play the package comparison video">
-    <img class="poster" id="videoPoster" alt="" src="" onerror="this.style.display='none'">
-    <div class="play"><div class="circle"></div></div>
-    <div class="label">Watch: which package is right for you?</div>
-  </div>
 
   <div class="pkgs" style="margin-top:14px">
     <div class="pkg"><div class="top"><span class="name">The Cert</span><span class="len">8 weeks</span></div>
@@ -304,9 +329,9 @@
   <div class="eyebrow">Upcoming intakes</div>
   <h2>Real dates. Limited places.</h2>
   <div class="intakes">
-    <div class="intake"><span class="d">2 Jul 2026</span><span class="m">PT Summer · 8-week intensive · all six locations</span></div>
+    <div class="intake"><span class="d">2 Jul 2026</span><span class="m">8-week intensive · all six locations</span></div>
     <div class="intake"><span class="d">31 Aug 2026</span><span class="m">Dublin (Swords &amp; Tallaght) · Evenings + Saturday</span></div>
-    <div class="intake"><span class="d">6 Sep 2026</span><span class="m">Dublin · Sundays (Sun16)</span></div>
+    <div class="intake"><span class="d">6 Sep 2026</span><span class="m">Dublin · Sunday classes</span></div>
     <div class="intake"><span class="d">1 Oct 2026</span><span class="m">Cork &amp; Galway · 8-week intensive</span></div>
     <div class="intake"><span class="d">24 Oct 2026</span><span class="m">Cork · Galway · Limerick · Wexford · 16-week Saturday</span></div>
     <div class="intake"><span class="d">26 Oct 2026</span><span class="m">Dublin · Evenings + Saturday</span></div>
