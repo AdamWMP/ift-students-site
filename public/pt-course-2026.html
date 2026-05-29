@@ -49,8 +49,8 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--body);
     line-height:1.5;font-size:17px;padding-bottom:86px;-webkit-font-smoothing:antialiased}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
-  h1{font-size:clamp(32px,8.6vw,44px);line-height:1.04;font-weight:800;letter-spacing:-.5px;margin:0 0 14px}
-  h2{font-size:clamp(22px,5.6vw,28px);line-height:1.1;font-weight:800;letter-spacing:-.3px;margin:0 0 18px}
+  h1{font-size:clamp(38px,10vw,52px);line-height:.98;font-weight:800;letter-spacing:-1px;text-transform:uppercase;margin:0 0 14px}
+  h2{font-size:clamp(25px,6.4vw,34px);line-height:1;font-weight:800;letter-spacing:-.6px;text-transform:uppercase;margin:0 0 16px}
   h3{font-weight:700}
   .gold{color:var(--gold)}
   .dim{color:var(--ink-dim)}
@@ -237,6 +237,23 @@
   .wherenow b{color:var(--ink)}
   .rep{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-dim)}
   .rep .stars{color:var(--gold);letter-spacing:2px}
+  /* big athletic statement band */
+  .statement{text-align:center;padding:30px 0}
+  .statement p{font-family:var(--body);font-weight:800;text-transform:uppercase;letter-spacing:-.5px;
+    font-size:clamp(24px,7vw,38px);line-height:1.02;color:var(--ink)}
+  .statement .g{color:var(--gold)}
+  /* full-width team image band */
+  .bandimg{width:100%;border-radius:14px;display:block;margin:0 0 16px;aspect-ratio:16/10;object-fit:cover;background:#161616}
+  .famline{font-size:16px;color:var(--ink);font-weight:600;margin-bottom:16px}
+  /* small link button + modal */
+  .linkbtn{background:none;border:none;color:var(--gold-bright);font-family:var(--body);font-size:14px;
+    font-weight:600;text-decoration:underline;cursor:pointer;padding:6px 0}
+  .modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.75);backdrop-filter:blur(3px);padding:20px}
+  .modal.open{display:flex}
+  .modal-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:380px;width:100%;position:relative}
+  .modal-card h3{font-size:18px;margin-bottom:4px}
+  .modal-x{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--ink-dim);font-size:26px;line-height:1;cursor:pointer}
 </style>
 </head>
 <body>
@@ -264,12 +281,19 @@
 
 <!-- ============ TRUST BAR (real accreditation logos) ============ -->
 <div class="trustbadges wrap" aria-label="Accreditations">
+  <div class="blogo"><img src="/reps-ireland-logo.png" alt="REPs Ireland accredited" loading="lazy" decoding="async"></div>
+  <div class="blogo"><img src="/ehfa-logo.webp" alt="EHFA / Ireland Active approved" loading="lazy" decoding="async"></div>
   <div class="blogo"><img src="/skillnet-logo.png" alt="Skillnet Ireland" loading="lazy" decoding="async"></div>
   <div class="blogo govchip" id="govBadge">
     <img src="/gov-of-ireland.png" alt="Funded by the Government of Ireland" loading="lazy" decoding="async" onerror="document.getElementById('govBadge').classList.add('nologo')">
     <span class="govtxt">Government of Ireland<b>Funded</b></span>
   </div>
 </div>
+
+<!-- ============ IDENTITY STATEMENT ============ -->
+<section class="wrap statement">
+  <p>Stop taking the class.<br><span class="g">Become the one running it.</span></p>
+</section>
 
 <!-- ============ TUTOR AUTHORITY ============ -->
 <section class="wrap">
@@ -278,7 +302,7 @@
   <p class="dim" style="font-size:14.5px;margin:-8px 0 14px">Not lecturers — coaches who do this for a living: gym owners, therapists and strength specialists with decades in the industry.</p>
   <div class="people">
     <div class="person"><div class="ph" id="tutorGary" style="background-image:url('/tutors/gary.jpg')"></div><p class="q">"After 16 years in this industry, teaching the next generation of coaches is the best part of the job."</p><p class="n">Gary — Gym owner · 16 years</p></div>
-    <div class="person"><div class="ph" id="tutorShane" style="background-image:url('/tutors/shane.jpg')"></div><p class="q">"What separates this course from the others? The people behind it."</p><p class="n">Shane — Strength coach &amp; therapist</p></div>
+    <div class="person"><div class="ph" id="tutorShane" style="background-image:url('/tutors/shane.jpg')"></div><p class="q">"What separates this course from the others? The people behind it."</p><p class="n">Shane — GAA team fitness coach &amp; neuromuscular therapist</p></div>
   </div>
 </section>
 
@@ -292,8 +316,10 @@
 
 <!-- ============ EXPERIENCE / WHERE GRADUATES END UP ============ -->
 <section class="wrap">
-  <div class="eyebrow">16 years in the industry</div>
+  <div class="eyebrow">The Image family</div>
   <h2>Where Image graduates end up</h2>
+  <img class="bandimg" src="/ift-team.jpg" alt="The Image Fitness Training team and graduates" loading="lazy" decoding="async">
+  <p class="famline">Join the Image family — over 5,000 graduates coaching all over the globe.</p>
   <div class="stats3">
     <div class="stat"><b>16</b><span>years training coaches</span></div>
     <div class="stat"><b>5,000+</b><span>graduates</span></div>
@@ -316,12 +342,12 @@
     <div class="pkg"><div class="top"><span class="name">The Cert</span><span class="len">8–16 weeks</span></div>
       <div class="price">from €2,800</div>
       <p>The qualification itself — qualify to work in any gym, run group classes and coach clients. EQF Level 4.</p></div>
-    <div class="pkg feat"><span class="tag">Most popular</span><div class="top"><span class="name">The Career</span><span class="len">Cert + 60-day support</span></div>
+    <div class="pkg feat"><span class="tag">Most popular</span><div class="top"><span class="name">The Career</span><span class="len">Cert + get hired</span></div>
       <div class="price">from €3,500</div>
-      <p>The exact same qualification as The Cert — plus we work with you for 60 days after you finish to get you placed with our gym partners.</p></div>
-    <div class="pkg"><div class="top"><span class="name">The Business</span><span class="len">24 weeks</span></div>
+      <p>The same qualification as The Cert — but we don't stop there. 60 days of hands-on placement support to get you <b>actually working</b>, with our gym-partner network behind you.</p></div>
+    <div class="pkg"><div class="top"><span class="name">The Business</span><span class="len">Build your brand</span></div>
       <div class="price">€4,800</div>
-      <p>Everything in The Career — plus the skills to build and run your own fitness business.</p></div>
+      <p>Everything in The Career — plus two specialist business workshops and a professional brand photo shoot, so you launch as a coach clients can find, trust and book.</p></div>
   </div>
   <p class="cta-note">Flexible payment plans — pay a deposit, then spread the balance over 12 months. We'll tailor it to you on the call.</p>
 </section>
@@ -347,6 +373,7 @@
   <h2>Book your free 15-min strategy call</h2>
   <p class="dim" style="font-size:15px;margin:-6px 0 12px">We'll walk you through every course and package coming up — then put the ball in your court. No pressure to commit: you decide what suits you best, with the full picture in front of you.</p>
   <p class="qualify"><b>Is it for you?</b> This is a recognised EQF Level 4 qualification — a real career path, not a weekend certificate. If you're serious about coaching, the call is 15 honest minutes: we'll tell you straight whether it's the right fit for you, with no obligation.</p>
+  <p class="dim" style="font-size:13.5px;margin:-6px 0 14px">On average, people who book a call save themselves ~2.5 weeks of researching online — we give you the clear answers in 15 minutes.</p>
   <div class="cal-head"><span class="ic">📅</span><div><b>Available today</b><div class="dim" style="font-size:12.5px">15-minute call · no obligation</div></div></div>
   <div class="cal-shell" style="border-radius:0 0 16px 16px">
     <div class="cal-placeholder" id="calPlaceholder">
@@ -357,14 +384,16 @@
     </div>
     <div id="calMount"></div>
   </div>
-  <div class="cal-hint" id="calHint" aria-hidden="true"><span>Picked a date? Scroll down to choose your time</span><i>↓</i></div>
+  <div class="cal-hint" id="calHint" aria-hidden="true"><span>Scroll down to choose your date</span><i>↓</i></div>
+  <p style="text-align:center;margin-top:14px"><button class="linkbtn" id="leadOpen">Can't find a time that suits? Have us call you →</button></p>
 </section>
 
-<!-- ============ TERTIARY — SMALL OPT-IN FORM (tracking backstop) ============ -->
-<section class="wrap">
-  <div class="formbox">
+<!-- ============ CALLBACK FORM (modal — opens from a small link under the calendar) ============ -->
+<div class="modal" id="leadModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="modal-x" id="leadClose" aria-label="Close">&times;</button>
     <h3>Prefer we call you?</h3>
-    <p class="s">Leave your details and the team will be in touch — no need to pick a slot now.</p>
+    <p style="font-size:13px;color:var(--ink-dim);margin-bottom:14px">Leave your details and the team will be in touch — no need to pick a slot now.</p>
     <form id="leadForm" novalidate>
       <div class="field-row">
         <div class="field"><input type="text" id="lf_first" name="first_name" placeholder="First name" autocomplete="given-name" required></div>
@@ -377,7 +406,7 @@
     </form>
     <div class="ok" id="leadOk">✓ Got it — the team will be in touch shortly.</div>
   </div>
-</section>
+</div>
 
 <!-- ============ FAQ ============ -->
 <section class="wrap">
@@ -387,14 +416,6 @@
   <details><summary>Do I need to be fit or experienced already?</summary><p>No. Every cohort includes complete beginners. The course teaches anatomy, programming and coaching from the ground up.</p></details>
   <details><summary>What does it cost — and can I pay in instalments?</summary><p>Payment plans are available. We'll walk you through the options and find what works for you on the call.</p></details>
   <details><summary>Will I actually get clients after I qualify?</summary><p>IFT has 200+ active hiring partners. Graduate with a merit or distinction and you unlock placement support with our gym-partner network — many get offers before they've even finished.</p></details>
-</section>
-
-<!-- ============ WHATSAPP INLINE ============ -->
-<section class="wrap">
-  <div class="wa-inline">
-    <p>Faster than a call? Message us directly.</p>
-    <a href="#" class="btn btn-wa" id="waInline" data-cta="inline-whatsapp" target="_blank" rel="noopener">Message us on WhatsApp</a>
-  </div>
 </section>
 
 <!-- ============ FINAL CTA + FOOTER ============ -->
@@ -646,6 +667,17 @@ window.addEventListener('message',function(e){
 })();
 
 /* ---------- Opt-in form: Pixel `Lead` (client) + CAPI (server) shared event_id ---------- */
+/* Callback form modal — opens from the small link under the calendar */
+(function(){
+  var m=document.getElementById('leadModal'), openB=document.getElementById('leadOpen'), closeB=document.getElementById('leadClose');
+  function open(){ if(m){ m.classList.add('open'); m.setAttribute('aria-hidden','false'); } }
+  function close(){ if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); } }
+  if(openB) openB.addEventListener('click',open);
+  if(closeB) closeB.addEventListener('click',close);
+  if(m) m.addEventListener('click',function(e){ if(e.target===m) close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+
 document.getElementById('leadForm').addEventListener('submit',function(ev){
   ev.preventDefault();
   var first=document.getElementById('lf_first').value.trim();
