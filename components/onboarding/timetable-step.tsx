@@ -8,14 +8,30 @@ import { generateICSFile, generateSingleSessionICS } from '@/lib/ics-generator';
 import { locations, timetables, courseStartDates } from '@/lib/course-data';
 import type { ContactData } from './onboarding-content';
 
-// Map Ontraport option IDs back to keys
+// Map Ontraport option IDs back to internal keys.
+// Pulled from get_object_meta(0) on 2026-05-27 — covers EVERY active
+// option in f2291 (PT Course Location) and f2292 (PT Course Timetable).
+// Historical incompleteness was the cause of blank-screen onboarding
+// timetables for Sunday-cohort + Mon/Tue + Mon/Wed Evening students.
 const LOCATION_ID_TO_KEY: Record<string, string> = {
-  '503': 'swords', '502': 'tallaght', '501': 'cork', '500': 'galway',
-  '499': 'limerick', '498': 'wexford', '563': 'belfast', '544': 'online',
+  // PT Course Location (f2291) — full set
+  '498': 'wexford',
+  '499': 'limerick',
+  '500': 'galway',
+  '501': 'cork',
+  '502': 'tallaght',
+  '503': 'swords',
+  '544': 'online',
+  '563': 'belfast',
 };
 const TIMETABLE_ID_TO_KEY: Record<string, string> = {
-  '505': '8-week-intensive', '597': '16-week-evening-sat',
-  '504': '16-week-saturday', '544': 'online-self-paced',
+  // PT Course Timetable (f2292) — full set
+  '504': '16-week-saturday',           // Saturday (16 Weeks)
+  '505': '8-week-intensive',           // Thursday & Friday (8 Weeks)
+  '506': '8-week-mon-tue',             // Monday & Tuesday (8 Weeks)
+  '539': '16-week-mon-wed-eve',        // Monday & Wednesday Evenings (16 Weeks)
+  '597': '8-week-eve-weekend',         // Evening & Weekend — Mon + Wed + Sat (8 Weeks)
+  '633': 'pt-sun16',                   // Sunday (16 Weeks)
 };
 
 interface TimetableStepProps {
@@ -84,6 +100,64 @@ export function TimetableStep({ contact, checkoutData, onComplete, isCompleted }
       onComplete();
     }
   };
+
+  // ─── Fallback: contact data didn't resolve to a known cohort ─────
+  // Triggers when (a) the Ontraport location/timetable IDs aren't in the
+  // maps above, (b) the start date can't be resolved against the timetable
+  // generator, or (c) the resulting weeks list is empty. Previously this
+  // path silently rendered nothing; now we show a friendly hand-off panel
+  // pointing to education@imageft.ie + WhatsApp so the student isn't stuck.
+  const couldNotResolve =
+    timetableKey !== 'online-self-paced' &&
+    (!location || !timetable || !effectiveStartDate || weeks.length === 0);
+
+  if (couldNotResolve) {
+    const debugReason = !timetableKey
+      ? `timetable id "${contact.courseTimetable}" not in map`
+      : !locationKey
+      ? `location id "${contact.courseLocation}" not in map`
+      : !effectiveStartDate
+      ? 'no start date on contact'
+      : 'week generator returned empty';
+    return (
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 md:p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Calendar className="w-5 h-5 text-amber-400" />
+          <h3 className="text-white font-semibold">We need a moment to finalise your timetable</h3>
+        </div>
+        <p className="text-zinc-300 text-sm mb-3 leading-relaxed">
+          Your booking is confirmed, but we can&apos;t auto-generate your week-by-week schedule
+          yet — your cohort assignment isn&apos;t fully linked on our end.
+        </p>
+        <p className="text-zinc-400 text-sm mb-4 leading-relaxed">
+          Message us on{' '}
+          <a href="https://wa.me/353866003667" className="text-gold hover:text-yellow-400 underline">
+            WhatsApp (+353 86 600 3667)
+          </a>{' '}
+          or email{' '}
+          <a href="mailto:education@imageft.ie" className="text-gold hover:text-yellow-400 underline">
+            education@imageft.ie
+          </a>
+          {' '}— quote student no.{' '}
+          <strong className="text-white">#{contact.id}</strong>
+          {' '}and we&apos;ll send your full schedule within one working day.
+        </p>
+        {process.env.NODE_ENV !== 'production' && (
+          <p className="text-zinc-600 text-xs italic mb-3">[dev] reason: {debugReason}</p>
+        )}
+        {!isCompleted && (
+          <motion.button whileTap={{ scale: 0.98 }} onClick={handleViewed} className="w-full py-3 bg-gold text-black font-bold rounded-lg">
+            I&apos;ve Reached Out — Mark Step Done
+          </motion.button>
+        )}
+        {isCompleted && (
+          <div className="flex items-center gap-2 text-green-400">
+            <Check className="w-5 h-5" /> <span className="text-sm font-semibold">Noted</span>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Online courses don't have a fixed timetable
   if (timetableKey === 'online-self-paced') {
