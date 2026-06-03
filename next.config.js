@@ -27,6 +27,19 @@ const nextConfig = {
       { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
   },
+  async rewrites() {
+    return [
+      // Branded PT landing page — proxied from the standalone Vercel LP
+      // project so the URL stays imageft.ie/pt-course-2026. The LP's own
+      // image/video assets are absolute (ift-lp-deploy.vercel.app), so only
+      // the HTML document is proxied here. The lead form posts to the
+      // root-relative /api/contact, which resolves to this site's API.
+      {
+        source: '/pt-course-2026',
+        destination: 'https://ift-lp-deploy.vercel.app/',
+      },
+    ];
+  },
   async redirects() {
     return [
       // ── Pilates → imagepilates.ie ────────────────────────────────────────
