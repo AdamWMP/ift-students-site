@@ -3,92 +3,89 @@
 import { motion } from 'framer-motion'
 import { FileText } from 'lucide-react'
 
+// Mirrors the 10-section binding agreement students sign during onboarding
+// (source of truth: components/onboarding/contract-step.tsx). Keep in sync.
 const sections = [
   {
     title: '1. Enrollment & Payment',
     content: [
       'A non-refundable deposit is required to secure your place on any course.',
       'Full payment or agreed payment plan must be completed before course completion.',
-      'Payment plans are available with 2, 4, 6, or 8-month options depending on the course.',
-      'Prices are subject to change but locked in at the time of enrollment.',
-      'Early bird discounts must be claimed within the specified promotional period.',
+      'Payment plans are available with options depending on the course selected.',
+      'Prices are locked in at the time of enrollment.',
     ],
   },
   {
-    title: '2. Course Transfers & Deferrals',
+    title: '2. Certificate Release',
+    content: [
+      'Your certificate will be released once 50% of your total course fees have been paid.',
+      'Upon passing your exams, a letter of completion can be provided on request, but the physical certificate will only be issued once the payment threshold is met.',
+    ],
+  },
+  {
+    title: '3. Payment Liability',
+    content: [
+      'You are liable for the full course fees once enrolled. Failure to maintain agreed payment schedules or dropping out of the course does not absolve you of this liability.',
+      'Payments are automatically charged to the card used for your deposit on the 30th of each month at approximately 11am.',
+      'If you need to amend your payment date or plan, contact education@imageft.ie before the payment is due.',
+    ],
+  },
+  {
+    title: '4. Non-Payment & Legal Proceedings',
+    content: [
+      'If payments are not maintained and you do not engage with Image Fitness Training to resolve outstanding fees, legal proceedings will be initiated to recover the full amount owed.',
+      'All costs associated with debt recovery, including legal fees, will be added to the outstanding balance.',
+      'Image Fitness Training reserves the right to suspend access to course materials and community platforms for students with overdue payments.',
+    ],
+  },
+  {
+    title: '5. Course Transfers & Deferrals',
     content: [
       'Course transfers may be requested up to 14 days before the course start date.',
       'Deferrals are granted at the discretion of Image Fitness Training management.',
       'A maximum of one deferral per enrollment is permitted.',
       'Deferred places must be taken within 12 months of the original start date.',
-      'Transfer requests after the course has commenced are not permitted.',
     ],
   },
   {
-    title: '3. Cancellation & Refunds',
+    title: '6. Cancellation & Refunds',
     content: [
       'Course deposits are non-refundable under any circumstances.',
       'Cancellations more than 30 days before course start: 75% refund of fees paid (excluding deposit).',
       'Cancellations 15-30 days before course start: 50% refund of fees paid (excluding deposit).',
       'Cancellations less than 14 days before course start: No refund.',
-      'Refunds are processed within 14 business days of approved cancellation request.',
     ],
   },
   {
-    title: '4. Attendance Requirements',
+    title: '7. Attendance Requirements',
     content: [
       'Minimum 80% attendance is required for practical sessions.',
       'Missed sessions may need to be made up in the next available intake.',
-      'Theory components must be completed within the designated timeframe.',
-      'Students are responsible for tracking their own attendance and progress.',
       'Failure to meet attendance requirements may result in delayed certification.',
     ],
   },
   {
-    title: '5. Assessment & Certification',
+    title: '8. Assessment & Certification',
     content: [
       'All assessments must be passed to receive certification.',
-      'One free re-sit is included for failed assessments.',
-      'Additional re-sits may incur extra fees.',
-      'Certificates are issued within 4-6 weeks of successful course completion.',
+      'One free re-sit is included for failed assessments. Additional re-sits may incur extra fees.',
       'REPs Ireland registration is the student\'s responsibility after certification.',
     ],
   },
   {
-    title: '6. Code of Conduct',
+    title: '9. Code of Conduct',
     content: [
       'Students must conduct themselves professionally at all times.',
-      'Respect for tutors, staff, and fellow students is mandatory.',
-      'Any form of harassment or discrimination will result in immediate removal.',
+      'Any form of harassment or discrimination will result in immediate removal without refund.',
       'Course materials are for personal use only and may not be shared or sold.',
-      'Social media conduct representing Image Fitness Training must be professional.',
     ],
   },
   {
-    title: '7. Intellectual Property',
-    content: [
-      'All course materials remain the intellectual property of Image Fitness Training.',
-      'Photography and video recording during sessions requires permission.',
-      'Student testimonials may be used for marketing with consent.',
-      'Graduates may not use Image Fitness Training branding without permission.',
-    ],
-  },
-  {
-    title: '8. Liability',
+    title: '10. Liability',
     content: [
       'Students participate in practical training at their own risk.',
       'Image Fitness Training is not liable for injuries during training.',
       'Students must declare any medical conditions before enrollment.',
-      'Professional indemnity insurance is recommended for all practicing trainers.',
-    ],
-  },
-  {
-    title: '9. Changes to Terms',
-    content: [
-      'Image Fitness Training reserves the right to modify these terms.',
-      'Changes will be communicated via email to enrolled students.',
-      'Continued enrollment constitutes acceptance of updated terms.',
-      'Material changes affecting current students will not be applied retrospectively.',
     ],
   },
 ]
@@ -114,7 +111,7 @@ export default function TermsContent() {
             </h1>
 
             <p className="text-white/60">
-              Last updated: February 2026
+              Last updated: May 2026
             </p>
           </motion.div>
         </div>

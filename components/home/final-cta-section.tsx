@@ -31,7 +31,7 @@ export default function FinalCtaSection() {
           transition={{ delay: 0.1 }}
           className="text-white/50 text-base sm:text-lg leading-relaxed mb-10 max-w-lg mx-auto"
         >
-          Hey 👋 it&apos;s Aaron here. This quick call is for anyone thinking about starting or growing a fitness career. We&apos;ll chat through your goals, see whether Pro Coach or Complete Coach fits best, and outline your fastest path to get qualified and earning. You&apos;ll leave with a clear plan — no pressure, just direction 👊
+          Hey 👋 it&apos;s Aaron here. This quick call is for anyone thinking about starting or growing a fitness career. We&apos;ll chat through your goals, see whether The Cert, The Career or The Business fits best, and outline your fastest path to get qualified and earning. You&apos;ll leave with a clear plan — no pressure, just direction 👊
         </motion.p>
 
         <motion.div
