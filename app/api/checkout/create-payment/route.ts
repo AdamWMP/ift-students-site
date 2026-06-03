@@ -1,14 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notifySale } from '@/lib/sale-notifications';
 import { addOns as ALL_ADDONS } from '@/lib/course-data';
+import { buildAddonPatch } from '@/lib/ontraport/addon-patch';
+import { sendReceipt } from '@/lib/receipts/send';
+import { sendReceiptEmail } from '@/lib/receipts/email';
+import type { ReceiptInput } from '@/lib/receipts/render';
+import { PACKAGE_COMPONENTS } from '@/lib/receipts/render';
 
 // ─── Types ─────────────────────────────────────────────────────────────
+interface CohortSelection {
+  locationId: string;       // Ontraport dropdown option ID (e.g. f2303 / f2593)
+  timetableId: string;      // Ontraport dropdown option ID (e.g. f2304 / f2594)
+  startDate: string;        // YYYY-MM-DD — converted to unix in the route
+}
+
 interface CheckoutRequest {
   packageId: string;
   packageName: string;
   packagePrice: number;
   addOns?: string[];        // selected add-on IDs from the frontend
-  addOnsTotal?: number;     // computed add-on price total from the frontend
+  addOnsTotal?: number;     // upfront add-on total (sum of addon.price)
+  addOnsTotalPlan?: number; // plan add-on total (sum of paymentPlanPrice ?? price)
+  // True if the deposit slider hit max → student is paying the bundle
+  // upfront and the upfront prices apply (e.g. Mat Pilates €1,800 not €2,000).
+  // False = payment plan in effect; plan prices apply for dual-priced add-ons.
+  isFullPayment?: boolean;
+  // Cohort details for cohort-required add-ons (Mat / Reformer Pilates).
+  // Keyed by addon id ('mat-pilates-cert', 'reformer-pilates-cpd'). Drives
+  // the Ontraport f2302–f2306/f2309 (Mat) + f2592–f2596/f2598 (Reformer)
+  // field writes so PT-side add-on bookings surface in Ontraport identically
+  // to direct pilatescheckout.imageft.ie bookings.
+  addonCohorts?: Record<string, CohortSelection>;
   depositAmount: number;
   months: number;
   monthlyPayment: number;
@@ -234,6 +256,18 @@ async function logRawBookingAttempt(payload: Record<string, unknown>): Promise<v
     `Months: ${(safe.months as number) ?? '?'}\n` +
     `Monthly: €${(safe.monthlyPayment as number) ?? '?'}\n` +
     `Add-ons: ${Array.isArray(safe.addOns) && (safe.addOns as unknown[]).length ? (safe.addOns as unknown[]).join(', ') : 'none'}\n` +
+    // Mat / Reformer add-ons need cohort details (location/timetable/start
+    // date) for support to fulfil the booking if the downstream Ontraport
+    // write silently drops. Without these in the failsafe log, a failed
+    // Mat/Reformer booking is unrecoverable.
+    (() => {
+      const cohorts = safe.addonCohorts as Record<string, { locationId?: string; timetableId?: string; startDate?: string }> | undefined;
+      if (!cohorts || Object.keys(cohorts).length === 0) return '';
+      const rows = Object.entries(cohorts).map(([addonId, c]) =>
+        `  - ${addonId}: loc=${c?.locationId || '?'} · tt=${c?.timetableId || '?'} · start=${c?.startDate || '?'}`
+      ).join('\n');
+      return `Add-on cohorts:\n${rows}\n`;
+    })() +
     `\nFull payload (cards stripped):\n` +
     '```\n' + JSON.stringify(safe, null, 2) + '\n```';
 
@@ -349,6 +383,9 @@ export async function POST(request: NextRequest) {
       packagePrice,
       addOns: selectedAddOnIds = [],
       addOnsTotal = 0,
+      addOnsTotalPlan = 0,
+      isFullPayment: bodyIsFullPayment = false,
+      addonCohorts = {},
       depositAmount,
       months,
       monthlyPayment,
@@ -368,10 +405,21 @@ export async function POST(request: NextRequest) {
     // Resolve add-on IDs → full add-on records (server-side source of truth)
     const selectedAddOns = ALL_ADDONS.filter((a) => selectedAddOnIds.includes(a.id));
     const selectedAddOnNames = selectedAddOns.map((a) => a.name);
-    // Sanity check: re-compute total server-side; if frontend mismatched, log it
-    const serverAddOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
-    if (selectedAddOnIds.length > 0 && Math.abs(serverAddOnsTotal - addOnsTotal) > 0.5) {
-      console.warn(`[Checkout] addOnsTotal mismatch: frontend=${addOnsTotal} server=${serverAddOnsTotal} for ${email}`);
+    // Effective per-addon price depends on whether the bundle is being paid
+    // upfront (use addon.price) or on a plan (use paymentPlanPrice if set).
+    // This makes the €200 upfront discount on Mat Pilates flow through to
+    // f2306 (Pilates Course Price), f2294 (Total Course Cost), and the
+    // Stripe-charged amount.
+    const effectiveAddonPrice = (a: typeof selectedAddOns[number]): number =>
+      bodyIsFullPayment ? a.price : (a.paymentPlanPrice ?? a.price);
+    // Upfront sum (validates frontend's addOnsTotal); plan sum (validates frontend's addOnsTotalPlan)
+    const serverAddOnsTotalUpfront = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
+    const serverAddOnsTotalPlan    = selectedAddOns.reduce((sum, a) => sum + (a.paymentPlanPrice ?? a.price), 0);
+    // The "actual" total paid for add-ons depends on isFullPayment
+    const serverAddOnsTotal = bodyIsFullPayment ? serverAddOnsTotalUpfront : serverAddOnsTotalPlan;
+    const clientReportedTotal = bodyIsFullPayment ? addOnsTotal : addOnsTotalPlan;
+    if (selectedAddOnIds.length > 0 && Math.abs(serverAddOnsTotal - clientReportedTotal) > 0.5) {
+      console.warn(`[Checkout] addOnsTotal mismatch (isFullPayment=${bodyIsFullPayment}): frontend=${clientReportedTotal} server=${serverAddOnsTotal} for ${email}`);
     }
     // packageName decorated with add-ons — used in Ontraport f1428 + Slack/email
     const packageNameWithAddOns = selectedAddOnNames.length
@@ -688,10 +736,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ── Send IFT Global Receipt to customer (with retry) ────────────────
-    if (invoiceId) {
-      await sendInvoiceReceipt(invoiceId as string | number);
-    }
+    // (Receipt email — moved below, after updateBody is fully built.)
 
     // ── Step 3: Add tags (only after successful payment) ────────────────
     const tagIds: string[] = ['50']; // "Customers"
@@ -716,6 +761,29 @@ export async function POST(request: NextRequest) {
       tagLabels.push('Programming for Success Sale');
       tagIds.push(BRAND_LAUNCH_PHOTOSHOOT_TAG_ID);
       tagLabels.push('Brand Launch Photoshoot Sale');
+    }
+
+    // ── Unified bundle add-on tracker ──────────────────────────────────
+    // Generates the Ontraport field patch + tag IDs for EVERY selected
+    // add-on (NutriCert, PPN, S&C, AI Workshop, Programming, Brand Launch,
+    // Mat Pilates, Reformer Pilates). Replaces the previous per-add-on
+    // inline code paths. Source of truth: lib/ontraport/addon-patch.ts.
+    //
+    // Patch is applied to updateBody below (where the contact PUT happens).
+    // Tags are pushed into tagIds here so they go out with the single
+    // tag-add call at /Contacts/tag.
+    const addonPatchResult = buildAddonPatch({
+      selectedAddOns,
+      isFullPayment: bodyIsFullPayment,
+      addonCohorts,
+      paymentPlanText,
+    });
+    for (let i = 0; i < addonPatchResult.tags.length; i++) {
+      tagIds.push(addonPatchResult.tags[i]);
+      tagLabels.push(addonPatchResult.tagLabels[i]);
+    }
+    if (addonPatchResult.notes.length) {
+      console.log(`[Checkout] Bundle add-on patch built for ${email}:\n  ${addonPatchResult.notes.join('\n  ')}`);
     }
 
     await fetch('https://api.ontraport.com/1/Contacts/tag', {
@@ -777,6 +845,16 @@ export async function POST(request: NextRequest) {
       updateBody.f2612 = 'true';
       updateBody.f2613 = 'true';
     }
+
+    // ── Apply bundle add-on patch (writes per-addon fields to updateBody) ─
+    // This replaces the previous per-addon inline writes. The patch covers:
+    //   NutriCert (f2329/f2330/f2332), PPN (f2323/f2324/f2326),
+    //   S&C (f2317/f2318/f2319/f2321), AI for Coaches (f2612),
+    //   Programming for Success (f2613), Brand Launch (f2611),
+    //   Mat Pilates (f2302/f2303/f2304/f2305/f2306/f2309),
+    //   Reformer Pilates (f2592–f2596/f2598).
+    // Everything sourced from lib/ontraport/addon-patch.ts.
+    Object.assign(updateBody, addonPatchResult.patch);
 
     // CRITICAL: capture the response so we know if this PUT actually
     // landed. The 7 May 2026 incident (Emily Doyle, contact 107136) was
@@ -849,6 +927,54 @@ export async function POST(request: NextRequest) {
       adSource2: attribution.adSet,
       adSource3: attribution.adName,
     }).catch(err => console.error('[Checkout] Notification error:', err));
+
+    // ── Step 6: Booking receipt — Email + Slack log + WhatsApp ──────────
+    // 1) Email the rendered HTML receipt to the customer (via /1/message —
+    //    the proven-working Ontraport endpoint; sendInvoice has been 404'ing).
+    // 2) Slack receipt audit trail (every receipt sent, with deep link).
+    // 3) WhatsApp booking confirmation (AiSensy template, if configured).
+    // All non-blocking — the booking flow doesn't fail if any of these does.
+    // Look up "what's included" for the chosen package, and stringify the
+    // add-on list so the receipt itemises everything the customer bought.
+    const lookupComponents = (label: string): string[] => {
+      if (PACKAGE_COMPONENTS[label]) return PACKAGE_COMPONENTS[label];
+      for (const key of ['The Business', 'The Career', 'The Cert']) {
+        if (label.includes(key) && PACKAGE_COMPONENTS[key]) return PACKAGE_COMPONENTS[key];
+      }
+      return [];
+    };
+    const addOnLines = selectedAddOns.map(a => {
+      const price = effectiveAddonPrice(a);
+      return `${a.name} (€${price.toLocaleString('en-IE')})`;
+    });
+
+    const receiptInput: ReceiptInput = {
+      receiptNo: `IFT-${currentYear}-${contactId}`,
+      contactId: String(contactId),
+      issuedDate: new Date().toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' }),
+      firstName,
+      lastName,
+      email,
+      phone,
+      packageName,                              // just the package name (e.g. "The Career") — add-ons go in their own section below
+      intakeDate: startDate
+        ? new Date(startDate).toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+        : 'TBC',
+      location: LOCATION_TO_LABEL[location] || location,
+      schedule: TIMETABLE_TO_LABEL[timetable] || timetable,
+      courseTotal: totalCourseValue,
+      paidToday: depositAmount,
+      monthlyAmount: monthlyPayment,
+      months,
+      firstInstalment: updateBody.f2607 || '',
+      isFullPayment,
+      brand: 'ift',
+      packageComponents: lookupComponents(packageName),
+      addOns: addOnLines,
+    };
+    sendReceiptEmail(receiptInput).catch(err => console.error('[Checkout] Receipt email error:', err));
+    sendReceipt({ ...receiptInput, ontraportInvoiceId: invoiceId })
+      .catch(err => console.error('[Checkout] Receipt send error:', err));
 
     return NextResponse.json({
       success: true,

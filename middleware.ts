@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ADMIN_COOKIE, hashSessionToken } from '@/lib/admin-auth';
 
 /**
  * Host-based routing middleware
@@ -12,8 +13,31 @@ const SUBDOMAIN_ROUTES: Record<string, string> = {
   // Future: 'pilatescheckout': '/pilates-checkout',
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
+  const path = request.nextUrl.pathname;
+
+  // ── Admin routes — gated by signed cookie ────────────────────────
+  // /admin/login and /api/admin/login are EXEMPT (otherwise the login
+  // page itself would require auth — chicken & egg). The login API
+  // route validates the password and sets the cookie.
+  if (path.startsWith('/admin') && path !== '/admin/login') {
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword) {
+      return new NextResponse('Admin not configured. Set ADMIN_PASSWORD env var.', { status: 503 });
+    }
+
+    const cookie = request.cookies.get(ADMIN_COOKIE)?.value;
+    const expected = await hashSessionToken(adminPassword);
+    if (cookie === expected) {
+      return NextResponse.next();              // ✅ authed
+    }
+
+    // Not authed → redirect to login, preserving the original destination
+    const loginUrl = new URL('/admin/login', request.url);
+    loginUrl.searchParams.set('next', path);
+    return NextResponse.redirect(loginUrl, { status: 303 });
+  }
 
   // Extract subdomain: "ptcheckout.imageft.ie" → "ptcheckout"
   const subdomain = hostname.split('.')[0];

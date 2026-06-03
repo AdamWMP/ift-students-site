@@ -117,3 +117,45 @@ model Testimonial {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ─── Receipt billing history ─────────────────────────────────────────
+// Every receipt emailed/WhatsApp'd to a student is logged here. Adam's
+// admin view (/admin/receipts) queries this table for the full billing
+// history per student + financial reconciliation. Receipts are written
+// in sendReceipt() — non-blocking on the checkout response.
+model Receipt {
+  // receiptNo is the human-readable invoice number, e.g. "IFT-2026-108318"
+  receiptNo         String   @id
+  contactId         String                       // Ontraport contact id = student no.
+  brand             String   @default("ift")     // 'ift' | 'pilates'
+  firstName         String
+  lastName          String
+  email             String
+  phone             String
+  packageName       String
+  intakeDate        String                       // human-readable
+  location          String
+  schedule          String
+  courseTotal       Float
+  paidToday         Float
+  remainingBalance  Float
+  monthlyAmount     Float
+  months            Int                          @default(0)
+  firstInstalment   String                       // e.g. "30 June 2026" (empty if paid in full)
+  cardLast4         String?
+  isFullPayment     Boolean
+  // Channel delivery status — set at send time
+  emailSent         Boolean  @default(false)
+  emailError        String?
+  whatsappSent      Boolean  @default(false)
+  whatsappError     String?
+  // Stored HTML snapshot — exactly what the customer received
+  htmlSnapshot      String                       // SQLite TEXT, no size limit
+  // Cross-reference
+  ontraportInvoiceId String?
+  createdAt         DateTime @default(now())
+
+  @@index([contactId])
+  @@index([email])
+  @@index([createdAt])
+}
