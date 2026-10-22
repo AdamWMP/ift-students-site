@@ -8,7 +8,7 @@ import Link from 'next/link'
 import CorporateInquiryForm from '@/components/corporate-inquiry-form'
 
 export const metadata = {
-  title: 'Corporate &amp; On-Site Course Delivery | Workshops, Retreats &amp; Team Training | Image Fitness Training',
+  title: 'Corporate & On-Site Course Delivery | Workshops, Retreats & Team Training',
   description:
     'Bring Image Fitness Training to your team. On-site Personal Trainer and Strength & Conditioning courses, bespoke workshops, international wellness retreats (Spain, Portugal, UK) and corporate CPD programmes delivered by Ireland\'s longest-running fitness educator. Register your interest.',
   keywords: [
@@ -23,7 +23,7 @@ export const metadata = {
   ],
   alternates: { canonical: 'https://imageft.ie/corporate' },
   openGraph: {
-    title: 'Corporate &amp; On-Site Delivery | Image Fitness Training',
+    title: 'Corporate & On-Site Delivery | Image Fitness Training',
     description:
       'On-site courses, bespoke workshops, international retreats, corporate wellness. Delivered to your team at your location — Ireland, UK, Spain or wherever your team is.',
     url: 'https://imageft.ie/corporate',
