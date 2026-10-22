@@ -1,5 +1,9 @@
+// Corporate B2B lead endpoint — self-contained Ontraport upsert +
+// Slack notify + sales@imageft.ie email via Ontraport /1/message.
+// Mirrors the same mechanics used by other lead endpoints without
+// taking a dependency on local-only lib/lead-notifications.ts.
+
 import { NextRequest, NextResponse } from 'next/server'
-import { notifyLead } from '@/lib/lead-notifications'
 
 export const dynamic = 'force-dynamic'
 
@@ -106,6 +110,29 @@ async function applyTags(contactId: string, tags: string[]): Promise<void> {
   }
 }
 
+async function postSlack(blocks: unknown[], text: string): Promise<void> {
+  const slackWebhook = (process.env.SLACK_LEADS_WEBHOOK_URL ?? process.env.SLACK_SALES_WEBHOOK_URL ?? '').trim()
+  const slackToken = process.env.SLACK_BOT_TOKEN
+  const payload = { text, blocks }
+  try {
+    if (slackWebhook) {
+      await fetch(slackWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+    } else if (slackToken) {
+      await fetch('https://slack.com/api/chat.postMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${slackToken}` },
+        body: JSON.stringify({ channel: 'C04T7HMBXRS', ...payload }),
+      })
+    }
+  } catch (err) {
+    console.error('[CorporateInquiry] Slack notification failed (non-fatal):', err)
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -134,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     if (contactId) {
       const noteLines = [
-        `Corporate enquiry via imageft.ie/corporate`,
+        `CORPORATE ENQUIRY via imageft.ie/corporate`,
         `Company: ${company}`,
         role ? `Role: ${role}` : '',
         engagementType ? `Engagement type: ${engagementType}` : '',
@@ -148,19 +175,41 @@ export async function POST(request: NextRequest) {
       await applyTags(contactId, ['Corporate Enquiry', 'Website Lead'])
     }
 
-    // Email sales@imageft.ie + Slack via the existing notifyLead helper
-    const subjectDetail = engagementType ? ` — ${engagementType}` : ''
-    await notifyLead({
-      firstName: String(firstName),
-      lastName: String(lastName),
-      email: String(email),
-      phone: String(phone || ''),
-      subject: `Corporate enquiry (${company})${subjectDetail}`,
-      source: 'imageft.ie/corporate',
-      interest: [groupSize, timeframe, location].filter(Boolean).join(' · '),
-      pageUrl: 'https://imageft.ie/corporate',
-      contactId,
-    }).catch((e) => console.error('[CorporateInquiry] notifyLead failed (non-fatal):', e))
+    // Slack notification to the sales team
+    await postSlack(
+      [
+        { type: 'header', text: { type: 'plain_text', text: '🏢 Corporate enquiry — IFT' } },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Name*\n${firstName} ${lastName}` },
+            { type: 'mrkdwn', text: `*Company*\n${company}` },
+            { type: 'mrkdwn', text: `*Email*\n${email}` },
+            { type: 'mrkdwn', text: `*Phone*\n${phone || '—'}` },
+            { type: 'mrkdwn', text: `*Role*\n${role || '—'}` },
+            { type: 'mrkdwn', text: `*Engagement*\n${engagementType || '—'}` },
+            { type: 'mrkdwn', text: `*Group size*\n${groupSize || '—'}` },
+            { type: 'mrkdwn', text: `*Timeframe*\n${timeframe || '—'}` },
+            { type: 'mrkdwn', text: `*Location*\n${location || '—'}` },
+          ],
+        },
+        ...(message
+          ? [{ type: 'section' as const, text: { type: 'mrkdwn' as const, text: `*Message*\n${message}` } }]
+          : []),
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: contactId
+                ? `Ontraport: https://app.ontraport.com/#!/contacts/view?id=${contactId}`
+                : 'Source: imageft.ie/corporate',
+            },
+          ],
+        },
+      ],
+      `🏢 Corporate enquiry — ${company}`
+    )
 
     return NextResponse.json({ success: true, contactId })
   } catch (err) {
